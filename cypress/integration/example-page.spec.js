@@ -1,13 +1,9 @@
 /// <reference types='Cypress' />
 
-context("Landing page", () => {
+context("Example page", () => {
     before(() => {
         cy.login("admin");
-        cy.loadPage();
-    });
-
-    it("has page title", () => {
-        cy.title().should("equal", "React App");
+        cy.visit("#/for");
     });
 
     it("increments counter when button clicked", () => {

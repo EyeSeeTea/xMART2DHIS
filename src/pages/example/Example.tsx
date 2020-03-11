@@ -1,12 +1,14 @@
-import React, { useState, useContext, useEffect } from "react";
+import React from "react";
 import i18n from "../../locales";
-import { useSnackbar } from "d2-ui-components";
+import { useSnackbar, MultiSelector, OrgUnitsSelector } from "d2-ui-components";
 import { Id } from "d2-api";
-import { ApiContext } from "../../contexts/api-context";
+import { useAppContext } from "../../contexts/app-context";
 import { makeStyles } from "@material-ui/styles";
+import { ExampleModel } from "../../models/Example";
 
 interface ExampleProps {
     name: string;
+    showExtraComponents?: boolean;
 }
 
 // We need explicit casting until d2-api supports type inteference from the options argument
@@ -14,25 +16,24 @@ interface DataSet {
     id: Id;
 }
 
-export default function Example(props: ExampleProps) {
-    const [counter, setCounter] = useState(0);
-    const [dataSets, setDataSets] = useState<DataSet[]>([]);
+const Example: React.FunctionComponent<ExampleProps> = props => {
+    const { name, showExtraComponents = true } = props;
+    const { d2, api, currentUser } = useAppContext();
+    const [counter, setCounter] = React.useState(0);
+    const [dataSets, setDataSets] = React.useState<DataSet[]>([]);
+    const [orgUnitPaths, setOrgUnitPaths] = React.useState<DataSet[]>([]);
+    const [selected, setSelected] = React.useState(["v1"]);
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const api = useContext(ApiContext);
+    const model = React.useMemo(() => new ExampleModel(api), [api]);
 
-    useEffect(() => {
-        function set() {
-            const { cancel, response } = api.models.dataSets.get({ pageSize: 5 });
-            response.then(response_ => setDataSets(response_.data.objects));
-            return cancel;
-        }
-        return set();
-    }, []);
+    React.useEffect(() => {
+        model.getDataSets().then(setDataSets);
+    }, [api, model]);
 
     return (
         <div>
-            <h2 className={classes.title}>Hello {props.name}!</h2>
+            <h2 className={classes.title}>Hello {name}!</h2>
 
             <div>
                 <p>
@@ -50,16 +51,43 @@ export default function Example(props: ExampleProps) {
             <div>
                 <p>Example of d2-ui-components snackbar usage:</p>
 
-                <button onClick={() => snackbar.info("Some info")}>
+                <button onClick={() => snackbar.error("Some info")}>
                     {i18n.t("Click to show feedback")}
                 </button>
             </div>
+
+            {showExtraComponents && (
+                <div>
+                    <OrgUnitsSelector
+                        api={api}
+                        onChange={setOrgUnitPaths}
+                        selected={orgUnitPaths}
+                        rootIds={currentUser.getOrgUnits().map(ou => ou.id)}
+                        fullWidth={false}
+                    />
+
+                    <MultiSelector
+                        d2={d2}
+                        searchFilterLabel={true}
+                        ordered={false}
+                        height={300}
+                        onChange={setSelected}
+                        options={[
+                            { text: "Option1", value: "v1" },
+                            { text: "Option2", value: "v2" },
+                        ]}
+                        selected={selected}
+                    />
+                </div>
+            )}
         </div>
     );
-}
+};
 
 const useStyles = makeStyles({
     title: {
         color: "blue",
     },
 });
+
+export default React.memo(Example);
