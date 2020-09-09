@@ -1,4 +1,4 @@
-import { D2Api, MetadataPick } from "d2-api";
+import { D2Api, MetadataPick } from "d2-api/2.32";
 
 const baseConfig = {
     // Add here static configuration

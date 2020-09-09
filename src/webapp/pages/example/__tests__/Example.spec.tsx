@@ -4,7 +4,7 @@ import "@testing-library/jest-dom/extend-expect";
 
 import Example from "../Example";
 import { act } from "react-dom/test-utils";
-import { getTestContext, getReactComponent } from "../../../utils/tests";
+import { getTestContext, getReactComponent } from "../../../../utils/tests";
 
 const { mock, context } = getTestContext();
 

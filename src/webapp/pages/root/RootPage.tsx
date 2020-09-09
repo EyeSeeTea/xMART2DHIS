@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, HashRouter } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 import Example from "../example/Example";
 import LandingPage from "../landing/LandingPage";
 
