@@ -13,8 +13,8 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "preserve",
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noUnusedLocals": false,
         "experimentalDecorators": true,
         "lib": [
             "dom",
