@@ -19,6 +19,7 @@ import Share from "../share/Share";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
+import { getCompositionRoot } from "../../../compositionRoot";
 
 type D2 = object;
 
@@ -63,7 +64,9 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
                     User.getCurrent(api),
                 ]);
 
-                const appContext: AppContext = { d2, api, config, currentUser };
+                const compositionRoot = getCompositionRoot(api);
+
+                const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
                 setAppContext(appContext);
 
                 setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
