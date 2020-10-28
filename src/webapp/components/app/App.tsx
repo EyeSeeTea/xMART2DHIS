@@ -52,14 +52,14 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     useEffect(() => {
         async function setup() {
             const [d2, config, currentUser] = await Promise.all([
-                init({ baseUrl: baseUrl + "/api" }),
+                init({ baseUrl: baseUrl + "/api", schemas: [] }),
                 Config.build(api),
                 User.getCurrent(api),
             ]);
 
             const compositionRoot = getCompositionRoot(api);
-
             const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
+
             setAppContext(appContext);
 
             setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
