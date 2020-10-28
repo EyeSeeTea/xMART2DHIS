@@ -20,16 +20,13 @@ import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
 import { getCompositionRoot } from "../../../compositionRoot";
+import { appConfig } from "../../../app-config";
 
 type D2 = object;
 
 type AppWindow = Window & {
     $: {
-        feedbackDhis2: (
-            d2: D2,
-            appKey: string,
-            feedbackOptions: AppConfig["feedback"]["feedbackOptions"]
-        ) => void;
+        feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
     };
 };
 
@@ -53,29 +50,26 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     const [appContext, setAppContext] = useState<AppContext | null>(null);
 
     useEffect(() => {
-        fetch("app-config.json", {
-            credentials: "same-origin",
-        })
-            .then(res => res.json())
-            .then(async appConfig => {
-                const [d2, config, currentUser] = await Promise.all([
-                    init({ baseUrl: baseUrl + "/api" }),
-                    Config.build(api),
-                    User.getCurrent(api),
-                ]);
+        async function setup() {
+            const [d2, config, currentUser] = await Promise.all([
+                init({ baseUrl: baseUrl + "/api" }),
+                Config.build(api),
+                User.getCurrent(api),
+            ]);
 
-                const compositionRoot = getCompositionRoot(api);
+            const compositionRoot = getCompositionRoot(api);
 
-                const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
-                setAppContext(appContext);
+            const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
+            setAppContext(appContext);
 
-                setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
-                if (currentUser.canReportFeedback()) {
-                    initFeedbackTool(d2, appConfig);
-                }
+            setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
+            if (currentUser.canReportFeedback()) {
+                initFeedbackTool(d2, appConfig);
+            }
 
-                setLoading(false);
-            });
+            setLoading(false);
+        }
+        setup();
     }, [d2, api, baseUrl]);
 
     if (loading) {
@@ -106,12 +100,12 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     );
 };
 
-interface AppConfig {
+export interface AppConfig {
     appKey: string;
     appearance: {
         showShareButton: boolean;
     };
-    feedback: {
+    feedback?: {
         token: string[];
         createIssue: boolean;
         sendToDhis2UserGroups: string[];
@@ -124,7 +118,7 @@ interface AppConfig {
             repository: string;
             branch: string;
         };
-        feedbackOptions: {};
+        feedbackOptions: object;
     };
 }
 
