@@ -7,6 +7,8 @@ import { SnackbarProvider } from "d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+//@ts-ignore
+import { HeaderBar } from "@dhis2/ui-widgets";
 import React, { useEffect, useState } from "react";
 import { Config } from "../../../models/Config";
 import { User } from "../../../models/User";
@@ -86,6 +88,8 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
+                    <HeaderBar appName={"Data Management"} />
+
                     <div id="app" className="content">
                         <AppContext.Provider value={appContext}>
                             <Root />
