@@ -2,7 +2,6 @@
 import { useConfig } from "@dhis2/app-runtime";
 import { LinearProgress } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import { init } from "d2";
 import { SnackbarProvider } from "d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
@@ -50,22 +49,13 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
 
     useEffect(() => {
         async function setup() {
-            const [d2, config, currentUser] = await Promise.all([
-                init({ baseUrl: baseUrl + "/api", schemas: [] }),
-                {},
-                User.getCurrent(api),
-            ]);
-
             const compositionRoot = getCompositionRoot(api);
+            const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
             const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
 
             setAppContext(appContext);
-
             setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
-            if (currentUser.canReportFeedback()) {
-                initFeedbackTool(d2, appConfig);
-            }
-
+            initFeedbackTool(d2, appConfig);
             setLoading(false);
         }
         setup();
