@@ -20,4 +20,5 @@ module.exports = {
         navigator: true,
         Element: true,
     },
+    setupFilesAfterEnv: ["<rootDir>/config/testSetup.ts"],
 };
