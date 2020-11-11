@@ -1,12 +1,10 @@
-import React from "react";
-import { SnackbarProvider } from "d2-ui-components";
-import { getMockApi } from "d2-api";
 import { render, RenderResult } from "@testing-library/react";
-
+import { SnackbarProvider } from "d2-ui-components";
+import React, { ReactNode } from "react";
+import { getMockApi } from "../types/d2-api";
+import { AppContext } from "../webapp/contexts/app-context";
 import { Config } from "./../models/Config";
 import { User } from "./../models/User";
-import { AppContext } from "../contexts/app-context";
-import { ReactNode } from "react";
 
 export function getTestUser() {
     return new User({

@@ -1,10 +1,10 @@
 import React from "react";
-import i18n from "../../locales";
+import i18n from "../../../locales";
 import { useSnackbar, MultiSelector, OrgUnitsSelector } from "d2-ui-components";
 import { Id } from "d2-api";
 import { useAppContext } from "../../contexts/app-context";
 import { makeStyles } from "@material-ui/styles";
-import { ExampleModel } from "../../models/Example";
+import { ExampleModel } from "../../../models/Example";
 
 interface ExampleProps {
     name: string;

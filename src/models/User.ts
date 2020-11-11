@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Id, D2Api } from "d2-api";
+import { D2Api, Id } from "../types/d2-api";
 
 export interface UserData {
     id: Id;

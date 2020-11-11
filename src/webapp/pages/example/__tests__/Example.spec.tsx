@@ -1,10 +1,10 @@
 import React from "react";
-import { fireEvent, waitForDomChange, RenderResult } from "@testing-library/react";
+import { fireEvent, waitFor, RenderResult } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
 import Example from "../Example";
 import { act } from "react-dom/test-utils";
-import { getTestContext, getReactComponent } from "../../../utils/tests";
+import { getTestContext, getReactComponent } from "../../../../utils/tests";
 
 const { mock, context } = getTestContext();
 
@@ -24,15 +24,14 @@ describe("Example", () => {
 
     test("renders a greeting", async () => {
         const component = getComponent();
-        await waitForDomChange();
-        expect(component.queryByText("Hello Some Name!")).toBeInTheDocument();
+        await waitFor(() => expect(component.queryByText("Hello Some Name!")).toBeInTheDocument());
     });
 
     test("renders the data set ids", async () => {
         const component = getComponent();
-        await waitForDomChange();
-        // component.debug() # show HTML of a componet on the console
-        expect(component.queryByText("ds-1, ds-2", { exact: false })).toBeInTheDocument();
+        await waitFor(() =>
+            expect(component.queryByText("ds-1, ds-2", { exact: false })).toBeInTheDocument()
+        );
     });
 
     test("counter is incremented when increment button is clicked", async () => {

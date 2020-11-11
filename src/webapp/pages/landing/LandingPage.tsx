@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { MenuCardProps } from "./landing/MenuCard";
 import { Landing } from "./Landing";
+import { MenuCardProps } from "./MenuCard";
 
 const LandingPage: React.FC = () => {
     const history = useHistory();
