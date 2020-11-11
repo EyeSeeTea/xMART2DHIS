@@ -28,7 +28,7 @@ const dhis2Auth = _(dhis2AuthEnvValue)
     .value();
 
 Cypress.Cookies.defaults({
-    whitelist: "JSESSIONID",
+    preserve: "JSESSIONID",
 });
 
 // const encryptionKey = Cypress.env("ENCRYPTION_KEY");
