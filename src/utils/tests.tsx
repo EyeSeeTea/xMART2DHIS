@@ -1,9 +1,9 @@
 import { render, RenderResult } from "@testing-library/react";
 import { SnackbarProvider } from "d2-ui-components";
 import React, { ReactNode } from "react";
+import { getCompositionRoot } from "../compositionRoot";
 import { getMockApi } from "../types/d2-api";
 import { AppContext } from "../webapp/contexts/app-context";
-import { Config } from "./../models/Config";
 import { User } from "./../models/User";
 
 export function getTestUser() {
@@ -23,10 +23,7 @@ export function getTestUser() {
 }
 
 export function getTestConfig() {
-    return new Config({
-        base: {},
-        categoryCombos: [],
-    });
+    return {};
 }
 
 export function getTestD2() {
@@ -35,17 +32,15 @@ export function getTestD2() {
 
 export function getTestContext() {
     const { api, mock } = getMockApi();
-
-    return {
-        mock,
-        api,
-        context: {
-            api: api,
-            d2: getTestD2(),
-            currentUser: getTestUser(),
-            config: getTestConfig(),
-        },
+    const context = {
+        api: api,
+        d2: getTestD2(),
+        currentUser: getTestUser(),
+        config: getTestConfig(),
+        compositionRoot: getCompositionRoot(api),
     };
+
+    return { mock, api, context };
 }
 
 export function getReactComponent(children: ReactNode, context: AppContext): RenderResult {

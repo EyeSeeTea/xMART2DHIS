@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { Config } from "../../models/Config";
 import { User } from "../../models/User";
 import { D2Api } from "../../types/d2-api";
 import { CompositionRoot } from "../../compositionRoot";
+import { Config } from "../../domain/entities/config";
 
 export interface AppContext {
     api: D2Api;

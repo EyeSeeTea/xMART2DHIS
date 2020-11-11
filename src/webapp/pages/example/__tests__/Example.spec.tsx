@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, waitFor, RenderResult } from "@testing-library/react";
+import { fireEvent, screen, waitFor, RenderResult } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
 import Example from "../Example";
@@ -12,7 +12,7 @@ function getComponent({ name = "Some Name" } = {}): RenderResult {
     return getReactComponent(<Example name={name} showExtraComponents={false} />, context);
 }
 
-describe("Example", () => {
+describe("Example component", () => {
     beforeEach(() => {
         mock.onGet("/dataSets", {
             params: { pageSize: 5, fields: "categoryCombo[name],id" },

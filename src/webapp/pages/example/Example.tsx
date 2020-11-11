@@ -43,9 +43,9 @@ const Example: React.FunctionComponent<ExampleProps> = props => {
                 <p>Datasets loaded: {dataSets.map(ds => ds.id).join(", ")}</p>
                 <p>Usage example of useState, a counter:</p>
                 <p>Value={counter}</p>
-                <button onClick={() => setCounter(counter - 1)}>-1</button>
+                <button onClick={() => setCounter(counter => counter - 1)}>-1</button>
                 &nbsp;
-                <button onClick={() => setCounter(counter + 1)}>+1</button>
+                <button onClick={() => setCounter(counter => counter + 1)}>+1</button>
             </div>
 
             <div>
