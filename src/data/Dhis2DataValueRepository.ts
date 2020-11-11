@@ -3,24 +3,21 @@ import { DataValueRepository } from "../domain/repositories/DataValueRepository"
 import { D2Api } from "../types/d2-api";
 
 export class Dhis2DataValueRepository implements DataValueRepository {
-    constructor(private api: D2Api) {
-        console.log("TOUSE", api)
-    }
+    constructor(private api: D2Api) {}
 
     async get(): Promise<DataValue[]> {
-        return [
-            {
-                id: "1234",
-                period: "2018",
-                orgUnit: { id: "1", name: "Algeria" },
-                dataSet: { id: "2", name: "Annual data" },
-                dataElement: { id: "3", name: "Total population" },
-                categoryOptionCombo: { id: "4", name: "default" },
-                value: "1234",
-                comment: "It looks good",
-                lastUpdated: new Date(2020, 10, 20, 23, 10, 53),
-                storedBy: { id: "u1", name: "Ignacio Foche" },
-            },
-        ];
+        const response = await this.api.dataValues
+            .getSet({
+                period: ["201905"],
+                dataSet: ["eZDhcZi6FLP"],
+                orgUnit: ["xO9WbCvFq5k"],
+            })
+            .getData();
+
+        const dataValues: Array<DataValue> = response.dataValues.map(
+            (dv): DataValue => ({ dataElement: { id: dv.dataElement }, value: dv.value })
+        );
+
+        return dataValues;
     }
 }

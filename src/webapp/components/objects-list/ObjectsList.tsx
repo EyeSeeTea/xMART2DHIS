@@ -9,7 +9,7 @@ import {
     TableState,
 } from "d2-ui-components";
 import { LinearProgress } from "material-ui";
-import { Spinner } from "../objects-list/Spinner";
+import { Spinner } from "./Spinner";
 import { makeStyles } from "@material-ui/core";
 
 export interface ObjectsListProps<Row extends ReferenceObject> {
