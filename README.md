@@ -1,5 +1,7 @@
 ## Setup
 
+Install dependencies:
+
 ```
 $ yarn install
 ```
@@ -9,7 +11,7 @@ $ yarn install
 Start development server:
 
 ```
-$ PORT=8082 REACT_APP_DHIS2_BASE_URL="https://play.dhis2.org/dev" yarn start
+$ PORT=8081 REACT_APP_DHIS2_BASE_URL="http://localhost:8080" yarn start
 ```
 
 Linting:
@@ -40,7 +42,8 @@ $ yarn cy:e2e:run
 $ yarn cy:e2e:open
 ```
 
-For this to work in Travis CI, you will have to create an environment variable CYPRESS_DHIS2_AUTH (Settings -> Environment Variables) with the password used in your testing DHIS2 instance.
+For this to work in Travis, you will have to create an environment variable `CYPRESS_DHIS2_AUTH`
+(Settings -> Environment Variables) with the `user:password` used in your testing DHIS2 instance.
 
 ## Build app ZIP
 
@@ -53,14 +56,15 @@ $ yarn build-webapp
 ### Structure
 
 -   `i18n/`: Contains literal translations (gettext format)
--   `public/`: Main app folder with a `index.html`, exposes the APP, contains the feedback-tool
+-   `public/`: Main app folder with a `index.html`, exposes the APP, contains the feedback-tool.
 -   `src/pages`: Main React components.
+-   `src/domain`: Domain layer of the app (clean architecture)
+-   `src/data`: Data of the app (clean architecture)
 -   `src/components`: Reusable React components.
--   `src/models`: Models that encapsulate all the logic of the app (React components should only contain view logic).
 -   `src/types`: `.d.ts` file types for modules without TS definitions.
 -   `src/utils`: Misc utilities.
--   `src/locales`: Auto-generated, don't change nor add to version control.
--   `cypress/integration/`: Contains the integration Cypress tests.
+-   `src/locales`: Auto-generated, do not update or add to the version control.
+-   `cypress/integration/`: Cypress integration tests.
 
 ### i18n
 
@@ -72,13 +76,8 @@ $ yarn localize
 
 ### App context
 
-File `src/contexts/app-context.ts` holds some general app context so typical infrastructure objects (`api`, `d2`, `currentUser`...) are readily available. Add your own global objects if necessary.
+The file `src/contexts/app-context.ts` holds some general context so typical infrastructure objects (`api`, `d2`, ...) are readily available. Add your own global objects if necessary.
 
-```
-import { useAppContext } from "./path/to/contexts/app-context";
+### Scripts
 
-const SomeComponent: React.FunctionComponent = () => {
-    const { d2, api, currentUser } = useAppContext();
-    // ...
-}
-```
+Check the example script, entry `"script-example"`in `package.json`->scripts and `src/scripts/example.ts`.

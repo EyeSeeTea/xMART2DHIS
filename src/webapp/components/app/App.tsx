@@ -2,13 +2,13 @@
 import { useConfig } from "@dhis2/app-runtime";
 import { LinearProgress } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import { init } from "d2";
 import { SnackbarProvider } from "d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+//@ts-ignore
+import { HeaderBar } from "@dhis2/ui-widgets";
 import React, { useEffect, useState } from "react";
-import { Config } from "../../../models/Config";
 import { User } from "../../../models/User";
 import { D2Api } from "../../../types/d2-api";
 import { AppContext } from "../../contexts/app-context";
@@ -17,16 +17,14 @@ import Share from "../share/Share";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
+import { getCompositionRoot } from "../../../compositionRoot";
+import { appConfig } from "../../../app-config";
 
 type D2 = object;
 
 type AppWindow = Window & {
     $: {
-        feedbackDhis2: (
-            d2: D2,
-            appKey: string,
-            feedbackOptions: AppConfig["feedback"]["feedbackOptions"]
-        ) => void;
+        feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
     };
 };
 
@@ -50,27 +48,17 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     const [appContext, setAppContext] = useState<AppContext | null>(null);
 
     useEffect(() => {
-        fetch("app-config.json", {
-            credentials: "same-origin",
-        })
-            .then(res => res.json())
-            .then(async appConfig => {
-                const [d2, config, currentUser] = await Promise.all([
-                    init({ baseUrl: baseUrl + "/api" }),
-                    Config.build(api),
-                    User.getCurrent(api),
-                ]);
+        async function setup() {
+            const compositionRoot = getCompositionRoot(api);
+            const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
+            const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
 
-                const appContext: AppContext = { d2, api, config, currentUser };
-                setAppContext(appContext);
-
-                setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
-                if (currentUser.canReportFeedback()) {
-                    initFeedbackTool(d2, appConfig);
-                }
-
-                setLoading(false);
-            });
+            setAppContext(appContext);
+            setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
+            initFeedbackTool(d2, appConfig);
+            setLoading(false);
+        }
+        setup();
     }, [d2, api, baseUrl]);
 
     if (loading) {
@@ -86,6 +74,8 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
+                    <HeaderBar appName={"Data Management"} />
+
                     <div id="app" className="content">
                         <AppContext.Provider value={appContext}>
                             <Root />
@@ -99,12 +89,12 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     );
 };
 
-interface AppConfig {
+export interface AppConfig {
     appKey: string;
     appearance: {
         showShareButton: boolean;
     };
-    feedback: {
+    feedback?: {
         token: string[];
         createIssue: boolean;
         sendToDhis2UserGroups: string[];
@@ -117,7 +107,7 @@ interface AppConfig {
             repository: string;
             branch: string;
         };
-        feedbackOptions: {};
+        feedbackOptions: object;
     };
 }
 

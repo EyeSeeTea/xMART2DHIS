@@ -21,18 +21,10 @@ interface OrganisationUnit {
 }
 
 export class User {
-    config = {
-        feedbackRole: "Feedback",
-    };
-
     constructor(private data: UserData) {}
 
     getOrgUnits(): OrganisationUnit[] {
         return this.data.organisationUnits;
-    }
-
-    canReportFeedback(): boolean {
-        return _(this.data.userRoles).some(userRole => userRole.name === this.config.feedbackRole);
     }
 
     static async getCurrent(api: D2Api): Promise<User> {

@@ -12,7 +12,7 @@ function getComponent({ name = "Some Name" } = {}): RenderResult {
     return getReactComponent(<Example name={name} showExtraComponents={false} />, context);
 }
 
-describe("Example", () => {
+describe("Example component", () => {
     beforeEach(() => {
         mock.onGet("/dataSets", {
             params: { pageSize: 5, fields: "categoryCombo[name],id" },
