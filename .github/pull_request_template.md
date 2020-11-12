@@ -4,19 +4,6 @@
 
 ### :memo: Implementation
 
-<<<<<<< HEAD
--
-
 ### :art: Screenshots
 
-### :fire: How to test it? (If there is any special consideration or the reviewer does not know how to test it)
-
-### :bookmark_tabs: Others
-
--   [ ] Any change in the [API repo](https://github.com/EyeSeeTea/d2-api)? If so, what branch/PR?
--   [ ] Any change in the [GUI library](https://github.com/EyeSeeTea/d2-ui-components)? If so, what branch/PR?
-=======
-### :art: Screenshots
-
-### :fire: Notes to the tester
->>>>>>> 89ff4e9 (Add github template)
+### :fire: Testing
