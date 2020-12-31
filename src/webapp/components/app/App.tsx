@@ -1,24 +1,24 @@
 //@ts-ignore
 import { useConfig } from "@dhis2/app-runtime";
+//@ts-ignore
+import { HeaderBar } from "@dhis2/ui-widgets";
 import { LinearProgress } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-//@ts-ignore
-import { HeaderBar } from "@dhis2/ui-widgets";
 import React, { useEffect, useState } from "react";
+import { appConfig } from "../../../app-config";
+import { getCompositionRoot } from "../../../compositionRoot";
 import { User } from "../../../models/User";
 import { D2Api } from "../../../types/d2-api";
-import { AppContext } from "../../contexts/app-context";
+import { AppContext, AppContextState } from "../../contexts/app-context";
 import Root from "../../pages/root/RootPage";
 import Share from "../share/Share";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
-import { getCompositionRoot } from "../../../compositionRoot";
-import { appConfig } from "../../../app-config";
 
 type D2 = object;
 
@@ -45,13 +45,13 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
 
     const [showShareButton, setShowShareButton] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [appContext, setAppContext] = useState<AppContext | null>(null);
+    const [appContext, setAppContext] = useState<AppContextState | null>(null);
 
     useEffect(() => {
         async function setup() {
             const compositionRoot = getCompositionRoot(api);
             const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
-            const appContext: AppContext = { d2, api, config, currentUser, compositionRoot };
+            const appContext: AppContextState = { d2, api, config, currentUser, compositionRoot };
 
             setAppContext(appContext);
             setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);

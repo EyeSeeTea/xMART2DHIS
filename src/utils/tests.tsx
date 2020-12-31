@@ -3,7 +3,7 @@ import { SnackbarProvider } from "d2-ui-components";
 import React, { ReactNode } from "react";
 import { getCompositionRoot } from "../compositionRoot";
 import { getMockApi } from "../types/d2-api";
-import { AppContext } from "../webapp/contexts/app-context";
+import { AppContext, AppContextState } from "../webapp/contexts/app-context";
 import { User } from "./../models/User";
 
 export function getTestUser() {
@@ -43,7 +43,7 @@ export function getTestContext() {
     return { mock, api, context };
 }
 
-export function getReactComponent(children: ReactNode, context: AppContext): RenderResult {
+export function getReactComponent(children: ReactNode, context: AppContextState): RenderResult {
     return render(
         <AppContext.Provider value={context}>
             <SnackbarProvider>{children}</SnackbarProvider>
