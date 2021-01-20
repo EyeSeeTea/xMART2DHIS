@@ -13,8 +13,6 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react",
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
         "experimentalDecorators": true,
         "noFallthroughCasesInSwitch": true,
         "lib": [
