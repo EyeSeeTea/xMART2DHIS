@@ -1,4 +1,4 @@
-import { TextDecoder, TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from "util";
 
 global.console = {
     error: console.error,
@@ -9,5 +9,5 @@ global.console = {
 };
 
 // Polyfill for encoding which isn't present globally in jsdom
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
