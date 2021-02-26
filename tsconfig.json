@@ -12,10 +12,9 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "preserve",
-        "noUnusedParameters": false,
-        "noUnusedLocals": false,
+        "jsx": "react",
         "experimentalDecorators": true,
+        "noFallthroughCasesInSwitch": true,
         "lib": [
             "dom",
             "dom.iterable",
