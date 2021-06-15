@@ -1,10 +1,8 @@
-//@ts-ignore
 import { useConfig } from "@dhis2/app-runtime";
-//@ts-ignore
-import { HeaderBar } from "@dhis2/ui-widgets";
+import { HeaderBar } from "@dhis2/ui";
 import { LinearProgress } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import { SnackbarProvider } from "d2-ui-components";
+import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
@@ -36,7 +34,7 @@ function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
             ...appConfig.feedback,
             i18nPath: "feedback-tool/i18n",
         };
-        ((window as unknown) as AppWindow).$.feedbackDhis2(d2, appKey, feedbackOptions);
+        (window as unknown as AppWindow).$.feedbackDhis2(d2, appKey, feedbackOptions);
     }
 }
 
