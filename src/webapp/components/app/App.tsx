@@ -20,11 +20,13 @@ import { muiTheme } from "./themes/dhis2.theme";
 
 type D2 = object;
 
-type AppWindow = Window & {
-    $: {
-        feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
-    };
-};
+declare global {
+    interface Window {
+        $: {
+            feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
+        };
+    }
+}
 
 function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
     const appKey = _(appConfig).get("appKey");
@@ -34,7 +36,7 @@ function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
             ...appConfig.feedback,
             i18nPath: "feedback-tool/i18n",
         };
-        (window as unknown as AppWindow).$.feedbackDhis2(d2, appKey, feedbackOptions);
+        window.$.feedbackDhis2(d2, appKey, feedbackOptions);
     }
 }
 
