@@ -1,4 +1,4 @@
-import { AppConfig } from "./webapp/components/app/App";
+import { AppConfig } from "./webapp/components/app/AppConfig";
 
 export const appConfig: AppConfig = {
     appKey: "dhis2-app-skeleton",

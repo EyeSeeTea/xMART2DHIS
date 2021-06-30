@@ -17,13 +17,63 @@ import Share from "../share/Share";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
+import { AppConfig } from "./AppConfig";
+
+const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
+    const { baseUrl } = useConfig();
+    const [showShareButton, setShowShareButton] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [appContext, setAppContext] = useState<AppContextState | null>(null);
+
+    useEffect(() => {
+        async function setup() {
+            const compositionRoot = getCompositionRoot(api);
+            const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
+            const appContext: AppContextState = { d2, api, config, currentUser, compositionRoot };
+            const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
+
+            setAppContext(appContext);
+            setShowShareButton(isShareButtonVisible);
+            initFeedbackTool(d2, appConfig);
+            setLoading(false);
+        }
+        setup();
+    }, [d2, api]);
+
+    if (loading) {
+        return (
+            <div style={styles.loadWrapper}>
+                <h3>Connecting to {baseUrl}...</h3>
+                <LinearProgress />
+            </div>
+        );
+    }
+
+    return (
+        <MuiThemeProvider theme={muiTheme}>
+            <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
+                <SnackbarProvider>
+                    <HeaderBar appName="Data Management" />
+
+                    <div id="app" className="content">
+                        <AppContext.Provider value={appContext}>
+                            <Root />
+                        </AppContext.Provider>
+                    </div>
+
+                    <Share visible={showShareButton} />
+                </SnackbarProvider>
+            </OldMuiThemeProvider>
+        </MuiThemeProvider>
+    );
+};
 
 type D2 = object;
 
 declare global {
     interface Window {
         $: {
-            feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
+            feedbackDhis2(d2: D2, appKey: string, feedbackOptions: object): void;
         };
     }
 }
@@ -40,75 +90,8 @@ function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
     }
 }
 
-const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
-    const { baseUrl } = useConfig();
-
-    const [showShareButton, setShowShareButton] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [appContext, setAppContext] = useState<AppContextState | null>(null);
-
-    useEffect(() => {
-        async function setup() {
-            const compositionRoot = getCompositionRoot(api);
-            const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
-            const appContext: AppContextState = { d2, api, config, currentUser, compositionRoot };
-
-            setAppContext(appContext);
-            setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
-            initFeedbackTool(d2, appConfig);
-            setLoading(false);
-        }
-        setup();
-    }, [d2, api, baseUrl]);
-
-    if (loading) {
-        return (
-            <div style={{ margin: 20 }}>
-                <h3>Connecting to {baseUrl}...</h3>
-                <LinearProgress />
-            </div>
-        );
-    }
-
-    return (
-        <MuiThemeProvider theme={muiTheme}>
-            <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
-                <SnackbarProvider>
-                    <HeaderBar appName={"Data Management"} />
-
-                    <div id="app" className="content">
-                        <AppContext.Provider value={appContext}>
-                            <Root />
-                        </AppContext.Provider>
-                    </div>
-
-                    <Share visible={showShareButton} />
-                </SnackbarProvider>
-            </OldMuiThemeProvider>
-        </MuiThemeProvider>
-    );
+const styles = {
+    loadWrapper: { margin: 20 },
 };
-
-export interface AppConfig {
-    appKey: string;
-    appearance: {
-        showShareButton: boolean;
-    };
-    feedback?: {
-        token: string[];
-        createIssue: boolean;
-        sendToDhis2UserGroups: string[];
-        issues: {
-            repository: string;
-            title: string;
-            body: string;
-        };
-        snapshots: {
-            repository: string;
-            branch: string;
-        };
-        feedbackOptions: object;
-    };
-}
 
 export default React.memo(App);
