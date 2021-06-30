@@ -1,10 +1,8 @@
-//@ts-ignore
 import { useConfig } from "@dhis2/app-runtime";
-//@ts-ignore
-import { HeaderBar } from "@dhis2/ui-widgets";
+import { HeaderBar } from "@dhis2/ui";
 import { LinearProgress } from "@material-ui/core";
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import { SnackbarProvider } from "d2-ui-components";
+import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 //@ts-ignore
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
@@ -19,30 +17,10 @@ import Share from "../share/Share";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
-
-type D2 = object;
-
-type AppWindow = Window & {
-    $: {
-        feedbackDhis2: (d2: D2, appKey: string, feedbackOptions: object) => void;
-    };
-};
-
-function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
-    const appKey = _(appConfig).get("appKey");
-
-    if (appConfig && appConfig.feedback) {
-        const feedbackOptions = {
-            ...appConfig.feedback,
-            i18nPath: "feedback-tool/i18n",
-        };
-        ((window as unknown) as AppWindow).$.feedbackDhis2(d2, appKey, feedbackOptions);
-    }
-}
+import { AppConfig } from "./AppConfig";
 
 const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     const { baseUrl } = useConfig();
-
     const [showShareButton, setShowShareButton] = useState(false);
     const [loading, setLoading] = useState(true);
     const [appContext, setAppContext] = useState<AppContextState | null>(null);
@@ -52,18 +30,19 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             const compositionRoot = getCompositionRoot(api);
             const [config, currentUser] = await Promise.all([{}, User.getCurrent(api)]);
             const appContext: AppContextState = { d2, api, config, currentUser, compositionRoot };
+            const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
             setAppContext(appContext);
-            setShowShareButton(_(appConfig).get("appearance.showShareButton") || false);
+            setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);
         }
         setup();
-    }, [d2, api, baseUrl]);
+    }, [d2, api]);
 
     if (loading) {
         return (
-            <div style={{ margin: 20 }}>
+            <div style={styles.loadWrapper}>
                 <h3>Connecting to {baseUrl}...</h3>
                 <LinearProgress />
             </div>
@@ -74,7 +53,7 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
-                    <HeaderBar appName={"Data Management"} />
+                    <HeaderBar appName="Data Management" />
 
                     <div id="app" className="content">
                         <AppContext.Provider value={appContext}>
@@ -89,26 +68,30 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     );
 };
 
-export interface AppConfig {
-    appKey: string;
-    appearance: {
-        showShareButton: boolean;
-    };
-    feedback?: {
-        token: string[];
-        createIssue: boolean;
-        sendToDhis2UserGroups: string[];
-        issues: {
-            repository: string;
-            title: string;
-            body: string;
+type D2 = object;
+
+declare global {
+    interface Window {
+        $: {
+            feedbackDhis2(d2: D2, appKey: string, feedbackOptions: object): void;
         };
-        snapshots: {
-            repository: string;
-            branch: string;
-        };
-        feedbackOptions: object;
-    };
+    }
 }
+
+function initFeedbackTool(d2: D2, appConfig: AppConfig): void {
+    const appKey = _(appConfig).get("appKey");
+
+    if (appConfig && appConfig.feedback) {
+        const feedbackOptions = {
+            ...appConfig.feedback,
+            i18nPath: "feedback-tool/i18n",
+        };
+        window.$.feedbackDhis2(d2, appKey, feedbackOptions);
+    }
+}
+
+const styles = {
+    loadWrapper: { margin: 20 },
+};
 
 export default React.memo(App);

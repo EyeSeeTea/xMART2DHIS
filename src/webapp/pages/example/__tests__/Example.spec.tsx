@@ -29,9 +29,7 @@ describe("Example component", () => {
 
     test("renders the data set ids", async () => {
         const component = getComponent();
-        await waitFor(() =>
-            expect(component.queryByText("ds-1, ds-2", { exact: false })).toBeInTheDocument()
-        );
+        await waitFor(() => expect(component.queryByText("ds-1, ds-2", { exact: false })).toBeInTheDocument());
     });
 
     test("counter is incremented when increment button is clicked", async () => {

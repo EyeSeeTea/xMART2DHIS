@@ -1,17 +1,11 @@
 import { ButtonProps, Icon, IconButton, Tooltip } from "@material-ui/core";
 import { Variant } from "@material-ui/core/styles/createTypography";
 import Typography from "@material-ui/core/Typography";
-import { DialogButton } from "d2-ui-components";
+import { DialogButton } from "@eyeseetea/d2-ui-components";
 import React from "react";
 import i18n from "../../../locales";
 
-const PageHeader: React.FC<PageHeaderProps> = ({
-    variant = "h5",
-    title,
-    onBackClick,
-    helpText,
-    children,
-}) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ variant = "h5", title, onBackClick, helpText, children }) => {
     return (
         <div>
             {!!onBackClick && (
@@ -26,12 +20,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 </IconButton>
             )}
 
-            <Typography
-                variant={variant}
-                gutterBottom
-                style={styles.text}
-                data-test={"page-header-title"}
-            >
+            <Typography variant={variant} gutterBottom style={styles.text} data-test={"page-header-title"}>
                 {title}
             </Typography>
             {helpText && renderHelpButton(helpText)}
