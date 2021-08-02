@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { Instance } from "../domain/entities/Instance";
 import { D2Api } from "../types/d2-api";
 
 export function getMajorVersion(version: string): number {
@@ -7,21 +8,6 @@ export function getMajorVersion(version: string): number {
     return Number(apiVersion);
 }
 
-export function getD2APiFromInstance(instance: DhisInstance) {
-    const auth =
-        instance.type === "external" ? { username: instance.username, password: instance.password } : undefined;
-
-    return new D2Api({ baseUrl: instance.url, auth, backend: "fetch" });
+export function getD2APiFromInstance(instance: Instance) {
+    return new D2Api({ baseUrl: instance.url, auth: instance.auth, backend: "fetch" });
 }
-
-export type DhisInstance =
-    | {
-          type: "local";
-          url: string;
-      }
-    | {
-          type: "external";
-          url: string;
-          username: string;
-          password: string;
-      };
