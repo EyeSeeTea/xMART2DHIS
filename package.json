@@ -96,8 +96,7 @@
         "cy:verify": "cypress verify",
         "cy:e2e:open": "NODE_ENV=test CYPRESS_E2E=true cypress open",
         "cy:e2e:run": "NODE_ENV=test CYPRESS_E2E=true cypress run --browser chrome",
-        "prepare": "husky install",
-        "script-example": "npx ts-node -P tsconfig-cli.json src/scripts/example.ts"
+        "prepare": "husky install"
     },
     "manifest.webapp": {
         "name": "xMART2DHIS",
