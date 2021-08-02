@@ -1,7 +1,7 @@
-import { AppConfig } from "./webapp/components/app/AppConfig";
+import { AppConfig } from "./webapp/pages/app/AppConfig";
 
 export const appConfig: AppConfig = {
-    appKey: "dhis2-app-skeleton",
+    appKey: "xMART2DHIS",
     appearance: {
         showShareButton: true,
     },
@@ -10,7 +10,7 @@ export const appConfig: AppConfig = {
         createIssue: true,
         sendToDhis2UserGroups: ["Administrators"],
         issues: {
-            repository: "EyeSeeTea/dhis2-app-skeleton",
+            repository: "EyeSeeTea/xMART2DHIS",
             title: "[User feedback] {title}",
             body: "## dhis2\n\nUsername: {username}\n\n{body}",
         },
