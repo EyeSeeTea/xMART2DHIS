@@ -70,9 +70,3 @@ msgstr ""
 
 msgid "xMART Table"
 msgstr ""
-
-#~ msgid "Click to show feedback"
-#~ msgstr "Toca para ver feedback"
-
-#~ msgid "configuration"
-#~ msgstr "Configuración"
