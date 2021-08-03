@@ -1,12 +1,24 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-08-02T10:04:12.692Z\n"
+"POT-Creation-Date: 2021-08-03T10:30:44.241Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgid "Data values - Create/update"
+msgstr ""
+
+msgid "Event"
+msgstr ""
+
+msgid "Add"
+msgstr "Añadir"
+
+msgid "List"
+msgstr "Listar"
 
 msgid "Back"
 msgstr "Volver"
@@ -14,14 +26,53 @@ msgstr "Volver"
 msgid "Help"
 msgstr "Ayuda"
 
+msgid "Action 1"
+msgstr ""
+
+msgid "Description 1"
+msgstr ""
+
+msgid "Action 2"
+msgstr ""
+
+msgid "Description 2"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Run"
+msgstr ""
+
+msgid "Executed {{total}} actions"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Common tools"
+msgstr ""
+
+msgid "Actions are a way to trigger events in your application"
+msgstr ""
+
+msgid "Browse xMART"
+msgstr ""
+
+msgid "List table contents of the MART"
+msgstr ""
+
+msgid "Identifier"
+msgstr ""
+
+msgid "xMART Table"
+msgstr ""
+
 #~ msgid "Click to show feedback"
 #~ msgstr "Toca para ver feedback"
-
-#~ msgid "Add"
-#~ msgstr "Añadir"
-
-#~ msgid "List"
-#~ msgstr "Listar"
 
 #~ msgid "configuration"
 #~ msgstr "Configuración"

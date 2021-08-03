@@ -28,7 +28,8 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         async function setup() {
             const instance = new Instance({ url: baseUrl });
             const compositionRoot = getCompositionRoot(instance);
-            const currentUser = await compositionRoot.instance.getCurrentUser();
+            const { data: currentUser } = await compositionRoot.instance.getCurrentUser().runAsync();
+            if (!currentUser) throw new Error("User not logged in");
 
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
