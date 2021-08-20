@@ -1,29 +1,31 @@
-import { ButtonProps, Icon, IconButton, Tooltip } from "@material-ui/core";
+import { ButtonProps, Icon, IconButton as MUIIConButton, Tooltip } from "@material-ui/core";
 import { Variant } from "@material-ui/core/styles/createTypography";
 import Typography from "@material-ui/core/Typography";
 import { DialogButton } from "@eyeseetea/d2-ui-components";
 import React from "react";
 import i18n from "../../../locales";
+import styled from "styled-components";
 
-const PageHeader: React.FC<PageHeaderProps> = ({ variant = "h5", title, onBackClick, helpText, children }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ variant = "h5", title, onBackClick, helpText, children }) => {
     return (
         <div>
             {!!onBackClick && (
-                <IconButton
+                <BackButton
                     onClick={onBackClick}
                     color="secondary"
                     aria-label={i18n.t("Back")}
-                    style={styles.backArrow}
                     data-test={"page-header-back"}
                 >
                     <Icon color="primary">arrow_back</Icon>
-                </IconButton>
+                </BackButton>
             )}
 
-            <Typography variant={variant} gutterBottom style={styles.text} data-test={"page-header-title"}>
+            <Title variant={variant} gutterBottom data-test={"page-header-title"}>
                 {title}
-            </Typography>
-            {helpText && renderHelpButton(helpText)}
+            </Title>
+
+            {helpText && <HelpButton text={helpText} />}
+
             {children}
         </div>
     );
@@ -36,28 +38,28 @@ export interface PageHeaderProps {
     helpText?: string;
 }
 
-const styles = {
-    backArrow: { paddingTop: 10, marginBottom: 5 },
-    help: { marginBottom: 8 },
-    text: { display: "inline-block", fontWeight: 300 },
-};
+const Title = styled(Typography)`
+    display: inline-block;
+    font-weight: 300;
+`;
 
 const Button = ({ onClick }: ButtonProps) => (
     <Tooltip title={i18n.t("Help")}>
-        <IconButton onClick={onClick} style={styles.help}>
+        <IconButton onClick={onClick}>
             <Icon color="primary">help</Icon>
         </IconButton>
     </Tooltip>
 );
 
-const renderHelpButton = (helpText: string) => (
-    <DialogButton
-        buttonComponent={Button}
-        title={i18n.t("Help")}
-        maxWidth={"sm"}
-        fullWidth={true}
-        contents={helpText}
-    />
+const HelpButton: React.FC<{ text: string }> = ({ text }) => (
+    <DialogButton buttonComponent={Button} title={i18n.t("Help")} maxWidth={"sm"} fullWidth={true} contents={text} />
 );
 
-export default PageHeader;
+const IconButton = styled(MUIIConButton)`
+    margin-bottom: 8px;
+`;
+
+const BackButton = styled(IconButton)`
+    padding-top: 10px;
+    margin-bottom: 5px;
+`;
