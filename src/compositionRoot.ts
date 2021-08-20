@@ -3,6 +3,8 @@ import { XMartDefaultRepository } from "./data/repositories/XMartDefaultReposito
 import { Instance } from "./domain/entities/Instance";
 import { Action1UseCase } from "./domain/usecases/actions/Action1UseCase";
 import { Action2UseCase } from "./domain/usecases/actions/Action2UseCase";
+import { Action3UseCase } from "./domain/usecases/actions/Action3UseCase";
+import { Action4UseCase } from "./domain/usecases/actions/Action4UseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
@@ -26,6 +28,8 @@ export function getCompositionRoot(instance: Instance) {
         actions: getExecute({
             action1: new Action1UseCase(martRepository, instanceRepository),
             action2: new Action2UseCase(martRepository, instanceRepository),
+            action3: new Action3UseCase(martRepository, instanceRepository),
+            action4: new Action4UseCase(martRepository, instanceRepository),
         }),
     };
 }

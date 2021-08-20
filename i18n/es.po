@@ -38,6 +38,18 @@ msgstr ""
 msgid "Description 2"
 msgstr ""
 
+msgid "Action 3"
+msgstr ""
+
+msgid "Description 3"
+msgstr ""
+
+msgid "Action 4"
+msgstr ""
+
+msgid "Description 4"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 

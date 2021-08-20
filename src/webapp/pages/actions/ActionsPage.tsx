@@ -26,6 +26,18 @@ export const ActionsPage: React.FC = () => {
                 description: i18n.t("Description 2"),
                 usecase: compositionRoot.actions.action2,
             },
+            {
+                id: "action-3",
+                name: i18n.t("Action 3"),
+                description: i18n.t("Description 3"),
+                usecase: compositionRoot.actions.action2,
+            },
+            {
+                id: "action-4",
+                name: i18n.t("Action 4"),
+                description: i18n.t("Description 4"),
+                usecase: compositionRoot.actions.action2,
+            },
         ],
         [compositionRoot]
     );
