@@ -1,6 +1,8 @@
+import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
-import { Future, FutureData } from "../../entities/Future";
-import { ProgramEvent } from "../../entities/ProgramEvent";
+import { FutureData } from "../../entities/Future";
+import { ProgramEvent, ProgramEventDataValue } from "../../entities/ProgramEvent";
+import { XMartContent } from "../../entities/XMart";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
@@ -9,106 +11,84 @@ export class Action3UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): FutureData<void> {
-        // TODO: Implement use-case logic
-        // Use mart repository to get the data from xMART
-        // Use instance repository to save the data to DHIS2
-        console.debug("Action 3", this.martRepository, this.instanceRepository);
+        return this.martRepository
+            .listAll("FACT_INTENSITY_TEST")
+            .map(options => {
+                const events: ProgramEvent[] = _.compact(
+                    options.map(item => {
+                        const event = item["PAIRING_CODE_INTENSITY"];
+                        const orgUnit = item["SITE_FK__SITE"];
+                        const eventDate = item["Sys_CommitDateUtc"];
+                        const attributeOptionCombo = item["INSTITUTION_TYPE"];
 
-        this.martRepository.listAll("FACT_INTENSITY_TEST").run(
-            options => {
-                const event = options?.map(item => {
-                    return <ProgramEvent>{
-                        //event: item["TEST_ID"],
-                        orgUnit: item["SITE_FK__SITE"],
-                        program: "FUzFm6UEmRn",
-                        status: "COMPLETED",
-                        eventDate: item["Sys_CommitDateUtc"],
-                        attributeOptionCombo: item["INSTITUTION_TYPE"],
-                        programStage: "VkFvRbbpVng",
-                        dataValues: [
-                            {
-                                dataElement: "mcRgVtgwevL",
-                                value: item["ADJ_MORTALITY_PERCENT_1X"],
-                            },
-                            {
-                                dataElement: "SPA9WRC0s7V",
-                                value: item["CITATION"],
-                            },
-                            {
-                                dataElement: "xiFX4d6U2WG",
-                                value: item["INSECTICIDE_FK"],
-                            },
-                            {
-                                dataElement: "l7iRc4fVcRO",
-                                value: item["INSTITUTION_FK"],
-                            },
-                            {
-                                dataElement: "nJGsnuqueOI",
-                                value: item["MONTH_END"],
-                            },
-                            {
-                                dataElement: "aNTjTSnE4n3",
-                                value: item["MONTH_START"],
-                            },
-                            {
-                                dataElement: "Dz489B9dDqQ",
-                                value: item["MORTALITY_NUMBER"],
-                            },
-                            {
-                                dataElement: "yo1z2WcralS",
-                                value: item["MORTALITY_PERCENT"],
-                            },
-                            {
-                                dataElement: "LFxCOJqeFxz",
-                                value: item["NUMBER_MOSQ_CONTROL"],
-                            },
-                            {
-                                dataElement: "NkFOQ7gLyqW",
-                                value: item["MONTH_NUMBER_MOSQ_EXPEND"],
-                            },
-                            {
-                                dataElement: "WJYxfzHrmQj",
-                                value: item["PUB_LINK"],
-                            },
-                            {
-                                dataElement: "z5o0lM2Cbus",
-                                value: item["PUBLISHED"],
-                            },
-                            {
-                                dataElement: "yGY1TUqZsNf",
-                                value: item["SPECIES_CONTROL_FK"],
-                            },
-                            {
-                                dataElement: "gXKPOItwUlb",
-                                value: item["SPECIES_FK"],
-                            },
-                            {
-                                dataElement: "gqhSHmY7Etl",
-                                value: item["STAGE_ORIGIN_FK"],
-                            },
-                            {
-                                dataElement: "v86CHHosXCi",
-                                value: item["TEST_TIME_FK"],
-                            },
-                            {
-                                dataElement: "NGU9TjLZcBg",
-                                value: item["TEST_TYPE_FK"],
-                            },
-                            {
-                                dataElement: "sxLgkqTWM1c",
-                                value: item["YEAR_END"],
-                            },
-                            {
-                                dataElement: "EvSWXtVdh6h",
-                                value: item["YEAR_START"],
-                            },
-                        ],
-                    };
-                });
-                this.instanceRepository.postEvents(event);
-            },
-            error => console.debug(error)
-        );
-        return Future.success(undefined);
+                        if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                            return undefined;
+                        }
+
+                        return {
+                            event: String(event),
+                            orgUnit: String(orgUnit),
+                            program: "FUzFm6UEmRn",
+                            status: "COMPLETED",
+                            eventDate: new Date(String(eventDate)).toISOString(),
+                            attributeOptionCombo: String(attributeOptionCombo),
+                            programStage: "VkFvRbbpVng",
+                            dataValues: _.compact([
+                                mapField(item, "ADJ_MORTALITY_PERCENT_1X"),
+                                mapField(item, "CITATION"),
+                                mapField(item, "INSECTICIDE_FK"),
+                                mapField(item, "INSTITUTION_FK"),
+                                mapField(item, "MONTH_END"),
+                                mapField(item, "MONTH_START"),
+                                mapField(item, "MORTALITY_NUMBER"),
+                                mapField(item, "MORTALITY_PERCENT"),
+                                mapField(item, "NUMBER_MOSQ_CONTROL"),
+                                mapField(item, "MONTH_NUMBER_MOSQ_EXPEND"),
+                                mapField(item, "PUB_LINK"),
+                                mapField(item, "PUBLISHED"),
+                                mapField(item, "SPECIES_CONTROL_FK"),
+                                mapField(item, "SPECIES_FK"),
+                                mapField(item, "STAGE_ORIGIN_FK"),
+                                mapField(item, "TEST_TIME_FK"),
+                                mapField(item, "TEST_TYPE_FK"),
+                                mapField(item, "YEAR_END"),
+                                mapField(item, "YEAR_START"),
+                            ]),
+                        };
+                    })
+                );
+                return events;
+            })
+            .map(events => this.instanceRepository.postEvents(events))
+            .map(() => undefined);
     }
 }
+
+function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
+    const dataElement = dhisId[field];
+    const value = item[field];
+
+    return dataElement && value ? { dataElement, value } : undefined;
+}
+
+const dhisId = {
+    ADJ_MORTALITY_PERCENT_1X: "mcRgVtgwevL",
+    CITATION: "SPA9WRC0s7V",
+    INSECTICIDE_FK: "xiFX4d6U2WG",
+    INSTITUTION_FK: "l7iRc4fVcRO",
+    MONTH_END: "nJGsnuqueOI",
+    MONTH_START: "aNTjTSnE4n3",
+    MORTALITY_NUMBER: "Dz489B9dDqQ",
+    MORTALITY_PERCENT: "yo1z2WcralS",
+    NUMBER_MOSQ_CONTROL: "LFxCOJqeFxz",
+    MONTH_NUMBER_MOSQ_EXPEND: "NkFOQ7gLyqW",
+    PUB_LINK: "WJYxfzHrmQj",
+    PUBLISHED: "z5o0lM2Cbus",
+    SPECIES_CONTROL_FK: "yGY1TUqZsNf",
+    SPECIES_FK: "gXKPOItwUlb",
+    STAGE_ORIGIN_FK: "gqhSHmY7Etl",
+    TEST_TIME_FK: "v86CHHosXCi",
+    TEST_TYPE_FK: "NGU9TjLZcBg",
+    YEAR_END: "sxLgkqTWM1c",
+    YEAR_START: "EvSWXtVdh6h",
+};
