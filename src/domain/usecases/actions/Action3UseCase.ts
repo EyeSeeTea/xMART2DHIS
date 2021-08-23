@@ -112,5 +112,3 @@ export class Action3UseCase implements UseCase {
         return Future.success(undefined);
     }
 }
-
-function 
