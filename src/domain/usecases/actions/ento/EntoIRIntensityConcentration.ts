@@ -17,7 +17,7 @@ export default function action(
     const intensity10x = "_x10";
 
     return martRepository
-        .listAll("FACT_INTENSITY_TEST")
+        .listAll("ENTO", "FACT_INTENSITY_TEST")
         .map(options => {
             const events: ProgramEvent[] = _(options)
                 .groupBy(item => item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"])))

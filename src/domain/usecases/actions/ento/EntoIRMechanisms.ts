@@ -14,7 +14,7 @@ export default function action(
     const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
     const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY";
     return martRepository
-        .listAll("FACT_MOLECULAR_TEST")
+        .listAll("ENTO", "FACT_MOLECULAR_TEST")
         .map(options => {
             const events: ProgramEvent[] = _.compact(
                 options.map(item => {

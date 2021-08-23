@@ -1,10 +1,12 @@
-import { Dropdown, ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
+import { XMartEndpoint } from "../../../compositionRoot";
 import { XMartContent, XMartTable } from "../../../domain/entities/XMart";
 import { ListOptions } from "../../../domain/repositories/XMartRepository";
+import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
@@ -13,6 +15,7 @@ export const ListPage: React.FC = () => {
     const snackbar = useSnackbar();
 
     const [tables, setTables] = useState<XMartTable[]>();
+    const [selectedApi, setSelectedApi] = useState<XMartEndpoint>("ENTO");
     const [selectedTable, setSelectedTable] = useState<string>();
 
     const [loading, setLoading] = useState(false);
@@ -31,10 +34,10 @@ export const ListPage: React.FC = () => {
 
     const fetchRows = useCallback(
         (options: ListOptions) => {
-            if (!selectedTable) return;
+            if (!selectedApi || !selectedTable) return;
 
             setLoading(true);
-            return compositionRoot.xmart.list(selectedTable, options).run(
+            return compositionRoot.xmart.list(selectedApi, selectedTable, options).run(
                 ({ objects, pager }) => {
                     setRows(
                         objects.map((item, idx) => ({
@@ -48,7 +51,7 @@ export const ListPage: React.FC = () => {
                 error => snackbar.error(error)
             );
         },
-        [compositionRoot, snackbar, selectedTable]
+        [compositionRoot, snackbar, selectedTable, selectedApi]
     );
 
     const onChange = useCallback(
@@ -63,14 +66,16 @@ export const ListPage: React.FC = () => {
     }, [fetchRows]);
 
     useEffect(() => {
-        compositionRoot.xmart.listTables().run(
+        if (!selectedApi) return;
+
+        compositionRoot.xmart.listTables(selectedApi).run(
             tables => {
                 setTables(tables);
                 setSelectedTable(tables[0]?.name);
             },
             error => snackbar.error(error)
         );
-    }, [compositionRoot, snackbar]);
+    }, [compositionRoot, snackbar, selectedApi]);
 
     return (
         <Container>
@@ -83,12 +88,24 @@ export const ListPage: React.FC = () => {
                 onChange={onChange}
                 forceSelectionColumn={true}
                 filterComponents={
-                    <Dropdown
-                        label={i18n.t("xMART Table")}
-                        value={selectedTable}
-                        items={tables?.map(item => ({ text: item.name, value: item.name })) ?? []}
-                        onChange={table => setSelectedTable(table)}
-                    />
+                    <React.Fragment>
+                        <Dropdown<XMartEndpoint>
+                            label={i18n.t("xMART API")}
+                            value={selectedApi}
+                            items={ENDPOINTS}
+                            onValueChange={endpoint => {
+                                setSelectedTable(undefined);
+                                setTables(undefined);
+                                setSelectedApi(endpoint);
+                            }}
+                        />
+                        <Dropdown
+                            label={i18n.t("xMART Table")}
+                            value={selectedTable ?? ""}
+                            items={tables?.map(item => ({ id: item.name, name: item.name })) ?? []}
+                            onValueChange={table => setSelectedTable(table)}
+                        />
+                    </React.Fragment>
                 }
             />
         </Container>
@@ -100,3 +117,8 @@ type TableObject = XMartContent & { id: string };
 const Container = styled.div`
     margin: 20px;
 `;
+
+const ENDPOINTS: DropdownOption<XMartEndpoint>[] = [
+    { id: "ENTO", name: "ENTO" },
+    { id: "GHO", name: "GHO" },
+];

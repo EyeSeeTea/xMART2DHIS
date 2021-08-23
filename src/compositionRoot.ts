@@ -47,3 +47,10 @@ function getExecute<UseCases extends Record<Key, UseCase>, Key extends keyof Use
 export interface UseCase {
     execute: Function;
 }
+
+export const XMartEndpoints = {
+    ENTO: "https://frontdoor-r5quteqglawbs.azurefd.net/VECTORS_IR",
+    GHO: "https://dev.eyeseetea.com/cors/ghoapi.azureedge.net/api",
+};
+
+export type XMartEndpoint = keyof typeof XMartEndpoints;

@@ -1,20 +1,18 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
+import { XMartEndpoint, XMartEndpoints } from "../../compositionRoot";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { XMartContent, XMartResponse, XMartTable } from "../../domain/entities/XMart";
 import { ListAllOptions, ListOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
 
-const BASE_URL = "https://frontdoor-r5quteqglawbs.azurefd.net";
-const MART = `VECTORS_IR`;
-
 export class XMartDefaultRepository implements XMartRepository {
-    public listTables(): FutureData<XMartTable[]> {
-        return futureFetch<XMartTable[]>("get", MART).map(({ value: tables }) =>
+    public listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]> {
+        return futureFetch<XMartTable[]>("get", endpoint, "").map(({ value: tables }) =>
             tables.map(({ name, kind }) => ({ name, kind }))
         );
     }
 
-    public list(table: string, options: ListOptions = {}): FutureData<XMartResponse> {
+    public list(endpoint: XMartEndpoint, table: string, options: ListOptions = {}): FutureData<XMartResponse> {
         const { pageSize = 25, page = 1, select, expand, apply, filter, orderBy } = options;
         const params = compactObject({
             top: pageSize,
@@ -27,20 +25,20 @@ export class XMartDefaultRepository implements XMartRepository {
             orderBy,
         });
 
-        return this.query<XMartContent[]>(table, params).map(response => ({
+        return this.query<XMartContent[]>(endpoint, table, params).map(response => ({
             objects: response.value,
             pager: { pageSize, page, total: response["@odata.count"] },
         }));
     }
 
-    public listAll(table: string, options: ListAllOptions = {}): FutureData<XMartContent[]> {
-        return this.list(table, options).flatMap(response => {
+    public listAll(endpoint: XMartEndpoint, table: string, options: ListAllOptions = {}): FutureData<XMartContent[]> {
+        return this.list(endpoint, table, options).flatMap(response => {
             const { objects, pager } = response;
             if (pager.total <= pager.pageSize) return Future.success(objects);
 
             const maxPage = Math.ceil(pager.total / pager.pageSize) + 1;
             const futures = _.range(2, maxPage).map(page =>
-                this.list(table, { ...options, page, pageSize: pager.pageSize })
+                this.list(endpoint, table, { ...options, page, pageSize: pager.pageSize })
             );
 
             return Future.parallel(futures, { maxConcurrency: 5 }).map(arrays =>
@@ -49,32 +47,37 @@ export class XMartDefaultRepository implements XMartRepository {
         });
     }
 
-    public count(table: string): FutureData<number> {
-        return futureFetch<number>("get", `${MART}/${table}/$count`, { textResponse: true }).map(({ value }) => value);
+    public count(endpoint: XMartEndpoint, table: string): FutureData<number> {
+        return futureFetch<number>("get", endpoint, `/${table}/$count`, { textResponse: true }).map(
+            ({ value }) => value
+        );
     }
 
     private query<Data>(
+        endpoint: XMartEndpoint,
         table: string,
         params: Record<string, string | number | boolean>
     ): FutureData<ODataResponse<Data>> {
         const qs = buildParams(params);
-        return futureFetch("get", `${MART}/${table}?${qs}`);
+        return futureFetch("get", endpoint, `/${table}?${qs}`);
     }
 }
 
 function futureFetch<Data>(
     method: "get" | "post",
+    endpoint: XMartEndpoint,
     path: string,
     options: { body?: string; textResponse?: boolean } = {}
 ): FutureData<ODataResponse<Data>> {
     const { body, textResponse = false } = options;
     const controller = new AbortController();
+    const url = XMartEndpoints[endpoint];
 
     return Future.fromComputation((resolve, reject) => {
-        fetch(`${BASE_URL}/${path}`, {
+        fetch(url + path, {
             signal: controller.signal,
             method,
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "x-requested-with": "XMLHttpRequest" },
             body,
         })
             .then(async response => {

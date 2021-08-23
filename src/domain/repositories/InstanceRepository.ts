@@ -8,6 +8,7 @@ export interface InstanceRepository {
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
     postEvents(events: ProgramEvent[], params?: PostEventsParams): FutureData<SyncResult>;
+    getEvents(filters: GetEventsFilters): FutureData<ProgramEvent[]>;
 }
 
 export type PostEventsParams = {
@@ -17,3 +18,5 @@ export type PostEventsParams = {
     eventIdScheme?: "UID" | "CODE";
     dryRun?: boolean;
 };
+
+export type GetEventsFilters = {};

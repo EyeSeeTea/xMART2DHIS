@@ -1,11 +1,12 @@
+import { XMartEndpoint } from "../../compositionRoot";
 import { FutureData } from "../entities/Future";
 import { XMartContent, XMartResponse, XMartTable } from "../entities/XMart";
 
 export interface XMartRepository {
-    listTables(): FutureData<XMartTable[]>;
-    list(table: string, options?: ListOptions): FutureData<XMartResponse>;
-    listAll(table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
-    count(table: string): FutureData<number>;
+    listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]>;
+    list(endpoint: XMartEndpoint, table: string, options?: ListOptions): FutureData<XMartResponse>;
+    listAll(endpoint: XMartEndpoint, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
+    count(endpoint: XMartEndpoint, table: string): FutureData<number>;
 }
 
 export type ListOptions = ListAllOptions & {

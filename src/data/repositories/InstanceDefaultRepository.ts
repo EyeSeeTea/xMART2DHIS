@@ -3,7 +3,7 @@ import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
 import { SyncResult } from "../../domain/entities/SyncResult";
 import { User } from "../../domain/entities/User";
-import { InstanceRepository, PostEventsParams } from "../../domain/repositories/InstanceRepository";
+import { GetEventsFilters, InstanceRepository, PostEventsParams } from "../../domain/repositories/InstanceRepository";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
@@ -57,5 +57,9 @@ export class InstanceDefaultRepository implements InstanceRepository {
                 splitStatsList: true,
             })
         );
+    }
+
+    public getEvents(_filters: GetEventsFilters): FutureData<ProgramEvent[]> {
+        throw new Error("Method not implemented.");
     }
 }

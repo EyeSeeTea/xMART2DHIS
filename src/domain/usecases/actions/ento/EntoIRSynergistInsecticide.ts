@@ -14,7 +14,7 @@ export default function action(
     const PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "azxjVmQLicj";
     const PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "L6qpxsRQDWb";
     return martRepository
-        .listAll("FACT_SYNERGIST_BIOASSAY_TEST")
+        .listAll("ENTO", "FACT_SYNERGIST_BIOASSAY_TEST")
         .map(options => {
             const events: ProgramEvent[] = _.compact(
                 options.map(item => {

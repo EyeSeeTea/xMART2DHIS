@@ -15,7 +15,7 @@ export default function action(
     const PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION = "P7VZnpYMjf6";
 
     return martRepository
-        .listAll("FACT_DISCRIMINATING_TEST")
+        .listAll("ENTO", "FACT_DISCRIMINATING_TEST")
         .map(options => {
             const events: ProgramEvent[] = _.compact(
                 options.map(item => {
