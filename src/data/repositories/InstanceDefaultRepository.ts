@@ -17,6 +17,18 @@ export class InstanceDefaultRepository implements InstanceRepository {
     constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
     }
+    mapCategoryOptionCombo(key: string | undefined): string | undefined {
+        let id = undefined;
+        if (key === "adHe8ZqTLGQ") {
+            id = "VIsmG1pMMgI";
+        } else if (key === "MFYaHarMqU1") {
+            id = "PR1plsTJJER";
+        } else if (key === "U9ryfMWEJwI") {
+            id = "OVcRgB8Fe13";
+        }
+
+        return id;
+    }
 
     public getBaseUrl(): string {
         return this.api.baseUrl;
@@ -50,12 +62,13 @@ export class InstanceDefaultRepository implements InstanceRepository {
     }
 
     public postEvents(events: ProgramEvent[]): FutureData<SynchronizationResult> {
-        return apiToFuture(this.api.post<ImportPostResponse>("/events", {}, { events })).map(response =>
-            postImport(response, {
-                title: i18n.t("Data values - Create/update"),
-                model: i18n.t("Event"),
-                splitStatsList: true,
-            })
+        return apiToFuture(this.api.post<ImportPostResponse>("/events", { orgUnitIdScheme: "CODE" }, { events })).map(
+            response =>
+                postImport(response, {
+                    title: i18n.t("Data values - Create/update"),
+                    model: i18n.t("Event"),
+                    splitStatsList: true,
+                })
         );
     }
 }
