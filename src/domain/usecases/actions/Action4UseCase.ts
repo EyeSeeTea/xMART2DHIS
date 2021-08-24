@@ -9,7 +9,7 @@ import { XMartRepository } from "../../repositories/XMartRepository";
 
 // TODO: Rename file and use case to a more appropriate name
 export class Action4UseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): FutureData<void> {
         return this.martRepository
