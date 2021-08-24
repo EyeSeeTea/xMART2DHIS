@@ -1,6 +1,9 @@
+import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
-import { Future, FutureData } from "../../entities/Future";
-import { ProgramEvent } from "../../entities/ProgramEvent";
+import { getUid } from "../../../utils/uid";
+import { FutureData } from "../../entities/Future";
+import { ProgramEvent, ProgramEventDataValue } from "../../entities/ProgramEvent";
+import { XMartContent } from "../../entities/XMart";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
@@ -9,122 +12,79 @@ export class Action1UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): FutureData<void> {
-        // TODO: Implement use-case logic
-        // Use mart repository to get the data from xMART
-        // Use instance repository to save the data to DHIS2
+        return this.martRepository
+            .listAll("FACT_MOLECULAR_TEST")
+            .map(options => {
+                const events: ProgramEvent[] = _.compact(
+                    options.map(item => {
+                        const event = item["TEST_ID"] ? item["TEST_ID"]: getUid(String(item["_RecordID"]));
+                        const orgUnit = item["SITE_FK__SITE"];
+                        const eventDate = item["Sys_FirstCommitDateUtc"];
+                        const categoryOption = item["INSTITUTION_TYPE__CODE"];
+                        const attributeOptionCombo = this.instanceRepository.mapCategoryOptionCombo(
+                            String(categoryOption)
+                        );
 
-        this.martRepository.listAll("FACT_MOLECULAR_TEST").run(
-            options => {
-                const event = options?.map(item => {
-                    return <ProgramEvent>{
-                        //event: item["TEST_ID"],
-                        orgUnit: item["SITE_FK__SITE"],
-                        program: "Rw3oD4ExD8U",
-                        status: "COMPLETED",
-                        eventDate: item["Sys_CommitDateUtc"],
-                        attributeOptionCombo: item["INSTITUTION_TYPE"],
-                        programStage: "GeOxsjpEjSY",
-                        dataValues: [
-                            {
-                                dataElement: "yGY1TUqZsNf",
-                                value: item["SPECIES_CONTROL_FK__CODE"],
-                            },
-                            {
-                                dataElement: "gXKPOItwUlb",
-                                value: item["SPECIES_FK__CODE"],
-                            },
-                            {
-                                dataElement: "gqhSHmY7Etl",
-                                value: item["STAGE_ORIGIN_FK__CODE"],
-                            },
-                            {
-                                dataElement: "sxLgkqTWM1c",
-                                value: item["YEAR_END"],
-                            },
-                            {
-                                dataElement: "EvSWXtVdh6h",
-                                value: item["YEAR_START"],
-                            },
-                            {
-                                dataElement: "nJGsnuqueOI",
-                                value: item["MONTH_END"],
-                            },
-                            {
-                                dataElement: "aNTjTSnE4n3",
-                                value: item["MONTH_START"],
-                            },
-                            {
-                                dataElement: "l7iRc4fVcRO",
-                                value: item["INSTITUTION_FK"],
-                            },
-                            {
-                                dataElement: "Gwa8bf0Xh6Z",
-                                value: item["ADJ_MORTALITY_PERCENT_1X"],
-                            },
-                            {
-                                dataElement: "Gwa8bf0Xh6Z",
-                                value: item["CITATION"],
-                            },
-                            {
-                                dataElement: "l7iRc4fVcRO",
-                                value: item["INSECTICIDE_FK"],
-                            },
-                            {
-                                dataElement: "FvbJ0tU5elQ",
-                                value: item["IR_STATUS_FK"],
-                            },
-                            {
-                                dataElement: "NGU9TjLZcBg",
-                                value: item["METHOD_DETAILS"],
-                            },
-                            {
-                                dataElement: "i4KoaSwzufn",
-                                value: item["MORTALITY_CONTROL"],
-                            },
-                            {
-                                dataElement: "RosQioM91PZ",
-                                value: item["MORTALITY_NUMBER"],
-                            },
-                            {
-                                dataElement: "d2yWBe9n1wr",
-                                value: item["MORTALITY_PERCENT"],
-                            },
-                            {
-                                dataElement: "L42iFDUW1h7",
-                                value: item["NUMBER_MOSQ_CONTROL"],
-                            },
-                            {
-                                dataElement: "FhshaqyCFQw",
-                                value: item["NUMBER_MOSQ_EXP"],
-                            },
-                            {
-                                dataElement: "WJYxfzHrmQj",
-                                value: item["PUB_LINK"],
-                            },
-                            {
-                                dataElement: "WJYxfzHrmQj",
-                                value: item["SPECIES_CONTROL_FK"],
-                            },
-                            {
-                                dataElement: "WJYxfzHrmQj",
-                                value: item["PUB_LINK"],
-                            },
-                            {
-                                dataElement: "v86CHHosXCi",
-                                value: item["TEST_TIME_FK"],
-                            },
-                            {
-                                dataElement: "NGU9TjLZcBg",
-                                value: item["TEST_TYPE_FK"],
-                            },
-                        ],
-                    };
-                });
-                this.instanceRepository.postEvents(event);
-            },
-            error => console.debug(error)
-        );
+                        if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                            return undefined;
+                        }
 
-        return Future.success(undefined);
+                        return {
+                            event: String(event),
+                            orgUnit: String(orgUnit),
+                            program: "Rw3oD4ExD8U",
+                            status: "COMPLETED",
+                            eventDate: new Date(String(eventDate)).toISOString(),
+                            attributeOptionCombo: String(attributeOptionCombo),
+                            programStage: "GeOxsjpEjSY",
+                            dataValues: _.compact([
+                                mapField(item, "CITATION"),
+                                mapField(item, "INSTITUTION_FK"),
+                                mapField(item, "MONTH_END"),
+                                mapField(item, "MONTH_START"),
+                                mapField(item, "MECHANISM_FK__CODE"),
+                                mapField(item, "MECH_STATUS__CODE"),
+                                mapField(item, "NUMBER_MOSQ_EXP"),
+                                mapField(item, "PUB_LINK"),
+                                mapField(item, "PUBLISHED"),
+                                mapField(item, "SPECIES_CONTROL_FK__CODE"),
+                                mapField(item, "SPECIES_FK__CODE"),
+                                mapField(item, "STAGE_ORIGIN_FK__CODE"),
+                                mapField(item, "YEAR_END"),
+                                mapField(item, "YEAR_START"),
+                                mapField(item, "ALLELIC_FREQ"),
+                            ]),
+                        };
+                    })
+                );
+                return events;
+            })
+            .map(events => this.instanceRepository.postEvents(events))
+            .map(() => undefined);
     }
+}
+
+function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
+    const dataElement = dhisId[field];
+    const value = item[field];
+
+    return dataElement && value ? { dataElement, value } : undefined;
+}
+
+const dhisId = {
+    CITATION: "SPA9WRC0s7V",
+    INSTITUTION_FK: "l7iRc4fVcRO",
+    MECHANISM_FK__CODE: "wWjgsHax21F",
+    MECH_STATUS__CODE: "NJATA2S3BFc",
+    MONTH_END: "nJGsnuqueOI",
+    MONTH_START: "aNTjTSnE4n3",
+    NUMBER_MOSQ_EXP: "jO3nCtwAk9e",
+    PUB_LINK: "WJYxfzHrmQj",
+    PUBLISHED: "z5o0lM2Cbus",
+    SPECIES_CONTROL_FK__CODE: "yGY1TUqZsNf",
+    SPECIES_FK__CODE: "gXKPOItwUlb",
+    STAGE_ORIGIN_FK__CODE: "gqhSHmY7Etl",
+    YEAR_END: "sxLgkqTWM1c",
+    YEAR_START: "EvSWXtVdh6h",
+    ALLELIC_FREQ: "k4mBevJ2EfW",
 }
