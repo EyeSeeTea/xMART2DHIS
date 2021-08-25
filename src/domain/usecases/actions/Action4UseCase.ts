@@ -21,7 +21,7 @@ export class Action4UseCase implements UseCase {
             .map(options => {
                 const events: ProgramEvent[] = _.compact(
                     options.map(item => {
-                        const event = item["TEST_ID"] ? item["TEST_ID"] : getUid(String(item["_RecordID"]));
+                        const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];

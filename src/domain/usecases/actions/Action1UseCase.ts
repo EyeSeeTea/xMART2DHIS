@@ -20,7 +20,7 @@ export class Action1UseCase implements UseCase {
             .map(options => {
                 const events: ProgramEvent[] = _.compact(
                     options.map(item => {
-                        const event = item["TEST_ID"] ? item["TEST_ID"] : getUid(String(item["_RecordID"]));
+                        const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];
@@ -60,7 +60,7 @@ export class Action1UseCase implements UseCase {
                 );
                 return events;
             })
-            .flatMap(events => {return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" })});
+            .flatMap(events => { return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" }) });
     }
 }
 
