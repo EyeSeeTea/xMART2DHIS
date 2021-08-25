@@ -27,28 +27,28 @@ msgid "Help"
 msgstr "Ayuda"
 
 msgid "Action 1"
-msgstr "Sync Molecular and biochemical mechanisms"
+msgstr "1. Sync Molecular and biochemical mechanisms"
 
 msgid "Description 1"
-msgstr ""
+msgstr "Sync events"
 
 msgid "Action 2"
-msgstr "Sync Synergist-insecticide bioassay"
+msgstr "2. Sync Synergist-insecticide bioassay"
 
 msgid "Description 2"
-msgstr ""
+msgstr "Sync events"
 
 msgid "Action 3"
-msgstr "Sync Intensity concentration bioassay"
+msgstr "3. Sync Intensity concentration bioassay"
 
 msgid "Description 3"
-msgstr ""
+msgstr "Sync events"
 
 msgid "Action 4"
-msgstr "Sync IR discriminating concentration"
+msgstr "4. Sync IR discriminating concentration"
 
 msgid "Description 4"
-msgstr ""
+msgstr "Sync events"
 
 msgid "Name"
 msgstr ""
