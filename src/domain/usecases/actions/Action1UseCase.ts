@@ -21,9 +21,7 @@ export class Action1UseCase implements UseCase {
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                        const attributeOptionCombo = this.instanceRepository.mapCategoryOptionCombo(
-                            String(categoryOption)
-                        );
+                        const attributeOptionCombo = mapCategoryOptionCombo(String(categoryOption));
 
                         if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
                             return undefined;
@@ -88,3 +86,16 @@ const dhisId = {
     YEAR_START: "EvSWXtVdh6h",
     ALLELIC_FREQ: "k4mBevJ2EfW",
 };
+
+function mapCategoryOptionCombo(key: string | undefined): string | undefined {
+    let id = undefined;
+    if (key === "adHe8ZqTLGQ") {
+        id = "VIsmG1pMMgI";
+    } else if (key === "MFYaHarMqU1") {
+        id = "PR1plsTJJER";
+    } else if (key === "U9ryfMWEJwI") {
+        id = "OVcRgB8Fe13";
+    }
+
+    return id;
+}

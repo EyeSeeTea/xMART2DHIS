@@ -8,5 +8,4 @@ export interface InstanceRepository {
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
     postEvents(events: ProgramEvent[]): FutureData<SynchronizationResult>;
-    mapCategoryOptionCombo(key: string | undefined): string | undefined;
 }
