@@ -13,6 +13,8 @@ export class Action2UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
+        const PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "azxjVmQLicj"
+        const PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "L6qpxsRQDWb"
         return this.martRepository
             .listAll("FACT_SYNERGIST_BIOASSAY_TEST")
             .map(options => {
@@ -31,11 +33,11 @@ export class Action2UseCase implements UseCase {
                         return {
                             event: String(event),
                             orgUnit: String(orgUnit),
-                            program: "azxjVmQLicj",
+                            program: PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
                             status: "COMPLETED",
                             eventDate: new Date(String(eventDate)).toISOString(),
                             attributeOptionCombo: String(attributeOptionCombo),
-                            programStage: "L6qpxsRQDWb",
+                            programStage: PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
                             dataValues: _.compact([
                                 mapField(item, "ADJ_MORTALITY_PERCENT_1X"),
                                 mapField(item, "CITATION"),

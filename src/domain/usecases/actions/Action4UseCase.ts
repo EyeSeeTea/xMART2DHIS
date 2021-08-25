@@ -13,6 +13,9 @@ export class Action4UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
+        const PROGRAM_ENTO_IR_DISCRIMINATING_CONCENTRATION = "G9hvxFI8AYC"
+        const PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION = "P7VZnpYMjf6"
+        
         return this.martRepository
             .listAll("FACT_DISCRIMINATING_TEST")
             .map(options => {
@@ -31,8 +34,8 @@ export class Action4UseCase implements UseCase {
                         return {
                             event: String(event),
                             orgUnit: String(orgUnit),
-                            program: "G9hvxFI8AYC",
-                            status: "COMPLETED",
+                            program: PROGRAM_ENTO_IR_DISCRIMINATING_CONCENTRATION,
+                            status: PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION,
                             eventDate: new Date(String(eventDate)).toISOString(),
                             attributeOptionCombo: String(attributeOptionCombo),
                             programStage: "P7VZnpYMjf6",

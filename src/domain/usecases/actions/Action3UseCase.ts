@@ -13,6 +13,9 @@ export class Action3UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
+        const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn"
+        const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng"
+
         return this.martRepository
             .listAll("FACT_INTENSITY_TEST")
             .map(options => {
@@ -33,8 +36,8 @@ export class Action3UseCase implements UseCase {
                         return {
                             event: String(event),
                             orgUnit: String(orgUnit),
-                            program: "FUzFm6UEmRn",
-                            status: "COMPLETED",
+                            program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
+                            status: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
                             eventDate: new Date(String(eventDate)).toISOString(),
                             attributeOptionCombo: String(attributeOptionCombo),
                             programStage: "VkFvRbbpVng",

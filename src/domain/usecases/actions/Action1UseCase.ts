@@ -13,6 +13,8 @@ export class Action1UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
+        const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U"
+        const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY"
         return this.martRepository
             .listAll("FACT_MOLECULAR_TEST")
             .map(options => {
@@ -31,11 +33,11 @@ export class Action1UseCase implements UseCase {
                         return {
                             event: String(event),
                             orgUnit: String(orgUnit),
-                            program: "Rw3oD4ExD8U",
+                            program: PROGRAM_ENTO_IR_MECHANISMS,
                             status: "COMPLETED",
                             eventDate: new Date(String(eventDate)).toISOString(),
                             attributeOptionCombo: String(attributeOptionCombo),
-                            programStage: "GeOxsjpEjSY",
+                            programStage: PROGRAM_STAGE_ENTO_IR_MECHANISMS,
                             dataValues: _.compact([
                                 mapField(item, "CITATION"),
                                 mapField(item, "INSTITUTION_FK"),
