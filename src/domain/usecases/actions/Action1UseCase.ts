@@ -1,8 +1,9 @@
 import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
 import { getUid } from "../../../utils/uid";
-import { FutureData } from "../../entities/Future";
+import { Future } from "../../entities/Future";
 import { ProgramEvent, ProgramEventDataValue } from "../../entities/ProgramEvent";
+import { SynchronizationResult } from "../../entities/SynchronizationResult";
 import { XMartContent } from "../../entities/XMart";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
@@ -11,7 +12,7 @@ import { XMartRepository } from "../../repositories/XMartRepository";
 export class Action1UseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
-    public execute(): FutureData<void> {
+    public execute(): Future<string, SynchronizationResult> {
         return this.martRepository
             .listAll("FACT_MOLECULAR_TEST")
             .map(options => {
@@ -57,8 +58,7 @@ export class Action1UseCase implements UseCase {
                 );
                 return events;
             })
-            .map(events => this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" }))
-            .map(() => undefined);
+            .flatMap(events => {return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" })});
     }
 }
 
