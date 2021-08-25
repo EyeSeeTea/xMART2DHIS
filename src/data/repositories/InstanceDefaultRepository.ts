@@ -50,14 +50,13 @@ export class InstanceDefaultRepository implements InstanceRepository {
         return apiToFuture(this.api.system.info).map(({ version }) => version);
     }
 
-    public postEvents(events: ProgramEvent[], params?:Params): FutureData<SynchronizationResult> {
-        return apiToFuture(this.api.post<ImportPostResponse>("/events", params, { events })).map(
-            response =>
-                postImport(response, {
-                    title: i18n.t("Data values - Create/update"),
-                    model: i18n.t("Event"),
-                    splitStatsList: true,
-                })
+    public postEvents(events: ProgramEvent[], params?: Params): FutureData<SynchronizationResult> {
+        return apiToFuture(this.api.post<ImportPostResponse>("/events", params, { events })).map(response =>
+            postImport(response, {
+                title: i18n.t("Data values - Create/update"),
+                model: i18n.t("Event"),
+                splitStatsList: true,
+            })
         );
     }
 }

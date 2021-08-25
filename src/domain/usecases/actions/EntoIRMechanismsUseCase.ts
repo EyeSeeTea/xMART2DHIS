@@ -8,13 +8,12 @@ import { XMartContent } from "../../entities/XMart";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
-// TODO: Rename file and use case to a more appropriate name
-export class Action1UseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
+export class EntoIRMechanismsUseCase implements UseCase {
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): Future<string, SynchronizationResult> {
-        const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U"
-        const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY"
+        const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
+        const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY";
         return this.martRepository
             .listAll("FACT_MOLECULAR_TEST")
             .map(options => {
@@ -60,7 +59,9 @@ export class Action1UseCase implements UseCase {
                 );
                 return events;
             })
-            .flatMap(events => { return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" }) });
+            .flatMap(events => {
+                return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
+            });
     }
 }
 

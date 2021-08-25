@@ -8,21 +8,19 @@ import { XMartContent } from "../../entities/XMart";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
-// TODO: Rename file and use case to a more appropriate name
-export class Action3UseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
+export class EntoIRIntensityConcentrationUseCase implements UseCase {
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): Future<string, SynchronizationResult> {
-        const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn"
-        const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng"
+        const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn";
+        const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng";
 
         return this.martRepository
             .listAll("FACT_INTENSITY_TEST")
             .map(options => {
                 const events: ProgramEvent[] = _.compact(
                     options.map(item => {
-                        const event = item["PAIRING_CODE_INTENSITY"]
-                            ?? getUid(String(item["_RecordID"]));
+                        const event = item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"]));
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];
@@ -36,10 +34,10 @@ export class Action3UseCase implements UseCase {
                             event: String(event),
                             orgUnit: String(orgUnit),
                             program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
-                            status: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
+                            status: "COMPLETED",
                             eventDate: new Date(String(eventDate)).toISOString(),
                             attributeOptionCombo: String(attributeOptionCombo),
-                            programStage: "VkFvRbbpVng",
+                            programStage: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
                             dataValues: _.compact([
                                 mapField(item, "CITATION"),
                                 mapField(item, "INSTITUTION_FK"),
@@ -70,7 +68,9 @@ export class Action3UseCase implements UseCase {
                 );
                 return events;
             })
-            .flatMap(events => { return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" }) });
+            .flatMap(events => {
+                return this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
+            });
     }
 }
 

@@ -1,10 +1,10 @@
 import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
-import { Action1UseCase } from "./domain/usecases/actions/Action1UseCase";
-import { Action2UseCase } from "./domain/usecases/actions/Action2UseCase";
-import { Action3UseCase } from "./domain/usecases/actions/Action3UseCase";
-import { Action4UseCase } from "./domain/usecases/actions/Action4UseCase";
+import { EntoIRMechanismsUseCase } from "./domain/usecases/actions/EntoIRMechanismsUseCase";
+import { EntoIRSynergistInsecticideUseCase } from "./domain/usecases/actions/EntoIRSynergistInsecticideUseCase";
+import { EntoIRIntensityConcentrationUseCase } from "./domain/usecases/actions/EntoIRIntensityConcentrationUseCase";
+import { EntoDiscriminatingConcentrationUseCase } from "./domain/usecases/actions/EntoDiscriminatingConcentrationUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
@@ -26,10 +26,10 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            action1: new Action1UseCase(martRepository, instanceRepository),
-            action2: new Action2UseCase(martRepository, instanceRepository),
-            action3: new Action3UseCase(martRepository, instanceRepository),
-            action4: new Action4UseCase(martRepository, instanceRepository),
+            action1: new EntoIRMechanismsUseCase(martRepository, instanceRepository),
+            action2: new EntoIRSynergistInsecticideUseCase(martRepository, instanceRepository),
+            action3: new EntoIRIntensityConcentrationUseCase(martRepository, instanceRepository),
+            action4: new EntoDiscriminatingConcentrationUseCase(martRepository, instanceRepository),
         }),
     };
 }
