@@ -3,7 +3,8 @@ import { Sync } from "@material-ui/icons";
 import _ from "lodash";
 import { useMemo } from "react";
 import styled from "styled-components";
-import { Future, FutureData } from "../../../domain/entities/Future";
+import { Future } from "../../../domain/entities/Future";
+import { SynchronizationResult } from "../../../domain/entities/SynchronizationResult";
 import i18n from "../../../locales";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
@@ -89,5 +90,5 @@ type TableObject = {
     id: string;
     name: string;
     description: string;
-    usecase: () => FutureData<void>;
+    usecase: () => Future<string, SynchronizationResult>;
 };
