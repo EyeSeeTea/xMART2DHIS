@@ -9,7 +9,7 @@ import { XMartRepository } from "../../repositories/XMartRepository";
 
 // TODO: Rename file and use case to a more appropriate name
 export class Action2UseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): FutureData<void> {
         return this.martRepository
@@ -64,7 +64,7 @@ export class Action2UseCase implements UseCase {
                 );
                 return events;
             })
-            .map(events => this.instanceRepository.postEvents(events))
+            .map(events => this.instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" }))
             .map(() => undefined);
     }
 }

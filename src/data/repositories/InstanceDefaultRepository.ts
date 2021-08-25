@@ -1,3 +1,4 @@
+import { Params } from "@eyeseetea/d2-api/api/common";
 import { FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
@@ -49,8 +50,8 @@ export class InstanceDefaultRepository implements InstanceRepository {
         return apiToFuture(this.api.system.info).map(({ version }) => version);
     }
 
-    public postEvents(events: ProgramEvent[]): FutureData<SynchronizationResult> {
-        return apiToFuture(this.api.post<ImportPostResponse>("/events", { orgUnitIdScheme: "CODE" }, { events })).map(
+    public postEvents(events: ProgramEvent[], params?:Params): FutureData<SynchronizationResult> {
+        return apiToFuture(this.api.post<ImportPostResponse>("/events", params, { events })).map(
             response =>
                 postImport(response, {
                     title: i18n.t("Data values - Create/update"),
