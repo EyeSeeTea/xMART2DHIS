@@ -9,7 +9,7 @@ import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
 export class EntoIRMechanismsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
         const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
@@ -23,7 +23,7 @@ export class EntoIRMechanismsUseCase implements UseCase {
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                        const attributeOptionCombo = mapCategoryOptionCombo(String(categoryOption));
+                        const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
                         if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
                             return undefined;
@@ -90,15 +90,8 @@ const dhisId = {
     ALLELIC_FREQ: "k4mBevJ2EfW",
 };
 
-function mapCategoryOptionCombo(key: string | undefined): string | undefined {
-    let id = undefined;
-    if (key === "adHe8ZqTLGQ") {
-        id = "VIsmG1pMMgI";
-    } else if (key === "MFYaHarMqU1") {
-        id = "PR1plsTJJER";
-    } else if (key === "U9ryfMWEJwI") {
-        id = "OVcRgB8Fe13";
-    }
-
-    return id;
+const categoryOptionCombo: Record<string, string> = {
+    adHe8ZqTLGQ: "VIsmG1pMMgI",
+    MFYaHarMqU1: "PR1plsTJJER",
+    U9ryfMWEJwI: "OVcRgB8Fe13"
 }

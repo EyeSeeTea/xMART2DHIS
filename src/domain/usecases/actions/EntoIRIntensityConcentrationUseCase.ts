@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _, { } from "lodash";
 import { UseCase } from "../../../compositionRoot";
 import { getUid } from "../../../utils/uid";
 import { Future } from "../../entities/Future";
@@ -9,63 +9,75 @@ import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
 export class EntoIRIntensityConcentrationUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
         const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn";
         const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng";
+        const intensity5x = "_x5"
+        const intensity10x = "_x10"
 
         return this.martRepository
             .listAll("FACT_INTENSITY_TEST")
             .map(options => {
-                const events: ProgramEvent[] = _.compact(
-                    options.map(item => {
-                        const event = item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"]));
-                        const orgUnit = item["SITE_FK__SITE"];
-                        const eventDate = item["Sys_FirstCommitDateUtc"];
-                        const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                        const attributeOptionCombo = mapCategoryOptionCombo(String(categoryOption));
 
-                        if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
-                            return undefined;
+                const events: ProgramEvent[] =
+                    _(options).groupBy(item => item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"]))).values().map(
+                        items => {
+                            const get = (prop: string) => _.find(items, item => !!item[prop])?.[prop];
+
+                            const event = get("PAIRING_CODE_INTENSITY") ?? getUid(String(get("_RecordID")));
+                            const orgUnit = get("SITE_FK__SITE");
+                            const eventDate = get("Sys_FirstCommitDateUtc");
+                            const categoryOption = get("INSTITUTION_TYPE__CODE");
+                            const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
+
+                            if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                                return undefined;
+                            }
+
+                            const getByIntensity = (intensity: string) => items.find((item: XMartContent) =>
+                                (String(item["TEST_ID"]).endsWith(intensity)) ? item : undefined
+                            );
+
+                            const item_5 = getByIntensity(intensity5x)
+                            const item_10 = getByIntensity(intensity10x)
+                            return {
+                                event: String(event),
+                                orgUnit: String(orgUnit),
+                                program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
+                                status: "COMPLETED",
+                                eventDate: new Date(String(eventDate)).toISOString(),
+                                attributeOptionCombo: String(attributeOptionCombo),
+                                programStage: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
+                                dataValues: _.compact([
+                                    mapField(item_5, "CITATION"),
+                                    mapField(item_5, "INSTITUTION_FK"),
+                                    mapField(item_5, "MONTH_END"),
+                                    mapField(item_5, "MONTH_START"),
+                                    mapField(item_5, "PUB_LINK"),
+                                    mapField(item_5, "PUBLISHED"),
+                                    mapField(item_5, "SPECIES_CONTROL_FK__CODE"),
+                                    mapField(item_5, "SPECIES_FK__CODE"),
+                                    mapField(item_5, "STAGE_ORIGIN_FK__CODE"),
+                                    mapField(item_5, "YEAR_END"),
+                                    mapField(item_5, "YEAR_START"),
+                                    mapField(item_5, "TEST_TIME_FK__CODE"),
+                                    mapField(item_5, "TEST_TYPE_FK__CODE"),
+                                    mapField(item_5, "INSECTICIDE_FK__CODE"),
+                                    mapField(item_5, "NUMBER_MOSQ_CONTROL", intensity5x),
+                                    mapField(item_5, "MORTALITY_NUMBER", intensity5x),
+                                    mapField(item_5, "NUMBER_MOSQ_EXP", intensity5x),
+                                    mapField(item_5, "ADJ_MORTALITY_PERCENT_1X", intensity5x),
+                                    mapField(item_10, "NUMBER_MOSQ_CONTROL", intensity10x),
+                                    mapField(item_10, "MORTALITY_NUMBER", intensity10x),
+                                    mapField(item_10, "NUMBER_MOSQ_EXP", intensity10x),
+                                    mapField(item_10, "ADJ_MORTALITY_PERCENT_1X", intensity10x),
+                                ]),
+                            };
                         }
 
-                        return {
-                            event: String(event),
-                            orgUnit: String(orgUnit),
-                            program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
-                            status: "COMPLETED",
-                            eventDate: new Date(String(eventDate)).toISOString(),
-                            attributeOptionCombo: String(attributeOptionCombo),
-                            programStage: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
-                            dataValues: _.compact([
-                                mapField(item, "CITATION"),
-                                mapField(item, "INSTITUTION_FK"),
-                                mapField(item, "MONTH_END"),
-                                mapField(item, "MONTH_START"),
-                                mapField(item, "PUB_LINK"),
-                                mapField(item, "PUBLISHED"),
-                                mapField(item, "SPECIES_CONTROL_FK__CODE"),
-                                mapField(item, "SPECIES_FK__CODE"),
-                                mapField(item, "STAGE_ORIGIN_FK__CODE"),
-                                mapField(item, "YEAR_END"),
-                                mapField(item, "YEAR_START"),
-                                mapField(item, "TEST_TIME_FK__CODE"),
-                                mapField(item, "TEST_TYPE_FK__CODE"),
-                                mapField(item, "ADJ_MORTALITY_PERCENT_1X_5X"),
-                                mapField(item, "ADJ_MORTALITY_PERCENT_1X_10X"),
-                                mapField(item, "INSECTICIDE_FK__CODE_5X"),
-                                mapField(item, "INSECTICIDE_FK__CODE_10X"),
-                                mapField(item, "NUMBER_MOSQ_CONTROL_5X"),
-                                mapField(item, "NUMBER_MOSQ_CONTROL_10X"),
-                                mapField(item, "MORTALITY_NUMBER_5X"),
-                                mapField(item, "MORTALITY_NUMBER_10X"),
-                                mapField(item, "NUMBER_MOSQ_EXP_5X"),
-                                mapField(item, "NUMBER_MOSQ_EXP_10X"),
-                            ]),
-                        };
-                    })
-                );
+                    ).compact().value()
                 return events;
             })
             .flatMap(events => {
@@ -74,14 +86,26 @@ export class EntoIRIntensityConcentrationUseCase implements UseCase {
     }
 }
 
-function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
-    const dataElement = dhisId[field];
-    const value = item[field.replace("_5X", "").replace("_10X", "")];
+function mapField(item: XMartContent | undefined, field: keyof typeof dhisId, type = "_x5"): ProgramEventDataValue | undefined {
+    if (!item) return undefined;
+
+    const opossit = typeOpposit[type]
+    const getKeyByIntensity = (prop: string) => (String(item["TEST_ID"]).endsWith(type) ? `${prop}${type}` : `${prop}${opossit}`);
+
+    const keyByIntensity = String(getKeyByIntensity(field));
+    const dataElement = dhisId[keyByIntensity] ?? dhisId[field]
+
+    const value = item[field];
 
     return dataElement && value ? { dataElement, value } : undefined;
 }
 
-const dhisId = {
+const typeOpposit: Record<string, string> = {
+    _5X: "_10X",
+    _10X: "_5X",
+}
+
+const dhisId: Record<string, string> = {
     CITATION: "SPA9WRC0s7V",
     INSTITUTION_FK: "l7iRc4fVcRO",
     MONTH_END: "nJGsnuqueOI",
@@ -95,27 +119,20 @@ const dhisId = {
     YEAR_START: "EvSWXtVdh6h",
     TEST_TIME_FK__CODE: "v86CHHosXCi",
     TEST_TYPE_FK__CODE: "NGU9TjLZcBg",
-    ADJ_MORTALITY_PERCENT_1X_5X: "hjdSAokENFs",
-    INSECTICIDE_FK__CODE_5X: "mspNBRCNrPh",
-    NUMBER_MOSQ_CONTROL_5X: "RtoQzWkv24k",
-    MORTALITY_NUMBER_5X: "WoM25CEOaad",
-    NUMBER_MOSQ_EXP_5X: "TqBMpf6rqzO",
-    ADJ_MORTALITY_PERCENT_1X_10X: "mcRgVtgwevL",
-    INSECTICIDE_FK__CODE_10X: "xiFX4d6U2WG",
-    NUMBER_MOSQ_CONTROL_10X: "LFxCOJqeFxz",
-    MORTALITY_NUMBER_10X: "Dz489B9dDqQ",
-    NUMBER_MOSQ_EXP_10X: "NkFOQ7gLyqW",
+    ADJ_MORTALITY_PERCENT_1X_x5: "hjdSAokENFs",
+    INSECTICIDE_FK__CODE_x5: "mspNBRCNrPh",
+    NUMBER_MOSQ_CONTROL_x5: "RtoQzWkv24k",
+    MORTALITY_NUMBER_x5: "WoM25CEOaad",
+    NUMBER_MOSQ_EXP_x5: "TqBMpf6rqzO",
+    ADJ_MORTALITY_PERCENT_1X_x10: "mcRgVtgwevL",
+    INSECTICIDE_FK__CODE_x10: "xiFX4d6U2WG",
+    NUMBER_MOSQ_CONTROL_x10: "LFxCOJqeFxz",
+    MORTALITY_NUMBER_x10: "Dz489B9dDqQ",
+    NUMBER_MOSQ_EXP_x10: "NkFOQ7gLyqW",
 };
 
-function mapCategoryOptionCombo(key: string | undefined): string | undefined {
-    let id = undefined;
-    if (key === "adHe8ZqTLGQ") {
-        id = "VIsmG1pMMgI";
-    } else if (key === "MFYaHarMqU1") {
-        id = "PR1plsTJJER";
-    } else if (key === "U9ryfMWEJwI") {
-        id = "OVcRgB8Fe13";
-    }
-
-    return id;
+const categoryOptionCombo: Record<string, string> = {
+    adHe8ZqTLGQ: "VIsmG1pMMgI",
+    MFYaHarMqU1: "PR1plsTJJER",
+    U9ryfMWEJwI: "OVcRgB8Fe13"
 }

@@ -9,7 +9,7 @@ import { InstanceRepository } from "../../repositories/InstanceRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
 export class EntoIRSynergistInsecticideUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): Future<string, SynchronizationResult> {
         const PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "azxjVmQLicj";
@@ -23,7 +23,7 @@ export class EntoIRSynergistInsecticideUseCase implements UseCase {
                         const orgUnit = item["SITE_FK__SITE"];
                         const eventDate = item["Sys_FirstCommitDateUtc"];
                         const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                        const attributeOptionCombo = mapCategoryOptionCombo(String(categoryOption));
+                        const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
                         if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
                             return undefined;
@@ -104,15 +104,8 @@ const dhisId = {
     TEST_TYPE_FK__CODE: "Iy43l68wVGQ",
 };
 
-function mapCategoryOptionCombo(key: string | undefined): string | undefined {
-    let id = undefined;
-    if (key === "adHe8ZqTLGQ") {
-        id = "VIsmG1pMMgI";
-    } else if (key === "MFYaHarMqU1") {
-        id = "PR1plsTJJER";
-    } else if (key === "U9ryfMWEJwI") {
-        id = "OVcRgB8Fe13";
-    }
-
-    return id;
+const categoryOptionCombo: Record<string, string> = {
+    adHe8ZqTLGQ: "VIsmG1pMMgI",
+    MFYaHarMqU1: "PR1plsTJJER",
+    U9ryfMWEJwI: "OVcRgB8Fe13"
 }
