@@ -13,61 +13,58 @@ export default function action(
 ): FutureData<SyncResult> {
     const PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "azxjVmQLicj";
     const PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY = "L6qpxsRQDWb";
-    return martRepository
-        .listAll("ENTO", "FACT_SYNERGIST_BIOASSAY_TEST")
-        .map(options => {
-            const events: ProgramEvent[] = _.compact(
-                options.map(item => {
-                    const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
-                    const orgUnit = item["SITE_FK__SITE"];
-                    const eventDate = item["Sys_FirstCommitDateUtc"];
-                    const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                    const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
-                    if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
-                        return undefined;
-                    }
+    return martRepository.listAll("ENTO", "FACT_SYNERGIST_BIOASSAY_TEST").flatMap(options => {
+        const events: ProgramEvent[] = _.compact(
+            options.map(item => {
+                const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
+                const orgUnit = item["SITE_FK__SITE"];
+                const eventDate = item["Sys_FirstCommitDateUtc"];
+                const categoryOption = item["INSTITUTION_TYPE__CODE"];
+                const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
-                    return {
-                        event: String(event),
-                        orgUnit: String(orgUnit),
-                        program: PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
-                        status: "COMPLETED",
-                        eventDate: new Date(String(eventDate)).toISOString(),
-                        attributeOptionCombo: String(attributeOptionCombo),
-                        programStage: PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
-                        dataValues: _.compact([
-                            mapField(item, "ADJ_MORTALITY_PERCENT_1X"),
-                            mapField(item, "CITATION"),
-                            mapField(item, "INSECTICIDE_FK__CODE"),
-                            mapField(item, "MECH_INVOLVEMENT__CODE"),
-                            mapField(item, "INSTITUTION_FK"),
-                            mapField(item, "MONTH_END"),
-                            mapField(item, "MONTH_START"),
-                            mapField(item, "MORTALITY_CONTROL"),
-                            mapField(item, "MORTALITY_NUMBER"),
-                            mapField(item, "MORTALITY_PERCENT"),
-                            mapField(item, "NUMBER_MOSQ_CONTROL"),
-                            mapField(item, "NUMBER_MOSQ_EXP"),
-                            mapField(item, "PUB_LINK"),
-                            mapField(item, "PUBLISHED"),
-                            mapField(item, "YEAR_END"),
-                            mapField(item, "YEAR_START"),
-                            mapField(item, "SPECIES_CONTROL_FK__CODE"),
-                            mapField(item, "SPECIES_FK__CODE"),
-                            mapField(item, "STAGE_ORIGIN_FK__CODE"),
-                            mapField(item, "TEST_TIME_FK__CODE"),
-                            mapField(item, "SYNERGIST_TYPE_FK__CODE"),
-                            mapField(item, "TEST_TYPE_FK__CODE"),
-                        ]),
-                    };
-                })
-            );
-            return events;
-        })
-        .flatMap(events => {
-            return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
-        });
+                if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                    return undefined;
+                }
+
+                return {
+                    event: String(event),
+                    orgUnit: String(orgUnit),
+                    program: PROGRAM_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
+                    status: "COMPLETED",
+                    eventDate: new Date(String(eventDate)).toISOString(),
+                    attributeOptionCombo: String(attributeOptionCombo),
+                    programStage: PROGRAM_STAGE_ENTO_IR_SYNERGIST_INSECTICIDE_BIOASSAY,
+                    dataValues: _.compact([
+                        mapField(item, "ADJ_MORTALITY_PERCENT_1X"),
+                        mapField(item, "CITATION"),
+                        mapField(item, "INSECTICIDE_FK__CODE"),
+                        mapField(item, "MECH_INVOLVEMENT__CODE"),
+                        mapField(item, "INSTITUTION_FK"),
+                        mapField(item, "MONTH_END"),
+                        mapField(item, "MONTH_START"),
+                        mapField(item, "MORTALITY_CONTROL"),
+                        mapField(item, "MORTALITY_NUMBER"),
+                        mapField(item, "MORTALITY_PERCENT"),
+                        mapField(item, "NUMBER_MOSQ_CONTROL"),
+                        mapField(item, "NUMBER_MOSQ_EXP"),
+                        mapField(item, "PUB_LINK"),
+                        mapField(item, "PUBLISHED"),
+                        mapField(item, "YEAR_END"),
+                        mapField(item, "YEAR_START"),
+                        mapField(item, "SPECIES_CONTROL_FK__CODE"),
+                        mapField(item, "SPECIES_FK__CODE"),
+                        mapField(item, "STAGE_ORIGIN_FK__CODE"),
+                        mapField(item, "TEST_TIME_FK__CODE"),
+                        mapField(item, "SYNERGIST_TYPE_FK__CODE"),
+                        mapField(item, "TEST_TYPE_FK__CODE"),
+                    ]),
+                };
+            })
+        );
+
+        return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
+    });
 }
 
 function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {

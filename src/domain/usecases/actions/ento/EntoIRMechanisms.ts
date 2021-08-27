@@ -13,54 +13,51 @@ export default function action(
 ): FutureData<SyncResult> {
     const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
     const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY";
-    return martRepository
-        .listAll("ENTO", "FACT_MOLECULAR_TEST")
-        .map(options => {
-            const events: ProgramEvent[] = _.compact(
-                options.map(item => {
-                    const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
-                    const orgUnit = item["SITE_FK__SITE"];
-                    const eventDate = item["Sys_FirstCommitDateUtc"];
-                    const categoryOption = item["INSTITUTION_TYPE__CODE"];
-                    const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
-                    if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
-                        return undefined;
-                    }
+    return martRepository.listAll("ENTO", "FACT_MOLECULAR_TEST").flatMap(options => {
+        const events: ProgramEvent[] = _.compact(
+            options.map(item => {
+                const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
+                const orgUnit = item["SITE_FK__SITE"];
+                const eventDate = item["Sys_FirstCommitDateUtc"];
+                const categoryOption = item["INSTITUTION_TYPE__CODE"];
+                const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
-                    return {
-                        event: String(event),
-                        orgUnit: String(orgUnit),
-                        program: PROGRAM_ENTO_IR_MECHANISMS,
-                        status: "COMPLETED",
-                        eventDate: new Date(String(eventDate)).toISOString(),
-                        attributeOptionCombo: String(attributeOptionCombo),
-                        programStage: PROGRAM_STAGE_ENTO_IR_MECHANISMS,
-                        dataValues: _.compact([
-                            mapField(item, "CITATION"),
-                            mapField(item, "INSTITUTION_FK"),
-                            mapField(item, "MONTH_END"),
-                            mapField(item, "MONTH_START"),
-                            mapField(item, "MECHANISM_FK__CODE"),
-                            mapField(item, "MECH_STATUS__CODE"),
-                            mapField(item, "NUMBER_MOSQ_EXP"),
-                            mapField(item, "PUB_LINK"),
-                            mapField(item, "PUBLISHED"),
-                            mapField(item, "SPECIES_CONTROL_FK__CODE"),
-                            mapField(item, "SPECIES_FK__CODE"),
-                            mapField(item, "STAGE_ORIGIN_FK__CODE"),
-                            mapField(item, "YEAR_END"),
-                            mapField(item, "YEAR_START"),
-                            mapField(item, "ALLELIC_FREQ"),
-                        ]),
-                    };
-                })
-            );
-            return events;
-        })
-        .flatMap(events => {
-            return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
-        });
+                if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                    return undefined;
+                }
+
+                return {
+                    event: String(event),
+                    orgUnit: String(orgUnit),
+                    program: PROGRAM_ENTO_IR_MECHANISMS,
+                    status: "COMPLETED",
+                    eventDate: new Date(String(eventDate)).toISOString(),
+                    attributeOptionCombo: String(attributeOptionCombo),
+                    programStage: PROGRAM_STAGE_ENTO_IR_MECHANISMS,
+                    dataValues: _.compact([
+                        mapField(item, "CITATION"),
+                        mapField(item, "INSTITUTION_FK"),
+                        mapField(item, "MONTH_END"),
+                        mapField(item, "MONTH_START"),
+                        mapField(item, "MECHANISM_FK__CODE"),
+                        mapField(item, "MECH_STATUS__CODE"),
+                        mapField(item, "NUMBER_MOSQ_EXP"),
+                        mapField(item, "PUB_LINK"),
+                        mapField(item, "PUBLISHED"),
+                        mapField(item, "SPECIES_CONTROL_FK__CODE"),
+                        mapField(item, "SPECIES_FK__CODE"),
+                        mapField(item, "STAGE_ORIGIN_FK__CODE"),
+                        mapField(item, "YEAR_END"),
+                        mapField(item, "YEAR_START"),
+                        mapField(item, "ALLELIC_FREQ"),
+                    ]),
+                };
+            })
+        );
+
+        return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
+    });
 }
 
 function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {

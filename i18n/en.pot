@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-27T10:31:23.322Z\n"
-"PO-Revision-Date: 2021-08-27T10:31:23.322Z\n"
+"POT-Creation-Date: 2021-08-27T11:04:44.860Z\n"
+"PO-Revision-Date: 2021-08-27T11:04:44.860Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -18,6 +18,54 @@ msgid "Add"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "<No value>"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Updated"
+msgstr ""
+
+msgid "Deleted"
+msgstr ""
+
+msgid "Ignored"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Identifier"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "Import Results"
+msgstr ""
+
+msgid "Ok"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Messages"
+msgstr ""
+
+msgid "JSON Response"
 msgstr ""
 
 msgid "Back"
@@ -35,7 +83,7 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
-msgid "Executed {{total}} actions"
+msgid "Running actions..."
 msgstr ""
 
 msgid "Actions"
@@ -53,7 +101,7 @@ msgstr ""
 msgid "List table contents of the MART"
 msgstr ""
 
-msgid "Identifier"
+msgid "xMART API"
 msgstr ""
 
 msgid "xMART Table"

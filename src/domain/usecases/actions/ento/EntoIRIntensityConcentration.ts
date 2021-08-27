@@ -16,73 +16,69 @@ export default function action(
     const intensity5x = "_x5";
     const intensity10x = "_x10";
 
-    return martRepository
-        .listAll("ENTO", "FACT_INTENSITY_TEST")
-        .map(options => {
-            const events: ProgramEvent[] = _(options)
-                .groupBy(item => item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"])))
-                .values()
-                .map(items => {
-                    const get = (prop: string) => _.find(items, item => !!item[prop])?.[prop];
+    return martRepository.listAll("ENTO", "FACT_INTENSITY_TEST").flatMap(options => {
+        const events: ProgramEvent[] = _(options)
+            .groupBy(item => item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"])))
+            .values()
+            .map(items => {
+                const get = (prop: string) => _.find(items, item => !!item[prop])?.[prop];
 
-                    const event = get("PAIRING_CODE_INTENSITY") ?? getUid(String(get("_RecordID")));
-                    const orgUnit = get("SITE_FK__SITE");
-                    const eventDate = get("Sys_FirstCommitDateUtc");
-                    const categoryOption = get("INSTITUTION_TYPE__CODE");
-                    const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
+                const event = get("PAIRING_CODE_INTENSITY") ?? getUid(String(get("_RecordID")));
+                const orgUnit = get("SITE_FK__SITE");
+                const eventDate = get("Sys_FirstCommitDateUtc");
+                const categoryOption = get("INSTITUTION_TYPE__CODE");
+                const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
-                    if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
-                        return undefined;
-                    }
+                if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                    return undefined;
+                }
 
-                    const getByIntensity = (intensity: string) =>
-                        items.find((item: XMartContent) =>
-                            String(item["TEST_ID"]).endsWith(intensity) ? item : undefined
-                        );
+                const getByIntensity = (intensity: string) =>
+                    items.find((item: XMartContent) =>
+                        String(item["TEST_ID"]).endsWith(intensity) ? item : undefined
+                    );
 
-                    const item_5 = getByIntensity(intensity5x);
-                    const item_10 = getByIntensity(intensity10x);
-                    return {
-                        event: String(event),
-                        orgUnit: String(orgUnit),
-                        program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
-                        status: "COMPLETED",
-                        eventDate: new Date(String(eventDate)).toISOString(),
-                        attributeOptionCombo: String(attributeOptionCombo),
-                        programStage: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
-                        dataValues: _.compact([
-                            mapField(item_5, "CITATION"),
-                            mapField(item_5, "INSTITUTION_FK"),
-                            mapField(item_5, "MONTH_END"),
-                            mapField(item_5, "MONTH_START"),
-                            mapField(item_5, "PUB_LINK"),
-                            mapField(item_5, "PUBLISHED"),
-                            mapField(item_5, "SPECIES_CONTROL_FK__CODE"),
-                            mapField(item_5, "SPECIES_FK__CODE"),
-                            mapField(item_5, "STAGE_ORIGIN_FK__CODE"),
-                            mapField(item_5, "YEAR_END"),
-                            mapField(item_5, "YEAR_START"),
-                            mapField(item_5, "TEST_TIME_FK__CODE"),
-                            mapField(item_5, "TEST_TYPE_FK__CODE"),
-                            mapField(item_5, "INSECTICIDE_FK__CODE"),
-                            mapField(item_5, "NUMBER_MOSQ_CONTROL", intensity5x),
-                            mapField(item_5, "MORTALITY_NUMBER", intensity5x),
-                            mapField(item_5, "NUMBER_MOSQ_EXP", intensity5x),
-                            mapField(item_5, "ADJ_MORTALITY_PERCENT_1X", intensity5x),
-                            mapField(item_10, "NUMBER_MOSQ_CONTROL", intensity10x),
-                            mapField(item_10, "MORTALITY_NUMBER", intensity10x),
-                            mapField(item_10, "NUMBER_MOSQ_EXP", intensity10x),
-                            mapField(item_10, "ADJ_MORTALITY_PERCENT_1X", intensity10x),
-                        ]),
-                    };
-                })
-                .compact()
-                .value();
-            return events;
-        })
-        .flatMap(events => {
-            return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
-        });
+                const item_5 = getByIntensity(intensity5x);
+                const item_10 = getByIntensity(intensity10x);
+                return {
+                    event: String(event),
+                    orgUnit: String(orgUnit),
+                    program: PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION,
+                    status: "COMPLETED",
+                    eventDate: new Date(String(eventDate)).toISOString(),
+                    attributeOptionCombo: String(attributeOptionCombo),
+                    programStage: PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION,
+                    dataValues: _.compact([
+                        mapField(item_5, "CITATION"),
+                        mapField(item_5, "INSTITUTION_FK"),
+                        mapField(item_5, "MONTH_END"),
+                        mapField(item_5, "MONTH_START"),
+                        mapField(item_5, "PUB_LINK"),
+                        mapField(item_5, "PUBLISHED"),
+                        mapField(item_5, "SPECIES_CONTROL_FK__CODE"),
+                        mapField(item_5, "SPECIES_FK__CODE"),
+                        mapField(item_5, "STAGE_ORIGIN_FK__CODE"),
+                        mapField(item_5, "YEAR_END"),
+                        mapField(item_5, "YEAR_START"),
+                        mapField(item_5, "TEST_TIME_FK__CODE"),
+                        mapField(item_5, "TEST_TYPE_FK__CODE"),
+                        mapField(item_5, "INSECTICIDE_FK__CODE"),
+                        mapField(item_5, "NUMBER_MOSQ_CONTROL", intensity5x),
+                        mapField(item_5, "MORTALITY_NUMBER", intensity5x),
+                        mapField(item_5, "NUMBER_MOSQ_EXP", intensity5x),
+                        mapField(item_5, "ADJ_MORTALITY_PERCENT_1X", intensity5x),
+                        mapField(item_10, "NUMBER_MOSQ_CONTROL", intensity10x),
+                        mapField(item_10, "MORTALITY_NUMBER", intensity10x),
+                        mapField(item_10, "NUMBER_MOSQ_EXP", intensity10x),
+                        mapField(item_10, "ADJ_MORTALITY_PERCENT_1X", intensity10x),
+                    ]),
+                };
+            })
+            .compact()
+            .value();
+
+        return instanceRepository.postEvents(events, { orgUnitIdScheme: "CODE" });
+    });
 }
 
 function mapField(
