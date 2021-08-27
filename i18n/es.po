@@ -106,27 +106,3 @@ msgstr ""
 
 msgid "xMART Table"
 msgstr ""
-
-#~ msgid "Action 1"
-#~ msgstr "1. Sync Molecular and biochemical mechanisms"
-
-#~ msgid "Description 1"
-#~ msgstr "Sync events"
-
-#~ msgid "Action 2"
-#~ msgstr "2. Sync Synergist-insecticide bioassay"
-
-#~ msgid "Description 2"
-#~ msgstr "Sync events"
-
-#~ msgid "Action 3"
-#~ msgstr "3. Sync Intensity concentration bioassay"
-
-#~ msgid "Description 3"
-#~ msgstr "Sync events"
-
-#~ msgid "Action 4"
-#~ msgstr "4. Sync IR discriminating concentration"
-
-#~ msgid "Description 4"
-#~ msgstr "Sync events"
