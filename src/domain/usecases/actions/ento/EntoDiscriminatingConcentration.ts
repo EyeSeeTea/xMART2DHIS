@@ -7,13 +7,13 @@ import { XMartContent } from "../../../entities/XMart";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
+const PROGRAM_ENTO_IR_DISCRIMINATING_CONCENTRATION = "G9hvxFI8AYC";
+const PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION = "P7VZnpYMjf6";
+
 export default function action(
     martRepository: XMartRepository,
     instanceRepository: InstanceRepository
 ): FutureData<SyncResult> {
-    const PROGRAM_ENTO_IR_DISCRIMINATING_CONCENTRATION = "G9hvxFI8AYC";
-    const PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION = "P7VZnpYMjf6";
-
     return martRepository.listAll("ENTO", "FACT_DISCRIMINATING_TEST").flatMap(options => {
         const events: ProgramEvent[] = _.compact(
             options.map(item => {

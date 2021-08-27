@@ -7,15 +7,15 @@ import { XMartContent } from "../../../entities/XMart";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
+const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn";
+const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng";
+const intensity5x = "_x5";
+const intensity10x = "_x10";
+
 export default function action(
     martRepository: XMartRepository,
     instanceRepository: InstanceRepository
 ): FutureData<SyncResult> {
-    const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn";
-    const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng";
-    const intensity5x = "_x5";
-    const intensity10x = "_x10";
-
     return martRepository.listAll("ENTO", "FACT_INTENSITY_TEST").flatMap(options => {
         const events: ProgramEvent[] = _(options)
             .groupBy(item => item["PAIRING_CODE_INTENSITY"] ?? getUid(String(item["_RecordID"])))

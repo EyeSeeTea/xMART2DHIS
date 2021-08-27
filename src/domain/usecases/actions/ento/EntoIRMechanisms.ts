@@ -7,13 +7,13 @@ import { XMartContent } from "../../../entities/XMart";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
+const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
+const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY";
+
 export default function action(
     martRepository: XMartRepository,
     instanceRepository: InstanceRepository
 ): FutureData<SyncResult> {
-    const PROGRAM_ENTO_IR_MECHANISMS = "Rw3oD4ExD8U";
-    const PROGRAM_STAGE_ENTO_IR_MECHANISMS = "GeOxsjpEjSY";
-
     return martRepository.listAll("ENTO", "FACT_MOLECULAR_TEST").flatMap(options => {
         const events: ProgramEvent[] = _.compact(
             options.map(item => {
