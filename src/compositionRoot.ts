@@ -1,10 +1,7 @@
 import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
-import { EntoIRMechanismsUseCase } from "./domain/usecases/actions/EntoIRMechanismsUseCase";
-import { EntoIRSynergistInsecticideUseCase } from "./domain/usecases/actions/EntoIRSynergistInsecticideUseCase";
-import { EntoIRIntensityConcentrationUseCase } from "./domain/usecases/actions/EntoIRIntensityConcentrationUseCase";
-import { EntoDiscriminatingConcentrationUseCase } from "./domain/usecases/actions/EntoDiscriminatingConcentrationUseCase";
+import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
@@ -26,10 +23,7 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            action1: new EntoIRMechanismsUseCase(martRepository, instanceRepository),
-            action2: new EntoIRSynergistInsecticideUseCase(martRepository, instanceRepository),
-            action3: new EntoIRIntensityConcentrationUseCase(martRepository, instanceRepository),
-            action4: new EntoDiscriminatingConcentrationUseCase(martRepository, instanceRepository),
+            get: new GetActionsUseCase(martRepository, instanceRepository),
         }),
     };
 }

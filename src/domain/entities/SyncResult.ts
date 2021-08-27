@@ -1,6 +1,6 @@
-export type SynchronizationStatus = "PENDING" | "SUCCESS" | "WARNING" | "ERROR" | "NETWORK ERROR";
+export type SyncStatus = "PENDING" | "SUCCESS" | "WARNING" | "ERROR" | "NETWORK ERROR";
 
-export interface SynchronizationStats {
+export interface SyncStats {
     type?: string;
     imported: number;
     updated: number;
@@ -14,11 +14,11 @@ export interface ErrorMessage {
     message: string;
 }
 
-export interface SynchronizationResult {
+export interface SyncResult {
     title: string;
-    status: SynchronizationStatus;
+    status: SyncStatus;
     message?: string;
-    stats?: SynchronizationStats[];
+    stats?: SyncStats[];
     errors?: ErrorMessage[];
     rawResponse: object;
 }

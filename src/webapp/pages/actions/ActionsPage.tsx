@@ -1,49 +1,25 @@
-import { ObjectsTable, TableAction, TableColumn, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { ObjectsTable, TableAction, TableColumn, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Sync } from "@material-ui/icons";
 import _ from "lodash";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Future } from "../../../domain/entities/Future";
-import { SynchronizationResult } from "../../../domain/entities/SynchronizationResult";
+import { SyncAction } from "../../../domain/entities/SyncAction";
+import { SyncResult } from "../../../domain/entities/SyncResult";
 import i18n from "../../../locales";
+import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ActionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
+    const loading = useLoading();
 
-    const rows: TableObject[] = useMemo(
-        () => [
-            {
-                id: "action-1",
-                name: i18n.t("Action 1"),
-                description: i18n.t("Description 1"),
-                usecase: compositionRoot.actions.action1,
-            },
-            {
-                id: "action-2",
-                name: i18n.t("Action 2"),
-                description: i18n.t("Description 2"),
-                usecase: compositionRoot.actions.action2,
-            },
-            {
-                id: "action-3",
-                name: i18n.t("Action 3"),
-                description: i18n.t("Description 3"),
-                usecase: compositionRoot.actions.action3,
-            },
-            {
-                id: "action-4",
-                name: i18n.t("Action 4"),
-                description: i18n.t("Description 4"),
-                usecase: compositionRoot.actions.action4,
-            },
-        ],
-        [compositionRoot]
-    );
+    const [rows, setRows] = useState<SyncAction[]>([]);
+    const [results, setResults] = useState<SyncResult[]>();
 
-    const columns: TableColumn<TableObject>[] = useMemo(
+    const columns: TableColumn<SyncAction>[] = useMemo(
         () => [
             { name: "name", text: i18n.t("Name") },
             { name: "description", text: i18n.t("Description") },
@@ -51,7 +27,7 @@ export const ActionsPage: React.FC = () => {
         []
     );
 
-    const actions: TableAction<TableObject>[] = useMemo(
+    const actions: TableAction<SyncAction>[] = useMemo(
         () => [
             {
                 name: "run",
@@ -59,25 +35,41 @@ export const ActionsPage: React.FC = () => {
                 icon: <Sync />,
                 multiple: true,
                 onClick: (ids: string[]) => {
-                    const futures = _.compact(ids.map(id => rows.find(item => item.id === id))).map(({ usecase }) =>
-                        usecase()
+                    loading.show(true, i18n.t("Running actions..."));
+                    const futures = _.compact(ids.map(id => rows.find(item => item.id === id))).map(({ execute }) =>
+                        execute()
                     );
 
                     Future.parallel(futures, { maxConcurrency: 1 }).run(
-                        () => snackbar.success(i18n.t("Executed {{total}} actions", { total: futures.length })),
-                        error => snackbar.error(error)
+                        results => {
+                            loading.reset();
+                            setResults(results);
+                        },
+                        error => {
+                            loading.reset();
+                            snackbar.error(error);
+                        }
                     );
                 },
             },
         ],
-        [snackbar, rows]
+        [snackbar, loading, rows]
     );
+
+    useEffect(() => {
+        compositionRoot.actions.get().run(
+            rows => setRows(rows),
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar]);
 
     return (
         <Container>
             <PageHeader title={i18n.t("Actions")} onBackClick={() => window.history.back()} />
 
-            <ObjectsTable<TableObject> rows={rows} columns={columns} actions={actions} />
+            {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
+
+            <ObjectsTable<SyncAction> rows={rows} columns={columns} actions={actions} />
         </Container>
     );
 };
@@ -85,10 +77,3 @@ export const ActionsPage: React.FC = () => {
 const Container = styled.div`
     margin: 20px;
 `;
-
-type TableObject = {
-    id: string;
-    name: string;
-    description: string;
-    usecase: () => Future<string, SynchronizationResult>;
-};

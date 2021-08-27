@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-24T11:28:24.283Z\n"
-"PO-Revision-Date: 2021-08-24T11:28:24.283Z\n"
+"POT-Creation-Date: 2021-08-27T10:31:23.322Z\n"
+"PO-Revision-Date: 2021-08-27T10:31:23.322Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -25,30 +25,6 @@ msgstr ""
 
 msgid "Help"
 msgstr ""
-
-msgid "Action 1"
-msgstr "1. Sync Molecular and biochemical mechanisms"
-
-msgid "Description 1"
-msgstr "Sync events"
-
-msgid "Action 2"
-msgstr "2. Sync Synergist-insecticide bioassay"
-
-msgid "Description 2"
-msgstr "Sync events"
-
-msgid "Action 3"
-msgstr "3. Sync Intensity concentration bioassay"
-
-msgid "Description 3"
-msgstr "Sync events"
-
-msgid "Action 4"
-msgstr "4. Sync IR discriminating concentration"
-
-msgid "Description 4"
-msgstr "Sync events"
 
 msgid "Name"
 msgstr ""
