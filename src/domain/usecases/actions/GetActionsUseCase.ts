@@ -14,12 +14,12 @@ export class GetActionsUseCase implements UseCase {
     public execute(): FutureData<SyncAction[]> {
         return Future.success([
             {
-                id: "ento-discriminating-concentration",
+                id: "ento-ir-mechanisms",
                 name: "ENTO IR Mechanisms",
                 execute: () => EntoIRMechanismsUseCase(this.martRepository, this.instanceRepository),
             },
             {
-                id: "ento-ir-intensity-concentration",
+                id: "ento-ir-synergist-insecticide",
                 name: "ENTO IR Synergist Insecticide",
                 execute: () => EntoIRSynergistInsecticideUseCase(this.martRepository, this.instanceRepository),
             },
