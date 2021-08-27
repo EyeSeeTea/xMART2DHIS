@@ -14,6 +14,11 @@ export class Future<E, D> {
         return new Future(instance2);
     }
 
+    mapError<E2>(mapper: (data: E) => E2): Future<E2, D> {
+        const instance2 = fluture.mapRej(mapper)(this.instance) as fluture.FutureInstance<E2, D>;
+        return new Future(instance2);
+    }
+
     bimap<E2, D2>(dataMapper: (data: D) => D2, errorMapper: (error: E) => E2): Future<E2, D2> {
         const instance2 = fluture.bimap(errorMapper)(dataMapper)(this.instance);
         return new Future(instance2);
@@ -29,9 +34,9 @@ export class Future<E, D> {
         return new Future(chainRejMapper(this.instance));
     }
 
-    toPromise(): Promise<D> {
+    toPromise(onError?: (error: E) => void): Promise<D> {
         return new Promise((resolve, reject) => {
-            this.run(resolve, reject);
+            this.run(resolve, onError ?? reject);
         });
     }
 
@@ -46,6 +51,15 @@ export class Future<E, D> {
 
     /* Static methods */
     static noCancel: Cancel = () => {};
+
+    static fromPromise<E, D>(computation: Promise<D>): Future<E, D> {
+        return new Future(
+            fluture.Future((reject, resolve) => {
+                computation.then(data => resolve(data)).catch(error => reject(error));
+                return Future.noCancel;
+            })
+        );
+    }
 
     static fromComputation<E, D>(computation: Computation<E, D>): Future<E, D> {
         return new Future(fluture.Future((reject, resolve) => computation(resolve, reject)));
@@ -74,10 +88,7 @@ export class Future<E, D> {
         return new Future(instance);
     }
 
-    static parallel<E, D>(
-        futures: Array<Future<E, D>>,
-        options: { maxConcurrency?: number } = {}
-    ): Future<E, Array<D>> {
+    static parallel<E, D>(futures: Array<Future<E, D>>, options: ParallelOptions = {}): Future<E, Array<D>> {
         const { maxConcurrency = 10 } = options;
         const parallel = fluture.parallel(maxConcurrency);
         const instance = parallel(futures.map(future => future.instance));
@@ -86,7 +97,7 @@ export class Future<E, D> {
 
     static joinObj<FuturesObj extends Record<string, Future<any, any>>>(
         futuresObj: FuturesObj,
-        options: { maxConcurrency?: number } = {}
+        options: ParallelOptions = {}
     ): JoinObj<FuturesObj> {
         const { maxConcurrency = 10 } = options;
         const parallel = fluture.parallel(maxConcurrency);
@@ -97,10 +108,19 @@ export class Future<E, D> {
         return futureObj as JoinObj<FuturesObj>;
     }
 
-    static futureMap<T, E, D>(inputValues: T[], mapper: (value: T, index: number) => Future<E, D>): Future<E, D[]> {
-        return this.parallel(inputValues.map((value, index) => mapper(value, index)));
+    static futureMap<T, E, D>(
+        inputValues: T[],
+        mapper: (value: T, index: number) => Future<E, D>,
+        options?: ParallelOptions
+    ): Future<E, D[]> {
+        return this.parallel(
+            inputValues.map((value, index) => mapper(value, index)),
+            options
+        );
     }
 }
+
+type ParallelOptions = { maxConcurrency?: number };
 
 type JoinObj<Futures extends Record<string, Future<any, any>>> = Future<
     ExtractFutureError<Futures[keyof Futures]>,
