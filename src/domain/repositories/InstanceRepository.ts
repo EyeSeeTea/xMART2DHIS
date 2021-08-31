@@ -1,3 +1,4 @@
+import { DataValueSet } from "../entities/DataValueSet";
 import { FutureData } from "../entities/Future";
 import { ProgramEvent } from "../entities/ProgramEvent";
 import { SyncResult } from "../entities/SyncResult";
@@ -7,11 +8,20 @@ export interface InstanceRepository {
     getBaseUrl(): string;
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
+    postDataValueSet(dataValue: DataValueSet, params?: PostDataValuesParams): FutureData<SyncResult>;
     postEvents(events: ProgramEvent[], params?: PostEventsParams): FutureData<SyncResult>;
     getEvents(filters: GetEventsFilters): FutureData<ProgramEvent[]>;
 }
 
 export type PostEventsParams = {
+    idScheme?: "UID" | "CODE";
+    dataElementIdScheme?: "UID" | "CODE";
+    orgUnitIdScheme?: "UID" | "CODE";
+    eventIdScheme?: "UID" | "CODE";
+    dryRun?: boolean;
+};
+
+export type PostDataValuesParams = {
     idScheme?: "UID" | "CODE";
     dataElementIdScheme?: "UID" | "CODE";
     orgUnitIdScheme?: "UID" | "CODE";
