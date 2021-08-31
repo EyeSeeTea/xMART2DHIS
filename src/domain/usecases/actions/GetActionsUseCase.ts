@@ -7,9 +7,10 @@ import EntoDiscriminatingConcentrationUseCase from "./ento/EntoDiscriminatingCon
 import EntoIRIntensityConcentrationUseCase from "./ento/EntoIRIntensityConcentration";
 import EntoIRMechanismsUseCase from "./ento/EntoIRMechanisms";
 import EntoIRSynergistInsecticideUseCase from "./ento/EntoIRSynergistInsecticide";
+import GHOLifeExpentancyAtBirthUseCase from "./gho/GHOLifeExpentancyAtBirthUseCase";
 
 export class GetActionsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): FutureData<SyncAction[]> {
         return Future.success([
@@ -32,6 +33,11 @@ export class GetActionsUseCase implements UseCase {
                 id: "ento-discriminating-concentration",
                 name: "ENTO Discriminating Concentration",
                 execute: () => EntoDiscriminatingConcentrationUseCase(this.martRepository, this.instanceRepository),
+            },
+            {
+                id: "gho-life-expectancy-at-birth",
+                name: "GHO - Life expectancy at birth",
+                execute: () => GHOLifeExpentancyAtBirthUseCase(this.martRepository, this.instanceRepository),
             },
         ]);
     }
