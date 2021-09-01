@@ -10,7 +10,7 @@ import EntoIRSynergistInsecticideUseCase from "./ento/EntoIRSynergistInsecticide
 import GHOLifeExpentancyAtBirthUseCase from "./gho/GHOLifeExpentancyAtBirthUseCase";
 
 export class GetActionsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) { }
+    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
     public execute(): FutureData<SyncAction[]> {
         return Future.success([

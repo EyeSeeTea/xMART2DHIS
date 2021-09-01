@@ -4,7 +4,7 @@ export interface DataValueSet {
     period?: string;
     orgUnit?: string;
     attributeOptionCombo?: string;
-    dataValues?: DataValue[]
+    dataValues?: DataValue[];
 }
 
 export interface DataValue {

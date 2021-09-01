@@ -13,42 +13,42 @@ export default function action(
     martRepository: XMartRepository,
     instanceRepository: InstanceRepository
 ): FutureData<SyncResult> {
-
-    martRepository.listAll("GHO", "WHOSIS_000001").map(options => {
-        options.map(item => {
-            console.debug(item.name);
+    martRepository
+        .listAll("GHO", "WHOSIS_000001")
+        .map(options => {
+            options.map(item => {
+                console.debug(item.name);
+            });
         })
-    }).runAsync()
-
+        .runAsync();
 
     return martRepository.listAll("GHO", "WHOSIS_000001").flatMap(options => {
-        const dataValues: DataValue[] =
-            options.map(item => {
-                const orgUnit = String(item["SpatialDim"]);
-                /*                 const completeDate = String(item["Date"]);
+        const dataValues: DataValue[] = options.map(item => {
+            const orgUnit = String(item["SpatialDim"]);
+            /*                 const completeDate = String(item["Date"]);
                                 const attributeOptionCombo = DEFAULT_CATEGORY_OPTION_COMBO */
-                const dataelement = mapField(item, "Dim1")
-                const period = String(item["TimeDim"])
+            const dataelement = mapField(item, "Dim1");
+            const period = String(item["TimeDim"]);
 
-                return {
-                    /*                     dataSet: DATASET_GHO_GENERAL_INFORMATION,
+            return {
+                /*                     dataSet: DATASET_GHO_GENERAL_INFORMATION,
                                         period: period,
                                         completeDate: completeDate,
                                         orgUnit: String(orgUnit),
                                         attributeOptionCombo: String(attributeOptionCombo), 
                     dataValues: [{*/
 
-                    dataElement: String(dataelement),
-                    value: String(item["Value"]),
-                    orgUnit: String(orgUnit),
-                    period: String(period),
-                    attributeOptionCombo: DEFAULT_CATEGORY_OPTION_COMBO,
-                    categoryOptionCombo: DEFAULT_CATEGORY_OPTION_COMBO,
-                    comment: undefined,
+                dataElement: String(dataelement),
+                value: String(item["Value"]),
+                orgUnit: String(orgUnit),
+                period: String(period),
+                attributeOptionCombo: DEFAULT_CATEGORY_OPTION_COMBO,
+                categoryOptionCombo: DEFAULT_CATEGORY_OPTION_COMBO,
+                comment: undefined,
 
-                    // }]
-                };
-            })
+                // }]
+            };
+        });
         return instanceRepository.postDataValueSet({ dataValues: dataValues }, { orgUnitIdScheme: "CODE" });
     });
 }
