@@ -54,6 +54,7 @@ export const XMartEndpoints = {
     GHO: "https://dev.eyeseetea.com/cors/ghoapi.azureedge.net/api",
     GHO_POC: "https://frontdoor-r5quteqglawbs.azurefd.net/GHO_POC",
     ILIAD: "https://frontdoor-r5quteqglawbs.azurefd.net/ILIAD",
+    DEX_CMS: "https://frontdoor-r5quteqglawbs.azurefd.net/DEX_CMS",
 };
 
 export type XMartEndpoint = keyof typeof XMartEndpoints;
