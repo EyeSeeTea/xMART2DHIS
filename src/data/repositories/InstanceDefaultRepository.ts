@@ -1,4 +1,4 @@
-import { DataValueSet } from "../../domain/entities/DataValueSet";
+import { DataValue } from "../../domain/entities/DataValue";
 import { FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
@@ -8,7 +8,7 @@ import {
     GetEventsFilters,
     InstanceRepository,
     PostDataValuesParams,
-    PostEventsParams,
+    PostEventsParams
 } from "../../domain/repositories/InstanceRepository";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
@@ -65,8 +65,8 @@ export class InstanceDefaultRepository implements InstanceRepository {
         );
     }
 
-    postDataValueSet(dataValueSet: DataValueSet, params: PostDataValuesParams): FutureData<SyncResult> {
-        return apiToFuture(this.api.dataValues.postSet(params, dataValueSet)).map(response =>
+    postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
+        return apiToFuture(this.api.dataValues.postSet(params, { dataValues })).map(response =>
             postImport(response, {
                 title: i18n.t("Data values - Create/update"),
                 model: i18n.t("DataValue"),

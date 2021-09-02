@@ -50,7 +50,10 @@ export interface UseCase {
 
 export const XMartEndpoints = {
     ENTO: "https://frontdoor-r5quteqglawbs.azurefd.net/VECTORS_IR",
+    REFMART: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
     GHO: "https://dev.eyeseetea.com/cors/ghoapi.azureedge.net/api",
+    GHO_POC: "https://frontdoor-r5quteqglawbs.azurefd.net/GHO_POC",
+    ILIAD: "https://frontdoor-r5quteqglawbs.azurefd.net/ILIAD",
 };
 
 export type XMartEndpoint = keyof typeof XMartEndpoints;

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { DataValue } from "../../../entities/DataValueSet";
+import { DataValue } from "../../../entities/DataValue";
 import { FutureData } from "../../../entities/Future";
 import { SyncResult } from "../../../entities/SyncResult";
 import { XMartContent } from "../../../entities/XMart";
@@ -40,7 +40,7 @@ export default function action(
                 // }]
             };
         });
-        return instanceRepository.postDataValueSet({ dataValues: dataValues }, { orgUnitIdScheme: "CODE" });
+        return instanceRepository.postDataValueSet(dataValues, { orgUnitIdScheme: "CODE" });
     });
 }
 

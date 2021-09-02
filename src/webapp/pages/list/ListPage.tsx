@@ -3,7 +3,7 @@ import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { XMartEndpoint } from "../../../compositionRoot";
+import { XMartEndpoint, XMartEndpoints } from "../../../compositionRoot";
 import { XMartContent, XMartTable } from "../../../domain/entities/XMart";
 import { ListOptions } from "../../../domain/repositories/XMartRepository";
 import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
@@ -118,7 +118,7 @@ const Container = styled.div`
     margin: 20px;
 `;
 
-const ENDPOINTS: DropdownOption<XMartEndpoint>[] = [
-    { id: "ENTO", name: "ENTO" },
-    { id: "GHO", name: "GHO" },
-];
+const ENDPOINTS: DropdownOption<XMartEndpoint>[] = _.keys(XMartEndpoints).map(key => ({
+    id: key as XMartEndpoint,
+    name: key,
+}));
