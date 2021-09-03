@@ -8,7 +8,7 @@ import {
     GetEventsFilters,
     InstanceRepository,
     PostDataValuesParams,
-    PostEventsParams
+    PostEventsParams,
 } from "../../domain/repositories/InstanceRepository";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
