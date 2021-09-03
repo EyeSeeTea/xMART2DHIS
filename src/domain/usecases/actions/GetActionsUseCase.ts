@@ -7,6 +7,7 @@ import EntoDiscriminatingConcentrationUseCase from "./ento/EntoDiscriminatingCon
 import EntoIRIntensityConcentrationUseCase from "./ento/EntoIRIntensityConcentration";
 import EntoIRMechanismsUseCase from "./ento/EntoIRMechanisms";
 import EntoIRSynergistInsecticideUseCase from "./ento/EntoIRSynergistInsecticide";
+import GHOExpectationOfLifeAtAge from "./gho/GHOExpectationOfLifeAtAge";
 import GHOLifeExpentancyAtAge60UseCase from "./gho/GHOLifeExpentancyAtAge60UseCase";
 import GHOLifeExpentancyAtBirthUseCase from "./gho/GHOLifeExpentancyAtBirthUseCase";
 import GHOLifeExpentancyHALEAtAge60UseCase from "./gho/GHOLifeExpentancyHALEAtAge60UseCase";
@@ -56,6 +57,11 @@ export class GetActionsUseCase implements UseCase {
                 id: "gho-life-expectancy-hale-at-age-60-years",
                 name: "GHO - Life expectancy (HALE) at age 60 years",
                 execute: () => GHOLifeExpentancyHALEAtAge60UseCase(this.martRepository, this.instanceRepository),
+            },
+            {
+                id: "gho-expectation-of-life-at-age",
+                name: "GHO - Expectation of life at age",
+                execute: () => GHOExpectationOfLifeAtAge(this.martRepository, this.instanceRepository),
             },
         ]);
     }
