@@ -5,16 +5,16 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-09-01T16:35:39.622Z\n"
-"PO-Revision-Date: 2021-09-01T16:35:39.622Z\n"
+"POT-Creation-Date: 2021-10-01T10:04:57.833Z\n"
+"PO-Revision-Date: 2021-10-01T10:04:57.833Z\n"
 
-msgid "Data values - Create/update"
+msgid "Events - Create/update"
 msgstr ""
 
 msgid "Event"
 msgstr ""
 
-msgid "DataValue"
+msgid "Data values - Create/update"
 msgstr ""
 
 msgid "Add"

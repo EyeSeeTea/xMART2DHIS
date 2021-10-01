@@ -1,5 +1,5 @@
 import { DataValue } from "../../domain/entities/DataValue";
-import { FutureData } from "../../domain/entities/Future";
+import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
 import { SyncResult } from "../../domain/entities/SyncResult";
@@ -56,21 +56,42 @@ export class InstanceDefaultRepository implements InstanceRepository {
     }
 
     public postEvents(events: ProgramEvent[], params: PostEventsParams = {}): FutureData<SyncResult> {
-        return apiToFuture(this.api.events.post(params, { events })).map(response =>
-            postImport(response, {
-                title: i18n.t("Data values - Create/update"),
-                model: i18n.t("Event"),
-                splitStatsList: true,
+        return apiToFuture(this.api.events.postAsync(params, { events })).flatMap(({ response }) =>
+            apiToFuture(this.api.system.waitFor(response.jobType, response.id)).flatMap(response => {
+                if (!response) return Future.error("Unknown error saving events");
+
+                return Future.success(
+                    //@ts-ignore TODO: Alexis will review the types
+                    postImport(
+                        { status: response.status, response },
+                        {
+                            title: i18n.t("Events - Create/update"),
+                            model: i18n.t("Event"),
+                            splitStatsList: true,
+                        }
+                    )
+                );
             })
         );
     }
 
-    postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
-        return apiToFuture(this.api.dataValues.postSet(params, { dataValues })).map(response =>
-            postImport(response, {
-                title: i18n.t("Data values - Create/update"),
-                model: i18n.t("DataValue"),
-                splitStatsList: true,
+    public postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
+        return apiToFuture(this.api.dataValues.postSetAsync(params, { dataValues })).flatMap(({ response }) =>
+            apiToFuture(this.api.system.waitFor(response.jobType, response.id)).flatMap(importSummary => {
+                if (!importSummary) return Future.error("Unknown error saving data values");
+
+                const { status, description, conflicts, importCount } = importSummary;
+                const { imported, deleted, updated, ignored } = importCount;
+                const errors = conflicts?.map(({ object, value }) => ({ id: object, message: value })) ?? [];
+
+                return Future.success({
+                    title: i18n.t("Data values - Create/update"),
+                    status,
+                    message: description,
+                    stats: [{ imported, deleted, updated, ignored }],
+                    errors,
+                    rawResponse: importSummary,
+                });
             })
         );
     }

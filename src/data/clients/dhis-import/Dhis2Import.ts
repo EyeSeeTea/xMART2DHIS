@@ -95,7 +95,7 @@ export function postImport(
             importResult: response,
             splitStatsList,
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error?.response?.data) {
             return processImportResponse({
                 title,

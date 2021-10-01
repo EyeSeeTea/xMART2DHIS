@@ -69,4 +69,4 @@ const age: Record<string, string> = {
     "AGE80-84-FMLE": "cOiIgWw0CuG",
     "YEARS85PLUS-MLE": "vPPZ9IvzwcZ",
     "YEARS85PLUS-FMLE": "Bq2pVOheHJZ",
-}
+};
