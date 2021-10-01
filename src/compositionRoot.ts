@@ -55,6 +55,7 @@ export const XMartEndpoints = {
     GHO_POC: "https://frontdoor-r5quteqglawbs.azurefd.net/GHO_POC",
     ILIAD: "https://frontdoor-r5quteqglawbs.azurefd.net/ILIAD",
     DEX_CMS: "https://frontdoor-r5quteqglawbs.azurefd.net/DEX_CMS",
+    WHO_MULTIMEDIA: "https://dev.eyeseetea.com/cors/www.who.int/api/multimedias",
 };
 
 export type XMartEndpoint = keyof typeof XMartEndpoints;

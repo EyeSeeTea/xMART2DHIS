@@ -20,4 +20,5 @@ export type ListAllOptions = {
     apply?: string; // Group-by properties in the response
     filter?: string; // Filter results to be included in the response (ie: "contains(TEST_TYPE_FK, 'value')")
     orderBy?: string; // Order the results by properties
+    [key: string]: string | number | undefined;
 };

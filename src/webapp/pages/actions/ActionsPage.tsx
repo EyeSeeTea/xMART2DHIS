@@ -43,7 +43,7 @@ export const ActionsPage: React.FC = () => {
                     Future.parallel(futures, { maxConcurrency: 1 }).run(
                         results => {
                             loading.reset();
-                            setResults(results);
+                            setResults(_.compact(results));
                         },
                         error => {
                             loading.reset();

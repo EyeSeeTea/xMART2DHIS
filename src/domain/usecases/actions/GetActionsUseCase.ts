@@ -12,6 +12,7 @@ import GHOLifeExpentancyAtAge60UseCase from "./gho/GHOLifeExpentancyAtAge60UseCa
 import GHOLifeExpentancyAtBirthUseCase from "./gho/GHOLifeExpentancyAtBirthUseCase";
 import GHOLifeExpentancyHALEAtAge60UseCase from "./gho/GHOLifeExpentancyHALEAtAge60UseCase";
 import GHOLifeExpentancyHALEAtBirthUseCase from "./gho/GHOLifeExpentancyHALEAtBirthUseCase";
+import GetWHOCountries from "./who/GetWHOCountries";
 
 export class GetActionsUseCase implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
@@ -62,6 +63,11 @@ export class GetActionsUseCase implements UseCase {
                 id: "gho-expectation-of-life-at-age",
                 name: "GHO - Expectation of life at age",
                 execute: () => GHOExpectationOfLifeAtAge(this.martRepository, this.instanceRepository),
+            },
+            {
+                id: "who-countries",
+                name: "WHO - Get country list",
+                execute: () => GetWHOCountries(this.martRepository, this.instanceRepository),
             },
         ]);
     }

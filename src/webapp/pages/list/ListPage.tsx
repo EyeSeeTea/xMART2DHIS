@@ -56,7 +56,7 @@ export const ListPage: React.FC = () => {
 
     const onChange = useCallback(
         (state: TableState<TableObject>) => {
-            fetchRows(state.pagination);
+            fetchRows({ ...state.pagination });
         },
         [fetchRows]
     );

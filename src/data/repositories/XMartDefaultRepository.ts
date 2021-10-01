@@ -13,16 +13,12 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 
     public list(endpoint: XMartEndpoint, table: string, options: ListOptions = {}): FutureData<XMartResponse> {
-        const { pageSize = 25, page = 1, select, expand, apply, filter, orderBy } = options;
+        const { pageSize = 25, page = 1, ...extra } = options;
         const params = compactObject({
             top: pageSize,
             skip: (page - 1) * pageSize,
             count: true,
-            select,
-            expand,
-            apply,
-            filter,
-            orderBy,
+            ...extra,
         });
 
         return this.query<XMartContent[]>(endpoint, table, params).map(response => ({
@@ -94,8 +90,10 @@ function futureFetch<Data>(
     });
 }
 
+const specialParams = ["select", "expand", "apply", "filter", "orderBy"];
+
 function buildParams(params: Record<string, string | number | boolean>) {
-    return _.map(params, (value, key) => `$${key}=${value}`).join("&");
+    return _.map(params, (value, key) => `${specialParams.includes(key) ? "$" : ""}${key}=${value}`).join("&");
 }
 
 function compactObject<Obj extends object>(object: Obj) {
