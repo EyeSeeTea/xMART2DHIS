@@ -69,6 +69,9 @@ export default function action(
 
 function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
     const dataElement = dhisId[field];
+    if (field === "MECH_INVOLVEMENT__CODE") {
+        item[field] = mechInvolement[String(item[field])] ?? null;
+    }
     const value = item[field];
 
     return dataElement && value ? { dataElement, value } : undefined;
@@ -103,4 +106,13 @@ const categoryOptionCombo: Record<string, string> = {
     adHe8ZqTLGQ: "VIsmG1pMMgI",
     MFYaHarMqU1: "PR1plsTJJER",
     U9ryfMWEJwI: "OVcRgB8Fe13",
+};
+
+
+const mechInvolement: Record<string, number> = {
+    NOT_EVALUABLE: 0,
+    NEGATIVE: 1,
+    NO_INVOLVEMENT: 2,
+    PARTIAL: 3,
+    FULL: 4,
 };
