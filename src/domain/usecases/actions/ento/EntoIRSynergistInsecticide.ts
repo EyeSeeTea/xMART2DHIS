@@ -72,6 +72,13 @@ function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventD
     if (field === "MECH_INVOLVEMENT__CODE") {
         item[field] = mechInvolement[String(item[field])] ?? null;
     }
+    if (field === "SPECIES_CONTROL_FK__CODE" || field === "SPECIES_FK__CODE") {
+        if (item[field] === "STEPHENSI_SL") {
+            item[field] = "STEPHENSI";
+        } else if (item[field] === "NA" || item[field] === "NR" || item[field] === "ANOPHELES_SSP") {
+            item[field] = "";
+        }
+    }
     const value = item[field];
 
     return dataElement && value ? { dataElement, value } : undefined;
@@ -107,7 +114,6 @@ const categoryOptionCombo: Record<string, string> = {
     MFYaHarMqU1: "PR1plsTJJER",
     U9ryfMWEJwI: "OVcRgB8Fe13",
 };
-
 
 const mechInvolement: Record<string, number> = {
     NOT_EVALUABLE: 0,
