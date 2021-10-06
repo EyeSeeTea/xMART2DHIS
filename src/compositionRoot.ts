@@ -1,4 +1,5 @@
 import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
+import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
@@ -11,6 +12,7 @@ import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUse
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const martRepository = new XMartDefaultRepository();
+    const metadataRepository = new MetadataD2ApiRepository(instance);
 
     return {
         xmart: getExecute({
@@ -23,7 +25,7 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            get: new GetActionsUseCase(martRepository, instanceRepository),
+            get: new GetActionsUseCase(martRepository, metadataRepository, instanceRepository),
         }),
     };
 }

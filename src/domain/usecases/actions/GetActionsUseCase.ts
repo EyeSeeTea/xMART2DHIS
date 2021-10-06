@@ -2,6 +2,7 @@ import { UseCase } from "../../../compositionRoot";
 import { Future, FutureData } from "../../entities/Future";
 import { SyncAction } from "../../entities/SyncAction";
 import { InstanceRepository } from "../../repositories/InstanceRepository";
+import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 import EntoDiscriminatingConcentrationUseCase from "./ento/EntoDiscriminatingConcentration";
 import EntoIRIntensityConcentrationUseCase from "./ento/EntoIRIntensityConcentration";
@@ -15,7 +16,7 @@ import GHOLifeExpentancyHALEAtBirthUseCase from "./gho/GHOLifeExpentancyHALEAtBi
 import GetWHOCountries from "./who/GetWHOCountries";
 
 export class GetActionsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private martRepository: XMartRepository, private MetadataRepository: MetadataRepository, private instanceRepository: InstanceRepository) { }
 
     public execute(): FutureData<SyncAction[]> {
         return Future.success([
@@ -67,7 +68,7 @@ export class GetActionsUseCase implements UseCase {
             {
                 id: "who-countries",
                 name: "WHO - Get country list",
-                execute: () => GetWHOCountries(this.martRepository, this.instanceRepository),
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository),
             },
         ]);
     }
