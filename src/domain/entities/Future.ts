@@ -3,7 +3,7 @@ import _ from "lodash";
 import { Either } from "purify-ts";
 
 export class Future<E, D> {
-    private constructor(private instance: fluture.FutureInstance<E, D>) {}
+    private constructor(private instance: fluture.FutureInstance<E, D>) { }
 
     run(onSuccess: Fn<D>, onError: Fn<E>): Cancel {
         return fluture.fork(onError)(onSuccess)(this.instance);
@@ -45,7 +45,7 @@ export class Future<E, D> {
     }
 
     /* Static methods */
-    static noCancel: Cancel = () => {};
+    static noCancel: Cancel = () => { };
 
     static fromComputation<E, D>(computation: Computation<E, D>): Future<E, D> {
         return new Future(fluture.Future((reject, resolve) => computation(resolve, reject)));
@@ -56,7 +56,7 @@ export class Future<E, D> {
             fluture.Future((reject, resolve) => {
                 if (input.isRight()) resolve(input.extract());
                 else if (input.isLeft()) reject(input.extract());
-                return () => {};
+                return () => { };
             })
         );
     }

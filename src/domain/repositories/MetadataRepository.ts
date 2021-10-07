@@ -1,7 +1,6 @@
-import { MetadataPayload } from "@eyeseetea/d2-api/2.34";
 import { FutureData } from "../entities/Future";
 import { ImportResult } from "../entities/ImportResult";
-import { MetadataModel, MetadataItem } from "../entities/MetadataItem";
+import { MetadataModel, MetadataItem, MetadataPayload } from "../entities/MetadataItem";
 
 export interface MetadataRepository {
     list(options: ListOptions): FutureData<ListMetadataResponse>;

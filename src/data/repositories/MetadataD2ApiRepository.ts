@@ -1,19 +1,14 @@
+import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
+import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
+import { Instance } from "../../domain/entities/Instance";
+import { isValidModel, MetadataModel, Visualization, MetadataPayload, DataDimensionItem } from "../../domain/entities/MetadataItem";
+import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
+import { getD2APiFromInstance } from "../../utils/d2-api";
+import { apiToFuture } from "../../utils/futures";
+
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
-import { Instance } from "../../domain/entities/Instance";
-import {
-    DataDimensionItem,
-    isValidModel,
-    MetadataModel,
-    MetadataPayload,
-    Visualization,
-} from "../../domain/entities/MetadataItem";
-import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
-import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
-import { getD2APiFromInstance } from "../../utils/d2-api";
-import { apiToFuture } from "../../utils/futures";
 
 export class MetadataD2ApiRepository implements MetadataRepository {
     private api: D2Api;
@@ -22,7 +17,7 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         this.api = getD2APiFromInstance(instance);
     }
 
-    public list(options: ListOptions): FutureData<ListMetadataResponse> {
+    list(options: ListOptions): FutureData<ListMetadataResponse> {
         const { model, page, pageSize, search, sorting = { field: "id", order: "asc" } } = options;
 
         return apiToFuture(

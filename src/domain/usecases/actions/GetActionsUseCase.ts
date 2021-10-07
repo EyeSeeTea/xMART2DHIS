@@ -16,7 +16,11 @@ import GHOLifeExpentancyHALEAtBirthUseCase from "./gho/GHOLifeExpentancyHALEAtBi
 import GetWHOCountries from "./who/GetWHOCountries";
 
 export class GetActionsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private MetadataRepository: MetadataRepository, private instanceRepository: InstanceRepository) { }
+    constructor(
+        private martRepository: XMartRepository,
+        private MetadataRepository: MetadataRepository,
+        private instanceRepository: InstanceRepository
+    ) {}
 
     public execute(): FutureData<SyncAction[]> {
         return Future.success([

@@ -1,4 +1,6 @@
-export interface TranslationObject {
+import { NamedRef } from "./Ref";
+
+export interface TranslationObject extends NamedRef {
     property: string;
     locale: string;
     value: string;
@@ -10,6 +12,8 @@ export interface TranslatedObject {
 
 export function buildTranslationItem(property: string, locale: string, value: string): TranslationObject {
     return {
+        name: "",
+        id: "",
         property: property,
         locale: locale,
         value: value,
