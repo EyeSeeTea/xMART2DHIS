@@ -9,8 +9,8 @@ import { XMartRepository } from "../../../repositories/XMartRepository";
 
 const PROGRAM_ENTO_IR_INTENSITY_CONCENTRATION = "FUzFm6UEmRn";
 const PROGRAM_STAGE_ENTO_IR_INTENSITY_CONCENTRATION = "VkFvRbbpVng";
-const intensity5x = "_x5";
-const intensity10x = "_x10";
+const intensity5x = "_5x";
+const intensity10x = "_10x";
 
 export default function action(
     martRepository: XMartRepository,
@@ -84,7 +84,7 @@ export default function action(
 function mapField(
     item: XMartContent | undefined,
     field: keyof typeof dhisId,
-    type = "_x5"
+    type = "_5x"
 ): ProgramEventDataValue | undefined {
     if (!item) return undefined;
 
@@ -126,16 +126,16 @@ const dhisId: Record<string, string> = {
     YEAR_START: "EvSWXtVdh6h",
     TEST_TIME_FK__CODE: "v86CHHosXCi",
     TEST_TYPE_FK__CODE: "NGU9TjLZcBg",
-    ADJ_MORTALITY_PERCENT_1X_x5: "hjdSAokENFs",
-    INSECTICIDE_FK__CODE_x5: "mspNBRCNrPh",
-    NUMBER_MOSQ_CONTROL_x5: "RtoQzWkv24k",
-    MORTALITY_NUMBER_x5: "WoM25CEOaad",
-    NUMBER_MOSQ_EXP_x5: "TqBMpf6rqzO",
-    ADJ_MORTALITY_PERCENT_1X_x10: "mcRgVtgwevL",
-    INSECTICIDE_FK__CODE_x10: "xiFX4d6U2WG",
-    NUMBER_MOSQ_CONTROL_x10: "LFxCOJqeFxz",
-    MORTALITY_NUMBER_x10: "Dz489B9dDqQ",
-    NUMBER_MOSQ_EXP_x10: "NkFOQ7gLyqW",
+    ADJ_MORTALITY_PERCENT_1X_5x: "hjdSAokENFs",
+    INSECTICIDE_FK__CODE_5x: "mspNBRCNrPh",
+    NUMBER_MOSQ_CONTROL_5x: "RtoQzWkv24k",
+    MORTALITY_NUMBER_5x: "WoM25CEOaad",
+    NUMBER_MOSQ_EXP_5x: "TqBMpf6rqzO",
+    ADJ_MORTALITY_PERCENT_1X_10x: "mcRgVtgwevL",
+    INSECTICIDE_FK__CODE_10x: "xiFX4d6U2WG",
+    NUMBER_MOSQ_CONTROL_10x: "LFxCOJqeFxz",
+    MORTALITY_NUMBER_10x: "Dz489B9dDqQ",
+    NUMBER_MOSQ_EXP_10x: "NkFOQ7gLyqW",
 };
 
 const categoryOptionCombo: Record<string, string> = {
