@@ -20,7 +20,7 @@ export class GetActionsUseCase implements UseCase {
         private martRepository: XMartRepository,
         private MetadataRepository: MetadataRepository,
         private instanceRepository: InstanceRepository
-    ) {}
+    ) { }
 
     public execute(): FutureData<SyncAction[]> {
         return Future.success([

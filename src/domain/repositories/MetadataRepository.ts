@@ -4,7 +4,7 @@ import { MetadataModel, MetadataItem, MetadataPayload } from "../entities/Metada
 
 export interface MetadataRepository {
     list(options: ListOptions): FutureData<ListMetadataResponse>;
-    getOrganisationUnit(codes: string[]): FutureData<MetadataPayload>;
+    getMetadata(codes: string[]): FutureData<MetadataPayload>;
     save(payload: MetadataPayload): FutureData<ImportResult>;
     getModelName(model: string): string;
     isShareable(model: string): boolean;

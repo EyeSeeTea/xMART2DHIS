@@ -1,14 +1,16 @@
 import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
 import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
 import { Instance } from "../../domain/entities/Instance";
-import { isValidModel, MetadataModel, Visualization, MetadataPayload, DataDimensionItem } from "../../domain/entities/MetadataItem";
+import {
+    MetadataPayload,
+} from "../../domain/entities/MetadataItem";
 import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
 
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
-import { Future, FutureData } from "../../domain/entities/Future";
+import { FutureData } from "../../domain/entities/Future";
 
 export class MetadataD2ApiRepository implements MetadataRepository {
     private api: D2Api;
@@ -37,29 +39,8 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         return apiToFuture(this.api.metadata.post(payload)).map(response => buildMetadataImportResult(response));
     }
 
-    public getOrganisationUnit(ids: string[]): FutureData<MetadataPayload> {
-        return this.fetchMetadata(ids)
-            .flatMap(payload => {
-                const items = _(payload)
-                    .mapValues((items, key) => {
-                        if (!Array.isArray(items) || !isValidModel(key)) return undefined;
-                        return items.map(item => ({ model: key, id: item.id }));
-                    })
-                    .values()
-                    .flatten()
-                    .compact()
-                    .value();
-
-                return Future.futureMap(items, ({ model, id }) => this.fetchMetadataWithDependencies(model, id));
-            })
-            .flatMap(payloads => {
-                const payload = mergePayloads(payloads);
-                const extraIds = extractExtraDependencies(payload);
-                if (extraIds.length === 0) return Future.success(payload);
-
-                return this.fetchMetadata(extraIds).map(dependencies => mergePayloads([payload, dependencies]));
-            })
-            .map(payload => removeDefaults(payload));
+    public getMetadata(codes: string[]): FutureData<MetadataPayload> {
+        return this.fetchMetadataByCode(codes);
     }
 
     public getModelName(model: string): string {
@@ -74,13 +55,22 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         return this.api.models[model as ModelIndex].schema.dataShareable ?? false;
     }
 
-    private fetchMetadata(ids: string[]): FutureData<MetadataPayload> {
-        return apiToFuture(this.api.get("/metadata", { filter: `id:in:[${ids.join(",")}]` }));
+    /*     private fetchMetadata(ids: string[]): FutureData<MetadataPayload> {
+            return apiToFuture(this.api.get("/metadata", { filter: `id:in:[${ids.join(",")}]` }));
+        } */
+
+    private fetchMetadataByCode(codes: string[]): FutureData<MetadataPayload> {
+        return apiToFuture<MetadataPayload>(this.api.get("/metadata", { filter: `code:in:[${codes.join(",")}]`, fields: `*, categoryOptionCombos[*]` }));
     }
 
-    private fetchMetadataWithDependencies(model: MetadataModel, id: string): FutureData<MetadataPayload> {
-        return apiToFuture<MetadataPayload>(this.api.get(`/${model}/${id}/metadata.json`));
-    }
+
+    /*     private fetchMetadataWithDependencies(model: MetadataModel, id: string): FutureData<MetadataPayload> {
+            if (model === "categoryOptions") {
+                return apiToFuture<MetadataPayload>(this.api.get(`/${model}/${id}.json?fields=*,categoryOptionCombos[*]`));
+            } else {
+                return apiToFuture<MetadataPayload>(this.api.get(`/${model}/${id}.json?fields=*`));
+            }
+        } */
 }
 
 export function mergePayloads(payloads: MetadataPayload[]): MetadataPayload {
@@ -99,31 +89,9 @@ export function mergePayloads(payloads: MetadataPayload[]): MetadataPayload {
     );
 }
 
-function removeDefaults(payload: MetadataPayload): MetadataPayload {
+/* function removeDefaults(payload: MetadataPayload): MetadataPayload {
     return _.mapValues(payload, items => items.filter(({ code, name }) => code !== "default" && name !== "default"));
-}
-
-function extractExtraDependencies(payload: MetadataPayload): string[] {
-    return _(payload)
-        .mapValues((value, key) => {
-            if (key === "visualizations") {
-                return _.flatten(
-                    value.map((element: Visualization) =>
-                        _.flatMap(element.dataDimensionItems ?? [], (item: DataDimensionItem) => {
-                            const indicator = item.indicator?.id;
-                            const programIndicator = item.programIndicator?.id;
-                            return _.compact([indicator, programIndicator]);
-                        })
-                    )
-                );
-            }
-
-            return [];
-        })
-        .values()
-        .flatten()
-        .value();
-}
+} */
 
 function buildMetadataImportResult(response: MetadataResponse): ImportResult {
     const { status, stats, typeReports = [] } = response;

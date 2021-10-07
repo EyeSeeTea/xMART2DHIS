@@ -3,6 +3,7 @@ import _ from "lodash";
 import { Either } from "purify-ts";
 
 export class Future<E, D> {
+    [x: string]: any;
     private constructor(private instance: fluture.FutureInstance<E, D>) { }
 
     run(onSuccess: Fn<D>, onError: Fn<E>): Cancel {
