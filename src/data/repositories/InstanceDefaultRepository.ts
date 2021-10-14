@@ -1,9 +1,15 @@
+import { DataValue } from "../../domain/entities/DataValue";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
 import { SyncResult } from "../../domain/entities/SyncResult";
 import { User } from "../../domain/entities/User";
-import { GetEventsFilters, InstanceRepository, PostEventsParams } from "../../domain/repositories/InstanceRepository";
+import {
+    GetEventsFilters,
+    InstanceRepository,
+    PostDataValuesParams,
+    PostEventsParams,
+} from "../../domain/repositories/InstanceRepository";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
@@ -69,7 +75,7 @@ export class InstanceDefaultRepository implements InstanceRepository {
         );
     }
 
-    /**public postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
+    public postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
         return apiToFuture(this.api.dataValues.postSetAsync(params, { dataValues })).flatMap(({ response }) =>
             apiToFuture(this.api.system.waitFor(response.jobType, response.id)).flatMap(importSummary => {
                 if (!importSummary) return Future.error("Unknown error saving data values");
@@ -88,7 +94,7 @@ export class InstanceDefaultRepository implements InstanceRepository {
                 });
             })
         );
-    }**/
+    }
 
     public getEvents(_filters: GetEventsFilters): FutureData<ProgramEvent[]> {
         throw new Error("Method not implemented.");

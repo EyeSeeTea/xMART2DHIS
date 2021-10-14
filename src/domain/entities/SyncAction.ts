@@ -5,5 +5,5 @@ export interface SyncAction {
     id: string;
     name: string;
     description?: string;
-    execute: () => FutureData<SyncResult>;
+    execute: () => FutureData<SyncResult | undefined>;
 }
