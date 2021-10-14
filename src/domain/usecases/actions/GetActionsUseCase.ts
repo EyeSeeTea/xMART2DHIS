@@ -70,9 +70,39 @@ export class GetActionsUseCase implements UseCase {
                 execute: () => GHOExpectationOfLifeAtAge(this.martRepository, this.instanceRepository),
             },
             {
-                id: "who-countries",
-                name: "WHO - Get country list",
-                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository),
+                id: "who-countries-es",
+                name: "WHO - Get country Spanish list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "es"),
+            },
+            {
+                id: "who-countries-en",
+                name: "WHO - Get country English list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "en"),
+            },
+            {
+                id: "who-countries-ru",
+                name: "WHO - Get country Russian list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "ru"),
+            },
+            {
+                id: "who-countries-ar",
+                name: "WHO - Get country Arabic list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "ar"),
+            },
+            {
+                id: "who-countries-fr",
+                name: "WHO - Get country French list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "fr"),
+            },
+            {
+                id: "who-countries-ch",
+                name: "WHO - Get country Chinese list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "zh"),
+            },
+            {
+                id: "who-countries-pt",
+                name: "WHO - Get country Portuguese list",
+                execute: () => GetWHOCountries(this.martRepository, this.MetadataRepository, this.instanceRepository, "pt"),
             },
         ]);
     }

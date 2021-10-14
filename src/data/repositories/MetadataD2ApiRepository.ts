@@ -1,9 +1,7 @@
 import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
 import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
 import { Instance } from "../../domain/entities/Instance";
-import {
-    MetadataPayload,
-} from "../../domain/entities/MetadataItem";
+import { MetadataPayload } from "../../domain/entities/MetadataItem";
 import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
@@ -60,9 +58,10 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         } */
 
     private fetchMetadataByCode(codes: string[]): FutureData<MetadataPayload> {
-        return apiToFuture<MetadataPayload>(this.api.get("/metadata", { filter: `code:in:[${codes.join(",")}]`, fields: `*, categoryOptionCombos[*]` }));
+        return apiToFuture<MetadataPayload>(
+            this.api.get("/metadata", { filter: `code:in:[${codes.join(",")}]`, fields: `*, categoryOptionCombos[*]` })
+        );
     }
-
 
     /*     private fetchMetadataWithDependencies(model: MetadataModel, id: string): FutureData<MetadataPayload> {
             if (model === "categoryOptions") {

@@ -13,11 +13,14 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 
     public list(endpoint: XMartEndpoint, table: string, options: ListOptions = {}): FutureData<XMartResponse> {
-        const { pageSize = 25, page = 1, ...extra } = options;
+        const { pageSize = 100, page = 1, ...extra } = options;
         const params = compactObject({
             top: pageSize,
+            $top: pageSize,
             skip: (page - 1) * pageSize,
+            $skip: (page - 1) * pageSize,
             count: true,
+            $count: true,
             ...extra,
         });
 
@@ -55,6 +58,7 @@ export class XMartDefaultRepository implements XMartRepository {
         params: Record<string, string | number | boolean>
     ): FutureData<ODataResponse<Data>> {
         const qs = buildParams(params);
+        //todo fix pagination
         return futureFetch("get", endpoint, `/${table}?${qs}`);
     }
 }
@@ -100,4 +104,4 @@ function compactObject<Obj extends object>(object: Obj) {
     return _.pickBy(object, _.identity);
 }
 
-type ODataResponse<Data> = { value: Data; [key: string]: any };
+type ODataResponse<Data> = { value: Data;[key: string]: any };
