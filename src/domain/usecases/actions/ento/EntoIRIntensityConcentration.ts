@@ -42,9 +42,7 @@ export default function action(
                 const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
 
                 const insecticide_value = String(get("INSECTICIDE_FK__CODE")) ?? "undefined";
-                if (event === "C7KKHfq5XA8") {
-                    debugger;
-                }
+
                 if (String(get("TEST_ID"))?.includes("_5x")) {
                     const optionSets5x = metadata5x.optionSets ?? [];
                     const codes5x: String[] = optionSets5x.map(options => {
