@@ -142,6 +142,7 @@ function mapField(
     if (!item) return undefined;
 
     const opossit = typeOpposit[type];
+
     const getKeyByIntensity = (prop: string) =>
         String(item["TEST_ID"]).endsWith(type) ? `${prop}${type}` : `${prop}${opossit}`;
 
@@ -158,13 +159,15 @@ function mapField(
 
     //todo comment, dhis can't import false boolean with boolean format
     const value_formatter = item[field];
+
     if (String(value_formatter) === "true" || String(value_formatter) === "false" || String(value_formatter) === "0") {
         const value = String(value_formatter);
         return dataElement && value ? { dataElement, value } : undefined;
     }
-    const value = item[field];
 
-    return dataElement && value && value !== "null" ? { dataElement, value } : undefined;
+    const value = item[field] ?? "";
+
+    return dataElement && value !== "null" ? { dataElement, value } : undefined;
 }
 
 const typeOpposit: Record<string, string> = {
