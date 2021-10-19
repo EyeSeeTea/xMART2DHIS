@@ -62,6 +62,18 @@ export default function action(
 
 function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
     const dataElement = dhisId[field];
+    if (field === "SPECIES_CONTROL_FK__CODE" || field === "SPECIES_FK__CODE") {
+        if (item[field] === "STEPHENSI_SL") {
+            item[field] = "STEPHENSI";
+        } else if (item[field] === "NA" || item[field] === "NR" || item[field] === "ANOPHELES_SSP") {
+            item[field] = "";
+        }
+    }
+    const value_formatter = item[field];
+    if (String(value_formatter) === "true" || String(value_formatter) === "false") {
+        const value = String(value_formatter);
+        return dataElement && value ? { dataElement, value } : undefined;
+    }
     const value = item[field];
 
     return dataElement && value ? { dataElement, value } : undefined;

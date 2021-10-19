@@ -1,20 +1,26 @@
 import _ from "lodash";
 import { getUid } from "../../../../utils/uid";
-import { FutureData } from "../../../entities/Future";
+import { Future, FutureData } from "../../../entities/Future";
 import { ProgramEvent, ProgramEventDataValue } from "../../../entities/ProgramEvent";
 import { SyncResult } from "../../../entities/SyncResult";
 import { XMartContent } from "../../../entities/XMart";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
+import { MetadataRepository } from "../../../repositories/MetadataRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
 const PROGRAM_ENTO_IR_DISCRIMINATING_CONCENTRATION = "G9hvxFI8AYC";
 const PROGRAM_STAGE_ENTO_IR_DISCRIMINATING_CONCENTRATION = "P7VZnpYMjf6";
+const INSECTICIDE_CONCENTRATION_1x = "iwLpJ6hh3qI";
 
 export default function action(
     martRepository: XMartRepository,
-    instanceRepository: InstanceRepository
+    instanceRepository: InstanceRepository,
+    metadataRepository: MetadataRepository
 ): FutureData<SyncResult> {
-    return martRepository.listAll("ENTO", "FACT_DISCRIMINATING_TEST").flatMap(options => {
+    return Future.joinObj({
+        metadata: metadataRepository.getOptionsFromOptionSet([INSECTICIDE_CONCENTRATION_1x]),
+        options: martRepository.listAll("ENTO", "FACT_DISCRIMINATING_TEST"),
+    }).flatMap(({ metadata, options }) => {
         const events: ProgramEvent[] = _.compact(
             options.map(item => {
                 const event = item["TEST_ID"] ?? getUid(String(item["_RecordID"]));
@@ -22,8 +28,26 @@ export default function action(
                 const eventDate = item["Sys_FirstCommitDateUtc"];
                 const categoryOption = item["INSTITUTION_TYPE__CODE"];
                 const attributeOptionCombo = categoryOptionCombo[String(categoryOption)];
+                const insecticide_value = mapField(item, "INSECTICIDE_FK__CODE")?.value ?? "";
 
-                if (!event || !orgUnit || !eventDate || !attributeOptionCombo) {
+                const optionSets = metadata.optionSets ?? [];
+                const codes: String[] = optionSets.map(options => {
+                    const codes = options["options"].map((item: any) => {
+                        return String(item.code);
+                    });
+                    return codes;
+                })[0];
+                if (!codes.includes(String(insecticide_value))) {
+                    return undefined;
+                }
+
+                if (
+                    !event ||
+                    !orgUnit ||
+                    !eventDate ||
+                    !attributeOptionCombo ||
+                    codes.indexOf(String(insecticide_value)) === -1
+                ) {
                     return undefined;
                 }
 
@@ -68,6 +92,19 @@ export default function action(
 
 function mapField(item: XMartContent, field: keyof typeof dhisId): ProgramEventDataValue | undefined {
     const dataElement = dhisId[field];
+
+    if (field === "SPECIES_CONTROL_FK__CODE" || field === "SPECIES_FK__CODE") {
+        if (item[field] === "STEPHENSI_SL") {
+            item[field] = "STEPHENSI";
+        } else if (item[field] === "NA" || item[field] === "NR" || item[field] === "ANOPHELES_SSP") {
+            item[field] = "";
+        }
+    }
+    const value_formatter = item[field];
+    if (String(value_formatter) === "true" || String(value_formatter) === "false") {
+        const value = String(value_formatter);
+        return dataElement && value ? { dataElement, value } : undefined;
+    }
     const value = item[field];
 
     return dataElement && value ? { dataElement, value } : undefined;

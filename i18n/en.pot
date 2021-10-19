@@ -5,13 +5,22 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-27T11:04:44.860Z\n"
-"PO-Revision-Date: 2021-08-27T11:04:44.860Z\n"
+"POT-Creation-Date: 2021-10-15T08:13:26.930Z\n"
+"PO-Revision-Date: 2021-10-15T08:13:26.931Z\n"
+
+msgid "Events - Create/update"
+msgstr ""
+
+msgid "Event"
+msgstr ""
 
 msgid "Data values - Create/update"
 msgstr ""
 
-msgid "Event"
+msgid "Unknown model"
+msgstr ""
+
+msgid "Metadata"
 msgstr ""
 
 msgid "Add"
