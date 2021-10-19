@@ -19,4 +19,12 @@ export type PostEventsParams = {
     dryRun?: boolean;
 };
 
+export type PostDataValuesParams = {
+    idScheme?: "UID" | "CODE";
+    dataElementIdScheme?: "UID" | "CODE";
+    orgUnitIdScheme?: "UID" | "CODE";
+    eventIdScheme?: "UID" | "CODE";
+    dryRun?: boolean;
+};
+
 export type GetEventsFilters = {};

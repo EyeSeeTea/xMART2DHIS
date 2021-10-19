@@ -1,14 +1,13 @@
-import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
-import { Instance } from "../../domain/entities/Instance";
-import { MetadataPayload } from "../../domain/entities/MetadataItem";
-import { getD2APiFromInstance } from "../../utils/d2-api";
-import { apiToFuture } from "../../utils/futures";
-
-import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import { FutureData } from "../../domain/entities/Future";
 import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
-import { MetadataRepository, ListMetadataResponse, ListOptions } from "../../domain/repositories/MetadataRepository";
+import { Instance } from "../../domain/entities/Instance";
+import { MetadataPayload } from "../../domain/entities/Metadata";
+import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
+import i18n from "../../locales";
+import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
+import { getD2APiFromInstance } from "../../utils/d2-api";
+import { apiToFuture } from "../../utils/futures";
 
 export class MetadataD2ApiRepository implements MetadataRepository {
     private api: D2Api;
@@ -42,34 +41,30 @@ export class MetadataD2ApiRepository implements MetadataRepository {
     }
 
     public getModelName(model: string): string {
-        return this.api.models[model as ModelIndex].schema.displayName ?? i18n.t("Unknown model");
+        if (!this.isValidModel(model)) throw new Error(`Invalid model: ${model}`);
+
+        return this.api.models[model].schema.displayName ?? i18n.t("Unknown model");
     }
 
     public isShareable(model: string): boolean {
-        return this.api.models[model as ModelIndex].schema.shareable ?? false;
+        if (!this.isValidModel(model)) throw new Error(`Invalid model: ${model}`);
+
+        return this.api.models[model].schema.shareable ?? false;
     }
 
     public isDataShareable(model: string): boolean {
-        return this.api.models[model as ModelIndex].schema.dataShareable ?? false;
+        if (!this.isValidModel(model)) throw new Error(`Invalid model: ${model}`);
+
+        return this.api.models[model].schema.dataShareable ?? false;
     }
 
     private fetchOptionSets(ids: string[]): FutureData<MetadataPayload> {
         return apiToFuture(this.api.get("/metadata", { filter: `id:in:[${ids.join(",")}]`, fields: `options[code]` }));
     }
-    /* 
-        private fetchMetadataByCode(codes: string[]): FutureData<MetadataPayload> {
-            return apiToFuture<MetadataPayload>(
-                this.api.get("/metadata", { filter: `code:in:[${codes.join(",")}]`, fields: `*, categoryOptionCombos[*]` })
-            );
-        } */
 
-    /*     private fetchMetadataWithDependencies(model: MetadataModel, id: string): FutureData<MetadataPayload> {
-            if (model === "categoryOptions") {
-                return apiToFuture<MetadataPayload>(this.api.get(`/${model}/${id}.json?fields=*,categoryOptionCombos[*]`));
-            } else {
-                return apiToFuture<MetadataPayload>(this.api.get(`/${model}/${id}.json?fields=*`));
-            }
-        } */
+    private isValidModel(model: string): model is keyof D2ApiDefinition["schemas"] {
+        return _.keys(this.api.models).includes(model);
+    }
 }
 
 export function mergePayloads(payloads: MetadataPayload[]): MetadataPayload {
@@ -87,10 +82,6 @@ export function mergePayloads(payloads: MetadataPayload[]): MetadataPayload {
         {} as MetadataPayload
     );
 }
-
-/* function removeDefaults(payload: MetadataPayload): MetadataPayload {
-    return _.mapValues(payload, items => items.filter(({ code, name }) => code !== "default" && name !== "default"));
-} */
 
 function buildMetadataImportResult(response: MetadataResponse): ImportResult {
     const { status, stats, typeReports = [] } = response;
@@ -128,5 +119,3 @@ function formatStats(stats: Stats, type?: string): ImportStats {
 function getClassName(className: string): string | undefined {
     return _(className).split(".").last();
 }
-
-type ModelIndex = keyof D2ApiDefinition["schemas"];

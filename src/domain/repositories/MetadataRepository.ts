@@ -1,6 +1,6 @@
 import { FutureData } from "../entities/Future";
 import { ImportResult } from "../entities/ImportResult";
-import { MetadataModel, MetadataItem, MetadataPayload } from "../entities/MetadataItem";
+import { MetadataItem, MetadataModel, MetadataPayload } from "../entities/Metadata";
 
 export interface MetadataRepository {
     list(options: ListOptions): FutureData<ListMetadataResponse>;
