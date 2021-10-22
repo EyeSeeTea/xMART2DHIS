@@ -1,5 +1,4 @@
-import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
-import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
+import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
@@ -10,9 +9,8 @@ import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContent
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 
 export function getCompositionRoot(instance: Instance) {
-    const instanceRepository = new InstanceDefaultRepository(instance);
+    const instanceRepository = new InstanceD2ApiRepository(instance);
     const martRepository = new XMartDefaultRepository();
-    const metadataRepository = new MetadataD2ApiRepository(instance);
 
     return {
         xmart: getExecute({
@@ -25,7 +23,7 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            get: new GetActionsUseCase(martRepository, instanceRepository, metadataRepository),
+            get: new GetActionsUseCase(martRepository, instanceRepository),
         }),
     };
 }
@@ -51,7 +49,7 @@ export interface UseCase {
 }
 
 export const XMartEndpoints = {
-    ENTO: "https://frontdoor-r5quteqglawbs.azurefd.net/VECTORS_IR",
+    REFMART: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
 };
 
 export type XMartEndpoint = keyof typeof XMartEndpoints;

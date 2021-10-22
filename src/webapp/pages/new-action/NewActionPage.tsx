@@ -13,7 +13,9 @@ export const NewActionPage: React.FC = () => {
 
 const globals = ``;
 
-const template = `async function execute(martRepository: XMartRepository, instanceRepository: InstanceRepository): Promise<void> {}
+const template = `async function execute(martRepository: XMartRepository, instanceRepository: InstanceRepository): Promise<void> {
+    
+}
 `;
 
 const MonacoEditor: React.FC<{ value: string; onChange: (value: string | undefined) => void }> = ({

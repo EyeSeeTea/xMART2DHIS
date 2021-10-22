@@ -10,12 +10,12 @@ import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
-export const ListPage: React.FC = () => {
+export const ListMartPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
 
     const [tables, setTables] = useState<XMartTable[]>();
-    const [selectedApi, setSelectedApi] = useState<XMartEndpoint>("ENTO");
+    const [selectedApi, setSelectedApi] = useState<XMartEndpoint>("REFMART");
     const [selectedTable, setSelectedTable] = useState<string>();
 
     const [loading, setLoading] = useState(false);

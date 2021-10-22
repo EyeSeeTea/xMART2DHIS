@@ -16,7 +16,7 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         this.api = getD2APiFromInstance(instance);
     }
 
-    list(options: ListOptions): FutureData<ListMetadataResponse> {
+    public list(options: ListOptions): FutureData<ListMetadataResponse> {
         const { model, page, pageSize, search, sorting = { field: "id", order: "asc" } } = options;
 
         return apiToFuture(
