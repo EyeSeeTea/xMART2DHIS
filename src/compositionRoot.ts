@@ -47,9 +47,3 @@ function getExecute<UseCases extends Record<Key, UseCase>, Key extends keyof Use
 export interface UseCase {
     execute: Function;
 }
-
-export const XMartEndpoints = {
-    REFMART: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
-};
-
-export type XMartEndpoint = keyof typeof XMartEndpoints;

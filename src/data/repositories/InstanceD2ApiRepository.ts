@@ -14,6 +14,7 @@ import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { AggregatedD2ApiRepository } from "./AggregatedD2ApiRepository";
 import { EventsD2ApiRepository } from "./EventsD2ApiRepository";
 import { MetadataD2ApiRepository } from "./MetadataD2ApiRepository";
+import _ from "lodash";
 
 export class InstanceD2ApiRepository implements InstanceRepository {
     private api: D2Api;
@@ -33,6 +34,10 @@ export class InstanceD2ApiRepository implements InstanceRepository {
 
     public getBaseUrl(): string {
         return this.api.baseUrl;
+    }
+
+    public isAdmin(user: User): boolean {
+        return _.flatMap(user.userRoles, ({ authorities }) => authorities).includes("ALL");
     }
 
     @cache()

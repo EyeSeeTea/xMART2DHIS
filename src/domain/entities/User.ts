@@ -12,7 +12,3 @@ export interface User {
 export interface UserRole extends NamedRef {
     authorities: string[];
 }
-
-export const isSuperAdmin = (user: User): boolean => {
-    return _.flatMap(user.userRoles, ({ authorities }) => authorities).includes("ALL");
-};

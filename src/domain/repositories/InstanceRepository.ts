@@ -14,4 +14,5 @@ export interface InstanceRepository {
     getBaseUrl(): string;
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
+    isAdmin(user: User): boolean;
 }

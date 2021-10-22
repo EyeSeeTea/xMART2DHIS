@@ -33,7 +33,7 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
 
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
-            setAppContext({ api, currentUser, compositionRoot });
+            setAppContext({ api, instance, currentUser, compositionRoot });
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);

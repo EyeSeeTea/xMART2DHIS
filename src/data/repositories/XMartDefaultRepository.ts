@@ -1,9 +1,8 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
-import { XMartEndpoint, XMartEndpoints } from "../../compositionRoot";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { XMartContent, XMartResponse, XMartTable } from "../../domain/entities/XMart";
-import { ListAllOptions, ListOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
+import { ListAllOptions, ListXMartOptions, XMartEndpoint, XMartEndpoints, XMartRepository } from "../../domain/repositories/XMartRepository";
 
 export class XMartDefaultRepository implements XMartRepository {
     public listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]> {
@@ -12,7 +11,7 @@ export class XMartDefaultRepository implements XMartRepository {
         );
     }
 
-    public list(endpoint: XMartEndpoint, table: string, options: ListOptions = {}): FutureData<XMartResponse> {
+    public list(endpoint: XMartEndpoint, table: string, options: ListXMartOptions = {}): FutureData<XMartResponse> {
         const { pageSize = 25, page = 1, select, expand, apply, filter, orderBy } = options;
         const params = compactObject({
             top: pageSize,

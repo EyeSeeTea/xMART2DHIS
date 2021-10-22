@@ -3,7 +3,7 @@ import { ImportResult } from "../entities/ImportResult";
 import { MetadataItem, MetadataModel, MetadataPayload } from "../entities/Metadata";
 
 export interface MetadataRepository {
-    list(options: ListOptions): FutureData<ListMetadataResponse>;
+    list(options: ListMetadataOptions): FutureData<ListMetadataResponse>;
     getOptionsFromOptionSet(codes: string[]): FutureData<MetadataPayload>;
     save(payload: MetadataPayload): FutureData<ImportResult>;
     getModelName(model: string): string;
@@ -11,7 +11,7 @@ export interface MetadataRepository {
     isDataShareable(model: string): boolean;
 }
 
-export interface ListOptions {
+export interface ListMetadataOptions {
     model: MetadataModel;
     page?: number;
     pageSize?: number;

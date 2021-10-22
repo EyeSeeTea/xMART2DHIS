@@ -1,7 +1,7 @@
-import { UseCase, XMartEndpoint } from "../../../compositionRoot";
+import { UseCase } from "../../../compositionRoot";
 import { FutureData } from "../../entities/Future";
 import { XMartContent } from "../../entities/XMart";
-import { ListAllOptions, XMartRepository } from "../../repositories/XMartRepository";
+import { ListAllOptions, XMartEndpoint, XMartRepository } from "../../repositories/XMartRepository";
 
 export class ListAllMartContentsUseCase implements UseCase {
     constructor(private martRepository: XMartRepository) {}

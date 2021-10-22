@@ -3,9 +3,8 @@ import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { XMartEndpoint, XMartEndpoints } from "../../../compositionRoot";
 import { XMartContent, XMartTable } from "../../../domain/entities/XMart";
-import { ListOptions } from "../../../domain/repositories/XMartRepository";
+import { ListXMartOptions, XMartEndpoint, XMartEndpoints } from "../../../domain/repositories/XMartRepository";
 import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
@@ -33,7 +32,7 @@ export const ListMartPage: React.FC = () => {
     }, [rows]);
 
     const fetchRows = useCallback(
-        (options: ListOptions) => {
+        (options: ListXMartOptions) => {
             if (!selectedApi || !selectedTable) return;
 
             setLoading(true);

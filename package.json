@@ -108,6 +108,8 @@
         "check-uncommited": "test -z \"$(git status -uno --porcelain)\"",
         "cy:e2e:open": "NODE_ENV=test CYPRESS_E2E=true cypress open",
         "cy:e2e:run": "NODE_ENV=test CYPRESS_E2E=true cypress run --browser chrome",
+        "run-ts": "ts-node --files -O '{\"module\":\"commonjs\"}'",
+        "build-action-types": "yarn run-ts --files src/scripts/build-action-types.ts",
         "prepare": "husky install"
     },
     "manifest.webapp": {
