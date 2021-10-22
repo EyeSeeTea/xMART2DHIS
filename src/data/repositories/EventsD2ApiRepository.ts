@@ -7,7 +7,7 @@ import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
-import { postImport } from "../clients/dhis-import/Dhis2Import";
+import { postImport } from "../utils/Dhis2Import";
 
 export class EventsD2ApiRepository implements EventsRepository {
     private api: D2Api;

@@ -9,6 +9,8 @@ import { D2Api } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
+import { StorageDataStoreRepository } from "./StorageDataStoreRepository";
+import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { AggregatedD2ApiRepository } from "./AggregatedD2ApiRepository";
 import { EventsD2ApiRepository } from "./EventsD2ApiRepository";
 import { MetadataD2ApiRepository } from "./MetadataD2ApiRepository";
@@ -19,12 +21,14 @@ export class InstanceD2ApiRepository implements InstanceRepository {
     public metadata: MetadataRepository;
     public events: EventsRepository;
     public aggregated: AggregatedRepository;
+    public dataStore: StorageRepository;
 
     constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
         this.metadata = new MetadataD2ApiRepository(instance);
         this.events = new EventsD2ApiRepository(instance);
         this.aggregated = new AggregatedD2ApiRepository(instance);
+        this.dataStore = new StorageDataStoreRepository("global", instance);
     }
 
     public getBaseUrl(): string {
