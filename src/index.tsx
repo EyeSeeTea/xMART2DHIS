@@ -1,3 +1,5 @@
+import { PublicClientApplication } from "@azure/msal-browser";
+import { MsalProvider } from "@azure/msal-react";
 import { Provider } from "@dhis2/app-runtime";
 import i18n from "@dhis2/d2-i18n";
 import axios from "axios";
@@ -17,6 +19,14 @@ declare global {
         api: D2Api;
     }
 }
+
+const azureLogin = new PublicClientApplication({
+    auth: {
+        clientId: "192e3789-682d-4aeb-8d05-1a70acb86ab8",
+        authority: "https://login.microsoftonline.com/f610c0b7-bd24-4b39-810b-3dc280afb590",
+        redirectUri: window.location.href,
+    },
+});
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -55,7 +65,9 @@ async function main() {
         ReactDOM.render(
             <React.StrictMode>
                 <Provider config={{ baseUrl, apiVersion: 30 }}>
-                    <App api={api} d2={d2} />
+                    <MsalProvider instance={azureLogin}>
+                        <App api={api} d2={d2} />
+                    </MsalProvider>
                 </Provider>
             </React.StrictMode>,
             document.getElementById("root")
