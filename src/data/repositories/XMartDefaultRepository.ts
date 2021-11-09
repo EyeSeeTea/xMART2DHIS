@@ -2,7 +2,13 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { XMartContent, XMartResponse, XMartTable } from "../../domain/entities/XMart";
-import { ListAllOptions, ListXMartOptions, XMartEndpoint, XMartEndpoints, XMartRepository } from "../../domain/repositories/XMartRepository";
+import {
+    ListAllOptions,
+    ListXMartOptions,
+    XMartEndpoint,
+    XMartEndpoints,
+    XMartRepository,
+} from "../../domain/repositories/XMartRepository";
 
 export class XMartDefaultRepository implements XMartRepository {
     public listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]> {

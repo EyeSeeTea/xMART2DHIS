@@ -28,7 +28,8 @@ async function main() {
                 .join("\n")
                 .split("\n")
                 .filter(line => !line.startsWith("import"))
-                .join("\n").replace(/export/g, "declare");
+                .join("\n")
+                .replace(/export/g, "declare");
 
             const content = `export const actionGlobals = \`${types}\`;`;
 

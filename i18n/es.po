@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-10-28T10:02:24.060Z\n"
+"POT-Creation-Date: 2021-11-09T19:21:27.238Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,6 +21,12 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Sign in with Microsoft"
+msgstr ""
+
+msgid "Unknown user"
 msgstr ""
 
 msgid "Add"

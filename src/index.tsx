@@ -55,7 +55,7 @@ async function main() {
         ReactDOM.render(
             <React.StrictMode>
                 <Provider config={{ baseUrl, apiVersion: 30 }}>
-                        <App api={api} d2={d2} />
+                    <App api={api} d2={d2} />
                 </Provider>
             </React.StrictMode>,
             document.getElementById("root")

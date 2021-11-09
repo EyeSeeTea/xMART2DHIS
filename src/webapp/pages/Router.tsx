@@ -1,7 +1,7 @@
 import React from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import styled from "styled-components";
-import { AzureUser } from "../components/azure-user/AzureUser";
+import { AzureLogin } from "../components/azure-login/AzureLogin";
 import { LandingPage } from "./landing/LandingPage";
 import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
@@ -10,7 +10,7 @@ import { NewActionPage } from "./new-action/NewActionPage";
 export const Router = () => {
     return (
         <React.Fragment>
-            <AzureUser />
+            <AzureLogin />
 
             <Container>
                 <HashRouter>
