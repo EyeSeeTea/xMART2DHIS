@@ -1,7 +1,9 @@
 import React from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import styled from "styled-components";
+import i18n from "../../locales";
 import { AzureLogin } from "../components/azure-login/AzureLogin";
+import { PageHeader } from "../components/page-header/PageHeader";
 import { LandingPage } from "./landing/LandingPage";
 import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
@@ -9,23 +11,77 @@ import { NewActionPage } from "./new-action/NewActionPage";
 
 export const Router = () => {
     return (
-        <React.Fragment>
-            <AzureLogin />
+        <HashRouter>
+            <Switch>
+                <Route
+                    path="/actions/new"
+                    render={() => (
+                        <RouterPage title={i18n.t("New action")}>
+                            <NewActionPage />
+                        </RouterPage>
+                    )}
+                />
 
-            <Container>
-                <HashRouter>
-                    <Switch>
-                        <Route path="/actions/new" render={() => <NewActionPage />} />
-                        <Route path="/actions" render={() => <ListActionsPage />} />
-                        <Route path="/list" render={() => <ListMartPage />} />
-                        <Route render={() => <LandingPage />} />
-                    </Switch>
-                </HashRouter>
-            </Container>
-        </React.Fragment>
+                <Route
+                    path="/actions"
+                    render={() => (
+                        <RouterPage title={i18n.t("Actions")}>
+                            <ListActionsPage />
+                        </RouterPage>
+                    )}
+                />
+
+                <Route
+                    path="/list"
+                    render={() => (
+                        <RouterPage title={i18n.t("Browse xMART")}>
+                            <ListMartPage />
+                        </RouterPage>
+                    )}
+                />
+
+                <Route
+                    render={() => (
+                        <RouterPage title={i18n.t("xMART2DHIS")} isRoot={true}>
+                            <LandingPage />
+                        </RouterPage>
+                    )}
+                />
+            </Switch>
+        </HashRouter>
+    );
+};
+
+const RouterPage: React.FC<{ title: string; isRoot?: boolean }> = ({ children, title, isRoot = false }) => {
+    return (
+        <Container>
+            <AppHeader>
+                <PageHeader title={title} onBackClick={!isRoot ? () => window.history.back() : undefined} />
+                <Spacer />
+                <AzureLogin />
+            </AppHeader>
+
+            {children}
+        </Container>
     );
 };
 
 const Container = styled.div`
-    margin: 30px 10px;
+    margin: 10px 20px;
+`;
+
+const AppHeader = styled.div`
+    display: flex;
+
+    div {
+        align-self: center;
+    }
+
+    h5 {
+        margin: 20px;
+    }
+`;
+
+const Spacer = styled.div`
+    flex: 1;
 `;

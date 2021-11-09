@@ -2,11 +2,9 @@ import { ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseet
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
 import { XMartContent, XMartTable } from "../../../domain/entities/XMart";
 import { ListXMartOptions, XMartEndpoint, XMartEndpoints } from "../../../domain/repositories/XMartRepository";
 import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
-import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ListMartPage: React.FC = () => {
@@ -77,45 +75,38 @@ export const ListMartPage: React.FC = () => {
     }, [compositionRoot, snackbar, selectedApi]);
 
     return (
-        <Container>
-            <PageHeader title={i18n.t("Browse xMART")} onBackClick={() => window.history.back()} />
-            <ObjectsTable<TableObject>
-                loading={loading}
-                rows={rows}
-                columns={columns}
-                pagination={pager}
-                onChange={onChange}
-                forceSelectionColumn={true}
-                filterComponents={
-                    <React.Fragment>
-                        <Dropdown<XMartEndpoint>
-                            label={i18n.t("xMART API")}
-                            value={selectedApi}
-                            items={ENDPOINTS}
-                            onValueChange={endpoint => {
-                                setSelectedTable(undefined);
-                                setTables(undefined);
-                                setSelectedApi(endpoint);
-                            }}
-                        />
-                        <Dropdown
-                            label={i18n.t("xMART Table")}
-                            value={selectedTable ?? ""}
-                            items={tables?.map(item => ({ id: item.name, name: item.name })) ?? []}
-                            onValueChange={table => setSelectedTable(table)}
-                        />
-                    </React.Fragment>
-                }
-            />
-        </Container>
+        <ObjectsTable<TableObject>
+            loading={loading}
+            rows={rows}
+            columns={columns}
+            pagination={pager}
+            onChange={onChange}
+            forceSelectionColumn={true}
+            filterComponents={
+                <React.Fragment>
+                    <Dropdown<XMartEndpoint>
+                        label={i18n.t("xMART API")}
+                        value={selectedApi}
+                        items={ENDPOINTS}
+                        onValueChange={endpoint => {
+                            setSelectedTable(undefined);
+                            setTables(undefined);
+                            setSelectedApi(endpoint);
+                        }}
+                    />
+                    <Dropdown
+                        label={i18n.t("xMART Table")}
+                        value={selectedTable ?? ""}
+                        items={tables?.map(item => ({ id: item.name, name: item.name })) ?? []}
+                        onValueChange={table => setSelectedTable(table)}
+                    />
+                </React.Fragment>
+            }
+        />
     );
 };
 
 type TableObject = XMartContent & { id: string };
-
-const Container = styled.div`
-    margin: 20px;
-`;
 
 const ENDPOINTS: DropdownOption<XMartEndpoint>[] = _.keys(XMartEndpoints).map(key => ({
     id: key as XMartEndpoint,

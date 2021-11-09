@@ -41,11 +41,7 @@ const UserBadgeText: React.FC<{ account?: AccountInfo; isAuthenticated: boolean 
 };
 
 const Container = styled(Button)`
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin-top: 60px;
-    margin-right: 20px;
+    margin: 10px;
     background-color: #fff;
     padding: 0 20px;
     border-radius: 5px;

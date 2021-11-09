@@ -1,4 +1,3 @@
-import { PublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { useConfig } from "@dhis2/app-runtime";
 import { HeaderBar } from "@dhis2/ui";

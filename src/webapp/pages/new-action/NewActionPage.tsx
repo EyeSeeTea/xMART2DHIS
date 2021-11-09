@@ -9,7 +9,6 @@ import { InstanceD2ApiRepository } from "../../../data/repositories/InstanceD2Ap
 import { XMartDefaultRepository } from "../../../data/repositories/XMartDefaultRepository";
 import { actionGlobals } from "../../../data/utils/action-types";
 import i18n from "../../../locales";
-import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
 export const NewActionPage: React.FC = () => {
@@ -30,9 +29,7 @@ export const NewActionPage: React.FC = () => {
     }, [value, instance]);
 
     return (
-        <Wrapper>
-            <PageHeader title={i18n.t("New action")} onBackClick={() => window.history.back()} />
-
+        <React.Fragment>
             <MonacoEditor value={value} onChange={setValue} />
 
             <Center>
@@ -42,13 +39,9 @@ export const NewActionPage: React.FC = () => {
             </Center>
 
             <FixedSize>{result ? <ReactJson src={result} collapsed={1} enableClipboard={false} /> : null}</FixedSize>
-        </Wrapper>
+        </React.Fragment>
     );
 };
-
-const Wrapper = styled.div`
-    padding: 20px;
-`;
 
 const Center = styled.div`
     display: flex;

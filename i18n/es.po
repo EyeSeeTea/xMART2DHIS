@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-11-09T19:21:27.238Z\n"
+"POT-Creation-Date: 2021-11-09T20:07:22.424Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -89,16 +89,19 @@ msgstr "Volver"
 msgid "Help"
 msgstr "Ayuda"
 
-msgid "Common tools"
+msgid "New action"
 msgstr ""
 
 msgid "Actions"
 msgstr ""
 
-msgid "Actions are a way to trigger events in your application"
+msgid "Browse xMART"
 msgstr ""
 
-msgid "Browse xMART"
+msgid "xMART2DHIS"
+msgstr ""
+
+msgid "Actions are a way to trigger events in your application"
 msgstr ""
 
 msgid "List table contents of the MART"
@@ -120,7 +123,4 @@ msgid "xMART API"
 msgstr ""
 
 msgid "xMART Table"
-msgstr ""
-
-msgid "New action"
 msgstr ""
