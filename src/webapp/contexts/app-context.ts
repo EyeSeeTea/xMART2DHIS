@@ -1,3 +1,4 @@
+import { PublicClientApplication } from "@azure/msal-browser";
 import React, { useContext } from "react";
 import { CompositionRoot } from "../../compositionRoot";
 import { Instance } from "../../domain/entities/Instance";
@@ -9,6 +10,7 @@ export interface AppContextState {
     currentUser: User;
     compositionRoot: CompositionRoot;
     instance: Instance;
+    azureInstance: PublicClientApplication;
 }
 
 export const AppContext = React.createContext<AppContextState | null>(null);

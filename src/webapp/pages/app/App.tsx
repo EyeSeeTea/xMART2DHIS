@@ -1,3 +1,5 @@
+import { PublicClientApplication } from "@azure/msal-browser";
+import { MsalProvider } from "@azure/msal-react";
 import { useConfig } from "@dhis2/app-runtime";
 import { HeaderBar } from "@dhis2/ui";
 import { LoadingProvider, SnackbarProvider } from "@eyeseetea/d2-ui-components";
@@ -10,9 +12,9 @@ import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../compositionRoot";
 import { Instance } from "../../../domain/entities/Instance";
 import { D2Api } from "../../../types/d2-api";
+import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
-import Share from "../../components/share/Share";
 import "./App.css";
 import { AppConfig } from "./AppConfig";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
@@ -33,7 +35,10 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
 
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
-            setAppContext({ api, instance, currentUser, compositionRoot });
+            const azureConfig = compositionRoot.azure.getConfig();
+            const azureInstance = new PublicClientApplication(azureConfig);
+
+            setAppContext({ api, instance, currentUser, compositionRoot, azureInstance });
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);
@@ -41,26 +46,28 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         setup();
     }, [d2, api, baseUrl]);
 
-    if (loading) return null;
+    if (loading || !appContext) return null;
 
     return (
-        <MuiThemeProvider theme={muiTheme}>
-            <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
-                <SnackbarProvider>
-                    <LoadingProvider>
-                        <HeaderBar appName="Data Management" />
+        <MsalProvider instance={appContext.azureInstance}>
+            <MuiThemeProvider theme={muiTheme}>
+                <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
+                    <SnackbarProvider>
+                        <LoadingProvider>
+                            <HeaderBar appName="Data Management" />
 
-                        <div id="app" className="content">
-                            <AppContext.Provider value={appContext}>
-                                <Router />
-                            </AppContext.Provider>
-                        </div>
+                            <div id="app" className="content">
+                                <AppContext.Provider value={appContext}>
+                                    <Router />
+                                </AppContext.Provider>
+                            </div>
 
-                        <Share visible={showShareButton} />
-                    </LoadingProvider>
-                </SnackbarProvider>
-            </OldMuiThemeProvider>
-        </MuiThemeProvider>
+                            <Share visible={showShareButton} />
+                        </LoadingProvider>
+                    </SnackbarProvider>
+                </OldMuiThemeProvider>
+            </MuiThemeProvider>
+        </MsalProvider>
     );
 };
 
