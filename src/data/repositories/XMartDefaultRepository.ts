@@ -64,6 +64,14 @@ export class XMartDefaultRepository implements XMartRepository {
         params: Record<string, string | number | boolean>
     ): FutureData<ODataResponse<Data>> {
         const qs = buildParams(params);
+
+        /**console.log(response);
+        fetch("https://portal-uat.who.int/xmart-api/odata/TRAINING_ARC/AGGREGATED", {
+            headers: { Authorization: `Bearer ${response.accessToken}` },
+        })
+            .then(response => response.json())
+            .then(data => console.log(data));**/
+
         return futureFetch("get", endpoint, `/${table}?${qs}`);
     }
 }

@@ -33,12 +33,10 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             const { data: currentUser } = await compositionRoot.instance.getCurrentUser().runAsync();
             if (!currentUser) throw new Error("User not logged in");
 
-            const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
-
-            const azureConfig = compositionRoot.azure.getConfig();
-            const azureInstance = new PublicClientApplication(azureConfig);
-
+            const azureInstance = compositionRoot.azure.getInstance();
             setAppContext({ api, instance, currentUser, compositionRoot, azureInstance });
+
+            const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);

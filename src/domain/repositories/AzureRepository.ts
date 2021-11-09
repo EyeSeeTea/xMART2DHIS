@@ -1,5 +1,5 @@
-import { Configuration } from "@azure/msal-browser";
+import { PublicClientApplication } from "@azure/msal-browser";
 
 export interface AzureRepository {
-    getConfig(): Configuration;
+    getInstance(): PublicClientApplication;
 }
