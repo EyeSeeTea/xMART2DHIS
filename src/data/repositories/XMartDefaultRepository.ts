@@ -2,6 +2,7 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { XMartContent, XMartResponse, XMartTable } from "../../domain/entities/XMart";
+import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,
     ListXMartOptions,
@@ -11,6 +12,8 @@ import {
 } from "../../domain/repositories/XMartRepository";
 
 export class XMartDefaultRepository implements XMartRepository {
+    constructor(private azureRepository: AzureRepository) {}
+
     public listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]> {
         return futureFetch<XMartTable[]>("get", endpoint, "").map(({ value: tables }) =>
             tables.map(({ name, kind }) => ({ name, kind }))
@@ -80,9 +83,9 @@ function futureFetch<Data>(
     method: "get" | "post",
     endpoint: XMartEndpoint,
     path: string,
-    options: { body?: string; textResponse?: boolean } = {}
+    options: { body?: string; textResponse?: boolean; token?: string } = {}
 ): FutureData<ODataResponse<Data>> {
-    const { body, textResponse = false } = options;
+    const { body, textResponse = false, token } = options;
     const controller = new AbortController();
     const url = XMartEndpoints[endpoint];
 
@@ -90,11 +93,17 @@ function futureFetch<Data>(
         fetch(url + path, {
             signal: controller.signal,
             method,
-            headers: { "Content-Type": "application/json", "x-requested-with": "XMLHttpRequest" },
+            headers: {
+                "Content-Type": "application/json",
+                "x-requested-with": "XMLHttpRequest",
+                Authorization: token ? `Bearer ${token}` : "",
+            },
             body,
         })
             .then(async response => {
-                if (textResponse) {
+                if (!response.ok) {
+                    reject("Fetch request failed");
+                } else if (textResponse) {
                     const text = await response.text();
                     resolve({ value: text as unknown as Data });
                 } else {
@@ -103,6 +112,7 @@ function futureFetch<Data>(
                 }
             })
             .catch(err => reject(err ? err.message : "Unknown error"));
+
         return controller.abort;
     });
 }

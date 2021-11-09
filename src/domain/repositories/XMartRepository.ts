@@ -22,6 +22,8 @@ export type ListAllOptions = {
 };
 
 export const XMartEndpoints = {
+    UAT: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata",
+    PROD: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata",
     REFMART: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
 };
 

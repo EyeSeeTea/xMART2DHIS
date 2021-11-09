@@ -5,6 +5,7 @@ import React, { useCallback, useState } from "react";
 import ReactJson from "react-json-view";
 import styled from "styled-components";
 import * as ts from "typescript";
+import { AzureMSALRepository } from "../../../data/repositories/AzureMSALRepository";
 import { InstanceD2ApiRepository } from "../../../data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "../../../data/repositories/XMartDefaultRepository";
 import { actionGlobals } from "../../../data/utils/action-types";
@@ -21,7 +22,8 @@ export const NewActionPage: React.FC = () => {
         const jsCode = ts.transpile([`"use strict";`, value, "({ execute })"].join("\n"));
         const runtime = eval(jsCode);
 
-        const martRepository = new XMartDefaultRepository();
+        const azureRepository = new AzureMSALRepository();
+        const martRepository = new XMartDefaultRepository(azureRepository);
         const instanceRepository = new InstanceD2ApiRepository(instance);
         const result = await runtime.execute(martRepository, instanceRepository);
 

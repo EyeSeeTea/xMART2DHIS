@@ -12,8 +12,8 @@ import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUse
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
-    const martRepository = new XMartDefaultRepository();
     const azureRepository = new AzureMSALRepository();
+    const martRepository = new XMartDefaultRepository(azureRepository);
 
     return {
         xmart: getExecute({
