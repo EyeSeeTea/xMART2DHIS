@@ -2,7 +2,7 @@ import React from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import styled from "styled-components";
 import i18n from "../../locales";
-import { AzureLogin } from "../components/azure-login/AzureLogin";
+import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
 import { LandingPage } from "./landing/LandingPage";
 import { ListActionsPage } from "./list-actions/ListActionsPage";
@@ -58,7 +58,7 @@ const RouterPage: React.FC<{ title: string; isRoot?: boolean }> = ({ children, t
             <AppHeader>
                 <PageHeader title={title} onBackClick={!isRoot ? () => window.history.back() : undefined} />
                 <Spacer />
-                <AzureLogin />
+                <AzureBadge />
             </AppHeader>
 
             {children}

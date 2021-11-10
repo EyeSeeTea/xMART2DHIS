@@ -5,7 +5,7 @@ import React, { useCallback } from "react";
 import styled from "styled-components";
 import i18n from "../../../locales";
 
-export const AzureLogin: React.FC = () => {
+export const AzureBadge: React.FC = () => {
     const isAuthenticated = useIsAuthenticated();
     const { instance, accounts } = useMsal();
 
