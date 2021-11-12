@@ -2,17 +2,19 @@ import { ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseet
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { XMartContent, XMartTable } from "../../../domain/entities/XMart";
-import { ListXMartOptions, XMartEndpoint, XMartEndpoints } from "../../../domain/repositories/XMartRepository";
-import { Dropdown, DropdownOption } from "../../components/dropdown/Dropdown";
+import { DataMart, MartTable, XMartContent } from "../../../domain/entities/XMart";
+import { ListXMartOptions } from "../../../domain/repositories/XMartRepository";
+import { Dropdown } from "../../components/dropdown/Dropdown";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ListMartPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
 
-    const [tables, setTables] = useState<XMartTable[]>();
-    const [selectedApi, setSelectedApi] = useState<XMartEndpoint>("REFMART");
+    const [tables, setTables] = useState<MartTable[]>();
+
+    const [dataMarts, setDataMarts] = useState<DataMart[]>([]);
+    const [selectedApi, setSelectedApi] = useState<DataMart | undefined>(dataMarts[0]);
     const [selectedTable, setSelectedTable] = useState<string>();
 
     const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ export const ListMartPage: React.FC = () => {
             if (!selectedApi || !selectedTable) return;
 
             setLoading(true);
-            return compositionRoot.xmart.list(selectedApi, selectedTable, options).run(
+            return compositionRoot.xmart.listTableContent(selectedApi, selectedTable, options).run(
                 ({ objects, pager }) => {
                     setRows(
                         objects.map((item, idx) => ({
@@ -74,6 +76,16 @@ export const ListMartPage: React.FC = () => {
         );
     }, [compositionRoot, snackbar, selectedApi]);
 
+    useEffect(() => {
+        compositionRoot.xmart.listDataMarts().run(
+            dataMarts => {
+                setDataMarts(dataMarts);
+                setSelectedApi(dataMarts[0]);
+            },
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar]);
+
     return (
         <ObjectsTable<TableObject>
             loading={loading}
@@ -84,14 +96,14 @@ export const ListMartPage: React.FC = () => {
             forceSelectionColumn={true}
             filterComponents={
                 <React.Fragment>
-                    <Dropdown<XMartEndpoint>
+                    <Dropdown
                         label={i18n.t("xMART API")}
-                        value={selectedApi}
-                        items={ENDPOINTS}
+                        value={selectedApi?.id ?? ""}
+                        items={dataMarts.map(({ id, name }) => ({ id, name }))}
                         onValueChange={endpoint => {
                             setSelectedTable(undefined);
                             setTables(undefined);
-                            setSelectedApi(endpoint);
+                            setSelectedApi(_.find(dataMarts, ({ id }) => id === endpoint));
                         }}
                     />
                     <Dropdown
@@ -107,8 +119,3 @@ export const ListMartPage: React.FC = () => {
 };
 
 type TableObject = XMartContent & { id: string };
-
-const ENDPOINTS: DropdownOption<XMartEndpoint>[] = _.keys(XMartEndpoints).map(key => ({
-    id: key as XMartEndpoint,
-    name: key,
-}));

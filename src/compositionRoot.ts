@@ -7,6 +7,7 @@ import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigU
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
+import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 
@@ -18,8 +19,9 @@ export function getCompositionRoot(instance: Instance) {
     return {
         xmart: getExecute({
             listTables: new ListMartTablesUseCase(martRepository),
-            list: new ListMartContentsUseCase(martRepository),
-            listAll: new ListAllMartContentsUseCase(martRepository),
+            listTableContent: new ListMartContentsUseCase(martRepository),
+            listAllTableContent: new ListAllMartContentsUseCase(martRepository),
+            listDataMarts: new ListDataMartsUseCase(martRepository),
         }),
         instance: getExecute({
             getCurrentUser: new GetCurrentUserUseCase(instanceRepository),

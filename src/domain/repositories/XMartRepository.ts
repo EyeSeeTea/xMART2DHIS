@@ -1,11 +1,11 @@
 import { FutureData } from "../entities/Future";
-import { XMartContent, XMartResponse, XMartTable } from "../entities/XMart";
+import { XMartContent, XMartResponse, MartTable, DataMart } from "../entities/XMart";
 
 export interface XMartRepository {
-    listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]>;
-    list(endpoint: XMartEndpoint, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
-    listAll(endpoint: XMartEndpoint, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
-    count(endpoint: XMartEndpoint, table: string): FutureData<number>;
+    listTables(mart: DataMart): FutureData<MartTable[]>;
+    list(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
+    listAll(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
+    count(mart: DataMart, table: string): FutureData<number>;
 }
 
 export type ListXMartOptions = ListAllOptions & {
@@ -20,11 +20,3 @@ export type ListAllOptions = {
     filter?: string; // Filter results to be included in the response (ie: "contains(TEST_TYPE_FK, 'value')")
     orderBy?: string; // Order the results by properties
 };
-
-export const XMartEndpoints = {
-    UAT: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata",
-    PROD: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata",
-    REFMART: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
-};
-
-export type XMartEndpoint = keyof typeof XMartEndpoints;

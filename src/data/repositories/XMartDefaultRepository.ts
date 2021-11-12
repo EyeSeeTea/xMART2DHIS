@@ -1,26 +1,20 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { XMartContent, XMartResponse, XMartTable } from "../../domain/entities/XMart";
+import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/XMart";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
-import {
-    ListAllOptions,
-    ListXMartOptions,
-    XMartEndpoint,
-    XMartEndpoints,
-    XMartRepository,
-} from "../../domain/repositories/XMartRepository";
+import { ListAllOptions, ListXMartOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
 
 export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
 
-    public listTables(endpoint: XMartEndpoint): FutureData<XMartTable[]> {
-        return futureFetch<XMartTable[]>("get", endpoint, "").map(({ value: tables }) =>
-            tables.map(({ name, kind }) => ({ name, kind }))
+    public listTables(mart: DataMart): FutureData<MartTable[]> {
+        return this.futureFetch<MartTable[]>("get", mart, "").map(({ value: tables }) =>
+            tables.map(({ name, kind }) => ({ name, kind, mart: mart.id }))
         );
     }
 
-    public list(endpoint: XMartEndpoint, table: string, options: ListXMartOptions = {}): FutureData<XMartResponse> {
+    public list(mart: DataMart, table: string, options: ListXMartOptions = {}): FutureData<XMartResponse> {
         const { pageSize = 25, page = 1, select, expand, apply, filter, orderBy } = options;
         const params = compactObject({
             top: pageSize,
@@ -33,20 +27,20 @@ export class XMartDefaultRepository implements XMartRepository {
             orderBy,
         });
 
-        return this.query<XMartContent[]>(endpoint, table, params).map(response => ({
+        return this.query<XMartContent[]>(mart, table, params).map(response => ({
             objects: response.value,
             pager: { pageSize, page, total: response["@odata.count"] },
         }));
     }
 
-    public listAll(endpoint: XMartEndpoint, table: string, options: ListAllOptions = {}): FutureData<XMartContent[]> {
-        return this.list(endpoint, table, options).flatMap(response => {
+    public listAll(mart: DataMart, table: string, options: ListAllOptions = {}): FutureData<XMartContent[]> {
+        return this.list(mart, table, options).flatMap(response => {
             const { objects, pager } = response;
             if (pager.total <= pager.pageSize) return Future.success(objects);
 
             const maxPage = Math.ceil(pager.total / pager.pageSize) + 1;
             const futures = _.range(2, maxPage).map(page =>
-                this.list(endpoint, table, { ...options, page, pageSize: pager.pageSize })
+                this.list(mart, table, { ...options, page, pageSize: pager.pageSize })
             );
 
             return Future.parallel(futures, { maxConcurrency: 5 }).map(arrays =>
@@ -55,14 +49,14 @@ export class XMartDefaultRepository implements XMartRepository {
         });
     }
 
-    public count(endpoint: XMartEndpoint, table: string): FutureData<number> {
-        return futureFetch<number>("get", endpoint, `/${table}/$count`, { textResponse: true }).map(
+    public count(mart: DataMart, table: string): FutureData<number> {
+        return this.futureFetch<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(
             ({ value }) => value
         );
     }
 
     private query<Data>(
-        endpoint: XMartEndpoint,
+        mart: DataMart,
         table: string,
         params: Record<string, string | number | boolean>
     ): FutureData<ODataResponse<Data>> {
@@ -75,46 +69,58 @@ export class XMartDefaultRepository implements XMartRepository {
             .then(response => response.json())
             .then(data => console.log(data));**/
 
-        return futureFetch("get", endpoint, `/${table}?${qs}`);
+        return this.futureFetch("get", mart, `/${table}?${qs}`);
     }
-}
 
-function futureFetch<Data>(
-    method: "get" | "post",
-    endpoint: XMartEndpoint,
-    path: string,
-    options: { body?: string; textResponse?: boolean; token?: string } = {}
-): FutureData<ODataResponse<Data>> {
-    const { body, textResponse = false, token } = options;
-    const controller = new AbortController();
-    const url = XMartEndpoints[endpoint];
+    private futureFetch<Data>(
+        method: "get" | "post",
+        mart: DataMart,
+        path: string,
+        options: { body?: string; textResponse?: boolean } = {}
+    ): FutureData<ODataResponse<Data>> {
+        const { body, textResponse = false } = options;
+        const controller = new AbortController();
 
-    return Future.fromComputation((resolve, reject) => {
-        fetch(url + path, {
-            signal: controller.signal,
-            method,
-            headers: {
-                "Content-Type": "application/json",
-                "x-requested-with": "XMLHttpRequest",
-                Authorization: token ? `Bearer ${token}` : "",
-            },
-            body,
-        })
-            .then(async response => {
-                if (!response.ok) {
-                    reject("Fetch request failed");
-                } else if (textResponse) {
-                    const text = await response.text();
-                    resolve({ value: text as unknown as Data });
-                } else {
-                    const json = await response.json();
-                    resolve(json);
-                }
+        return this.getToken(mart).flatMap(token =>
+            Future.fromComputation((resolve, reject) => {
+                fetch(mart.apiUrl + path, {
+                    signal: controller.signal,
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-requested-with": "XMLHttpRequest",
+                        Authorization: token ? `Bearer ${token}` : "",
+                    },
+                    body,
+                })
+                    .then(async response => {
+                        if (!response.ok) {
+                            reject("Fetch request failed");
+                        } else if (textResponse) {
+                            const text = await response.text();
+                            resolve({ value: text as unknown as Data });
+                        } else {
+                            const json = await response.json();
+                            resolve(json);
+                        }
+                    })
+                    .catch(err => reject(err ? err.message : "Unknown error"));
+
+                return controller.abort;
             })
-            .catch(err => reject(err ? err.message : "Unknown error"));
+        );
+    }
 
-        return controller.abort;
-    });
+    private getToken(mart: DataMart): FutureData<string | undefined> {
+        switch (mart.type) {
+            case "PROD":
+                return this.azureRepository.getTokenPROD();
+            case "UAT":
+                return this.azureRepository.getTokenUAT();
+            default:
+                return Future.success(undefined);
+        }
+    }
 }
 
 function buildParams(params: Record<string, string | number | boolean>) {
