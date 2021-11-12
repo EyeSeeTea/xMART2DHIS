@@ -9,7 +9,7 @@ export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
 
     public listTables(mart: DataMart): FutureData<MartTable[]> {
-        return this.get<MartTable[]>(mart, "").map(({ value: tables }) =>
+        return this.request<MartTable[]>("get", mart, "").map(({ value: tables }) =>
             tables.map(({ name, kind }) => ({ name, kind, mart: mart.id }))
         );
     }
@@ -27,7 +27,7 @@ export class XMartDefaultRepository implements XMartRepository {
             orderBy,
         });
 
-        return this.get<XMartContent[]>(mart, table, params).map(response => ({
+        return this.request<XMartContent[]>("get", mart, table, { params }).map(response => ({
             objects: response.value,
             pager: { pageSize, page, total: response["@odata.count"] },
         }));
@@ -54,32 +54,23 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 
     public countTableElements(mart: DataMart, table: string): FutureData<number> {
-        return this.futureFetch<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(
-            ({ value }) => value
-        );
+        return this.request<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(({ value }) => value);
     }
 
-    private get<Data>(
-        mart: DataMart,
-        url: string,
-        params: Record<string, string | number | boolean> = {}
-    ): FutureData<ODataResponse<Data>> {
-        const qs = buildParams(params);
-        return this.futureFetch("get", mart, `/${url}?${qs}`);
-    }
-
-    private futureFetch<Data>(
+    private request<Data>(
         method: "get" | "post",
         mart: DataMart,
         path: string,
-        options: { body?: string; textResponse?: boolean } = {}
+        options: { body?: string; textResponse?: boolean; params?: Record<string, string | number | boolean> } = {}
     ): FutureData<ODataResponse<Data>> {
-        const { body, textResponse = false } = options;
+        const { body, textResponse = false, params } = options;
         const controller = new AbortController();
+        const qs = buildParams(params);
+        const url = `${joinUrl(mart.apiUrl, path)}${qs ? `?${qs}` : ""}`;
 
         return this.getToken(mart).flatMap(token =>
             Future.fromComputation((resolve, reject) => {
-                fetch(mart.apiUrl + path, {
+                fetch(url, {
                     signal: controller.signal,
                     method,
                     headers: {
@@ -119,7 +110,12 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 }
 
-function buildParams(params: Record<string, string | number | boolean>) {
+function joinUrl(...urls: string[]): string {
+    return urls.join("/").replace(/\/+/g, "/");
+}
+
+function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
+    if (!params) return undefined;
     return _.map(params, (value, key) => `$${key}=${value}`).join("&");
 }
 
