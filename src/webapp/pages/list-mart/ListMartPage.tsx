@@ -81,6 +81,7 @@ export const ListMartPage: React.FC = () => {
             dataMarts => {
                 setDataMarts(dataMarts);
                 setSelectedApi(dataMarts[0]);
+                setSelectedTable(undefined);
             },
             error => snackbar.error(error)
         );
