@@ -1,7 +1,10 @@
+export type DataMartEndpoint = "PUBLIC" | "PROD" | "UAT"
+
 export interface DataMart {
-    id: string;
-    name: string;
-    type: "PUBLIC" | "PROD" | "UAT";
+    id: string; // Auto-generated ID
+    name: string; // User defined name
+    code: string; // xMART code
+    type: DataMartEndpoint;
     // If public, manually set by the user in the UI ie: https://frontdoor-r5quteqglawbs.azurefd.net/REFMART
     // If private, set with a dropdown in the UI https://portal-uat.who.int/xmart-api/odata/REFMART (UAT) or https://extranet.who.int/xmart-api/odata/REFMART (PROD)
     apiUrl: string;

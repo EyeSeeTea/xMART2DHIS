@@ -57,45 +57,48 @@ export class XMartDefaultRepository implements XMartRepository {
         return this.request<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(({ value }) => value);
     }
 
+    public runPipeline(
+        mart: DataMart,
+        pipeline: string,
+        params: Record<string, string | number | boolean>
+    ): FutureData<any> {
+        const body = JSON.stringify(
+            {
+                martCode: mart.code,
+                originCode: pipeline,
+                inputValues: params,
+                comment: `[xMART2DHIS] Automated run of ${pipeline} in ${mart.code}`,
+            },
+            null,
+            4
+        );
+
+        return this.getAPIEndpoint(mart).flatMap(endpoint =>
+            futureFetch<any>("post", joinUrl(endpoint, `/origin/start`), { body })
+        );
+    }
+
     private request<Data>(
         method: "get" | "post",
         mart: DataMart,
         path: string,
         options: { body?: string; textResponse?: boolean; params?: Record<string, string | number | boolean> } = {}
     ): FutureData<ODataResponse<Data>> {
-        const { body, textResponse = false, params } = options;
-        const controller = new AbortController();
-        const qs = buildParams(params);
-        const url = `${joinUrl(mart.apiUrl, path)}${qs ? `?${qs}` : ""}`;
+        const url = joinUrl(mart.apiUrl, path);
+        return this.getToken(mart).flatMap(token => futureFetch(method, url, { ...options, bearer: token }));
+    }
 
-        return this.getToken(mart).flatMap(token =>
-            Future.fromComputation((resolve, reject) => {
-                fetch(url, {
-                    signal: controller.signal,
-                    method,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-requested-with": "XMLHttpRequest",
-                        Authorization: token ? `Bearer ${token}` : "",
-                    },
-                    body,
-                })
-                    .then(async response => {
-                        if (!response.ok) {
-                            reject("Fetch request failed");
-                        } else if (textResponse) {
-                            const text = await response.text();
-                            resolve({ value: text as unknown as Data });
-                        } else {
-                            const json = await response.json();
-                            resolve(json);
-                        }
-                    })
-                    .catch(err => reject(err ? err.message : "Unknown error"));
-
-                return controller.abort;
-            })
-        );
+    private getAPIEndpoint(mart: DataMart): FutureData<string> {
+        switch (mart.type) {
+            case "PUBLIC":
+                return Future.error("Unable to call xMART API for public data marts");
+            case "PROD":
+                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/api");
+            case "UAT":
+                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/api");
+            default:
+                return Future.error("Unknown data mart type");
+        }
     }
 
     private getToken(mart: DataMart): FutureData<string | undefined> {
@@ -121,6 +124,49 @@ function buildParams(params?: Record<string, string | number | boolean>): string
 
 function compactObject<Obj extends object>(object: Obj) {
     return _.pickBy(object, _.identity);
+}
+
+function futureFetch<Data>(
+    method: "get" | "post",
+    path: string,
+    options: {
+        body?: string;
+        textResponse?: boolean;
+        params?: Record<string, string | number | boolean>;
+        bearer?: string;
+    } = {}
+): FutureData<ODataResponse<Data>> {
+    const { body, textResponse = false, params, bearer } = options;
+    const controller = new AbortController();
+    const qs = buildParams(params);
+    const url = `${path}${qs ? `?${qs}` : ""}`;
+
+    return Future.fromComputation((resolve, reject) => {
+        fetch(url, {
+            signal: controller.signal,
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                "x-requested-with": "XMLHttpRequest",
+                Authorization: bearer ? `Bearer ${bearer}` : "",
+            },
+            body,
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    reject("Fetch request failed");
+                } else if (textResponse) {
+                    const text = await response.text();
+                    resolve({ value: text as unknown as Data });
+                } else {
+                    const json = await response.json();
+                    resolve(json);
+                }
+            })
+            .catch(err => reject(err ? err.message : "Unknown error"));
+
+        return controller.abort;
+    });
 }
 
 type ODataResponse<Data> = { value: Data; [key: string]: any };

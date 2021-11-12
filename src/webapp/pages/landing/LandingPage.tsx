@@ -2,9 +2,11 @@ import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import i18n from "../../../locales";
 import { Card, CardGrid } from "../../components/card-grid/CardGrid";
+import { useAppContext } from "../../contexts/app-context";
 
 export const LandingPage: React.FC = () => {
     const history = useHistory();
+    const { compositionRoot } = useAppContext();
 
     const cards: Card[] = useMemo(
         () => [
@@ -15,6 +17,7 @@ export const LandingPage: React.FC = () => {
                         name: i18n.t("Actions"),
                         description: i18n.t("Actions are a way to trigger events in your application"),
                         listAction: () => history.push("/actions"),
+                        addAction: () => compositionRoot.actions.exampleAction().run(console.log, console.error)
                     },
                     {
                         name: i18n.t("Browse xMART"),

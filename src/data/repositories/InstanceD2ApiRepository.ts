@@ -24,12 +24,16 @@ export class InstanceD2ApiRepository implements InstanceRepository {
     public aggregated: AggregatedRepository;
     public dataStore: StorageRepository;
 
-    constructor(instance: Instance) {
+    constructor(private instance: Instance) {
         this.api = getD2APiFromInstance(instance);
         this.metadata = new MetadataD2ApiRepository(instance);
         this.events = new EventsD2ApiRepository(instance);
         this.aggregated = new AggregatedD2ApiRepository(instance);
         this.dataStore = new StorageDataStoreRepository("global", instance);
+    }
+
+    public getInstance(): Instance {
+        return this.instance;
     }
 
     public getBaseUrl(): string {

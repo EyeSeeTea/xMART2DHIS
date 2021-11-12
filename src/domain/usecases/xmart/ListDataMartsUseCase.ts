@@ -14,27 +14,45 @@ export class ListDataMartsUseCase implements UseCase {
         return Future.success([
             {
                 id: "TRAINING",
-                name: "TRAINING",
+                name: "[UAT] EST Playground",
+                code: "TRAINING_ARC",
                 type: "UAT",
                 apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
             },
             {
-                id: "REFMART",
-                name: "REFMART",
-                type: "PUBLIC",
-                apiUrl: "https://frontdoor-r5quteqglawbs.azurefd.net/REFMART",
+                id: "TRAINING_RJ",
+                name: "[UAT] NTD Playground",
+                code: "TRAINING_RJ",
+                type: "UAT",
+                apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_RJ",
             },
             {
                 id: "REFMART-UAT",
-                name: "REFMART-UAT",
+                name: "[UAT] REFMART",
+                code: "REFMART",
                 type: "UAT",
                 apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/REFMART",
             },
             {
+                id: "REFMART-UAT-PUBLIC",
+                name: "[UAT] REFMART (Public)",
+                code: "REFMART",
+                type: "PUBLIC",
+                apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-r5quteqglawbs.azurefd.net/REFMART",
+            },
+            {
                 id: "REFMART-PROD",
-                name: "REFMART-PROD",
+                name: "[PROD] REFMART",
+                code: "REFMART",
                 type: "PROD",
                 apiUrl: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata/REFMART",
+            },
+            {
+                id: "REFMART-PROD-PUBLIC",
+                name: "[PROD] REFMART (Public)",
+                code: "REFMART",
+                type: "PUBLIC",
+                apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-l4uikgap6gz3m.azurefd.net/REFMART",
             },
         ]);
     }

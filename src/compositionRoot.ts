@@ -2,6 +2,7 @@ import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
+import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
@@ -29,6 +30,7 @@ export function getCompositionRoot(instance: Instance) {
         }),
         actions: getExecute({
             get: new GetActionsUseCase(martRepository, instanceRepository),
+            exampleAction: new ExampleActionUseCase(martRepository, instanceRepository),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

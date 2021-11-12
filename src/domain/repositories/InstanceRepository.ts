@@ -4,6 +4,7 @@ import { User } from "../entities/User";
 import { AggregatedRepository } from "./AggregatedRepository";
 import { EventsRepository } from "./EventsRepository";
 import { MetadataRepository } from "./MetadataRepository";
+import { Instance } from "../entities/Instance";
 
 export interface InstanceRepository {
     metadata: MetadataRepository;
@@ -11,6 +12,7 @@ export interface InstanceRepository {
     aggregated: AggregatedRepository;
     dataStore: StorageRepository;
 
+    getInstance(): Instance;
     getBaseUrl(): string;
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
