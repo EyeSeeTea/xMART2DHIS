@@ -9,12 +9,12 @@ export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
 
     public listTables(mart: DataMart): FutureData<MartTable[]> {
-        return this.futureFetch<MartTable[]>("get", mart, "").map(({ value: tables }) =>
+        return this.get<MartTable[]>(mart, "").map(({ value: tables }) =>
             tables.map(({ name, kind }) => ({ name, kind, mart: mart.id }))
         );
     }
 
-    public list(mart: DataMart, table: string, options: ListXMartOptions = {}): FutureData<XMartResponse> {
+    public listTableContent(mart: DataMart, table: string, options: ListXMartOptions = {}): FutureData<XMartResponse> {
         const { pageSize = 25, page = 1, select, expand, apply, filter, orderBy } = options;
         const params = compactObject({
             top: pageSize,
@@ -27,20 +27,24 @@ export class XMartDefaultRepository implements XMartRepository {
             orderBy,
         });
 
-        return this.query<XMartContent[]>(mart, table, params).map(response => ({
+        return this.get<XMartContent[]>(mart, table, params).map(response => ({
             objects: response.value,
             pager: { pageSize, page, total: response["@odata.count"] },
         }));
     }
 
-    public listAll(mart: DataMart, table: string, options: ListAllOptions = {}): FutureData<XMartContent[]> {
-        return this.list(mart, table, options).flatMap(response => {
+    public listAllTableContent(
+        mart: DataMart,
+        table: string,
+        options: ListAllOptions = {}
+    ): FutureData<XMartContent[]> {
+        return this.listTableContent(mart, table, options).flatMap(response => {
             const { objects, pager } = response;
             if (pager.total <= pager.pageSize) return Future.success(objects);
 
             const maxPage = Math.ceil(pager.total / pager.pageSize) + 1;
             const futures = _.range(2, maxPage).map(page =>
-                this.list(mart, table, { ...options, page, pageSize: pager.pageSize })
+                this.listTableContent(mart, table, { ...options, page, pageSize: pager.pageSize })
             );
 
             return Future.parallel(futures, { maxConcurrency: 5 }).map(arrays =>
@@ -49,19 +53,19 @@ export class XMartDefaultRepository implements XMartRepository {
         });
     }
 
-    public count(mart: DataMart, table: string): FutureData<number> {
+    public countTableElements(mart: DataMart, table: string): FutureData<number> {
         return this.futureFetch<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(
             ({ value }) => value
         );
     }
 
-    private query<Data>(
+    private get<Data>(
         mart: DataMart,
-        table: string,
-        params: Record<string, string | number | boolean>
+        url: string,
+        params: Record<string, string | number | boolean> = {}
     ): FutureData<ODataResponse<Data>> {
         const qs = buildParams(params);
-        return this.futureFetch("get", mart, `/${table}?${qs}`);
+        return this.futureFetch("get", mart, `/${url}?${qs}`);
     }
 
     private futureFetch<Data>(

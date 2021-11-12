@@ -3,9 +3,9 @@ import { XMartContent, XMartResponse, MartTable, DataMart } from "../entities/XM
 
 export interface XMartRepository {
     listTables(mart: DataMart): FutureData<MartTable[]>;
-    list(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
-    listAll(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
-    count(mart: DataMart, table: string): FutureData<number>;
+    listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
+    listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
+    countTableElements(mart: DataMart, table: string): FutureData<number>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

@@ -7,6 +7,6 @@ export class ListMartContentsUseCase implements UseCase {
     constructor(private martRepository: XMartRepository) {}
 
     public execute(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse> {
-        return this.martRepository.list(mart, table, options);
+        return this.martRepository.listTableContent(mart, table, options);
     }
 }
