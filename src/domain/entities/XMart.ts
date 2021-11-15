@@ -1,4 +1,4 @@
-export type DataMartEndpoint = "PUBLIC" | "PROD" | "UAT"
+export type DataMartEndpoint = "PUBLIC" | "PROD" | "UAT";
 
 export interface DataMart {
     id: string; // Auto-generated ID
