@@ -20,6 +20,7 @@ export const NewActionPage: React.FC = () => {
 
     const execute = useCallback(async () => {
         const jsCode = ts.transpile([`"use strict";`, value, "({ execute })"].join("\n"));
+        // eslint-disable-next-line no-eval
         const runtime = eval(jsCode);
 
         const azureRepository = new AzureMSALRepository();

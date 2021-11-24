@@ -7,7 +7,7 @@ export class ListDataMartsUseCase implements UseCase {
     constructor(private martRepository: XMartRepository) {}
 
     public execute(): FutureData<DataMart[]> {
-        console.log(this.martRepository);
+        console.debug(this.martRepository);
 
         // TODO: Hardcoded for now
         // return this.martRepository.listDataMarts(mart, table, options);
