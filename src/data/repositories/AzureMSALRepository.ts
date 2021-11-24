@@ -32,6 +32,14 @@ export class AzureMSALRepository implements AzureRepository {
         return this.getXmartToken(Scopes.XMART_UAT_SCOPE);
     }
 
+    public getPrivateTokenPROD(): FutureData<string> {
+        return this.getXmartToken(Scopes.XMART_PRIVATE_PROD_SCOPE);
+    }
+
+    public getPrivateTokenUAT(): FutureData<string> {
+        return this.getXmartToken(Scopes.XMART_PRIVATE_UAT_SCOPE);
+    }
+
     private getXmartToken(scope: string): FutureData<string> {
         const client = this.getInstance();
         const [account] = client.getAllAccounts();

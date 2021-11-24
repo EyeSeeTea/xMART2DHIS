@@ -4,12 +4,34 @@ import { Future, FutureData } from "../../domain/entities/Future";
 import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/XMart";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import { ListAllOptions, ListXMartOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
+import { generateUid } from "../../utils/uid";
 
 export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
 
+    // FIXME: This is a temporary solution to get the list of marts (using the private API)
+    public listMarts(): FutureData<DataMart[]> {
+        return this.azureRepository
+            .getPrivateTokenUAT()
+            .flatMap(token =>
+                futureFetch<any[]>("post", "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/api/mart", {
+                    body: "{}",
+                    bearer: token,
+                })
+            )
+            .map(items =>
+                items.map(({ CODE, TITLE }) => ({
+                    id: generateUid(),
+                    code: CODE,
+                    name: TITLE,
+                    apiUrl: `https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/${CODE}`,
+                    type: "UAT",
+                }))
+            );
+    }
+
     public listTables(mart: DataMart): FutureData<MartTable[]> {
-        return this.request<MartTable[]>("get", mart, "").map(({ value: tables }) =>
+        return this.requestMart<MartTable[]>("get", mart, "").map(({ value: tables }) =>
             tables.map(({ name, kind }) => ({ name, kind, mart: mart.id }))
         );
     }
@@ -27,7 +49,7 @@ export class XMartDefaultRepository implements XMartRepository {
             orderBy,
         });
 
-        return this.request<XMartContent[]>("get", mart, table, { params }).map(response => ({
+        return this.requestMart<XMartContent[]>("get", mart, table, { params }).map(response => ({
             objects: response.value,
             pager: { pageSize, page, total: response["@odata.count"] },
         }));
@@ -54,7 +76,9 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 
     public countTableElements(mart: DataMart, table: string): FutureData<number> {
-        return this.request<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(({ value }) => value);
+        return this.requestMart<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(
+            ({ value }) => value
+        );
     }
 
     public runPipeline(
@@ -78,14 +102,16 @@ export class XMartDefaultRepository implements XMartRepository {
         );
     }
 
-    private request<Data>(
+    private requestMart<Data>(
         method: "get" | "post",
         mart: DataMart,
         path: string,
         options: { body?: string; textResponse?: boolean; params?: Record<string, string | number | boolean> } = {}
     ): FutureData<ODataResponse<Data>> {
         const url = joinUrl(mart.apiUrl, path);
-        return this.getToken(mart).flatMap(token => futureFetch(method, url, { ...options, bearer: token }));
+        return this.getToken(mart).flatMap(token =>
+            futureFetch<ODataResponse<Data>>(method, url, { ...options, bearer: token })
+        );
     }
 
     private getAPIEndpoint(mart: DataMart): FutureData<string> {
@@ -135,7 +161,7 @@ function futureFetch<Data>(
         params?: Record<string, string | number | boolean>;
         bearer?: string;
     } = {}
-): FutureData<ODataResponse<Data>> {
+): FutureData<Data> {
     const { body, textResponse = false, params, bearer } = options;
     const controller = new AbortController();
     const qs = buildParams(params);
@@ -157,7 +183,7 @@ function futureFetch<Data>(
                     reject("Fetch request failed");
                 } else if (textResponse) {
                     const text = await response.text();
-                    resolve({ value: text as unknown as Data });
+                    resolve(text as unknown as Data);
                 } else {
                     const json = await response.json();
                     resolve(json);

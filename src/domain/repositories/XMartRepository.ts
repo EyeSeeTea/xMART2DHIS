@@ -1,7 +1,8 @@
 import { FutureData } from "../entities/Future";
-import { XMartContent, XMartResponse, MartTable, DataMart } from "../entities/XMart";
+import { DataMart, MartTable, XMartContent, XMartResponse } from "../entities/XMart";
 
 export interface XMartRepository {
+    listMarts(): FutureData<DataMart[]>;
     listTables(mart: DataMart): FutureData<MartTable[]>;
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
