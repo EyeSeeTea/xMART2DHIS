@@ -7,7 +7,7 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
-    runPipeline(mart: DataMart, pipeline: string, params: Record<string, string | number | boolean>): FutureData<any>;
+    runPipeline(mart: DataMart, pipeline: string, params: Record<string, string | number | boolean>): FutureData<void>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

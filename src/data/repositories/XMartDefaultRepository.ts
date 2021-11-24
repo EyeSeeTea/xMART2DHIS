@@ -85,7 +85,7 @@ export class XMartDefaultRepository implements XMartRepository {
         mart: DataMart,
         pipeline: string,
         params: Record<string, string | number | boolean>
-    ): FutureData<any> {
+    ): FutureData<void> {
         const body = JSON.stringify(
             {
                 martCode: mart.code,
@@ -97,8 +97,11 @@ export class XMartDefaultRepository implements XMartRepository {
             4
         );
 
-        return this.getAPIEndpoint(mart).flatMap(endpoint =>
-            futureFetch<any>("post", joinUrl(endpoint, `/origin/start`), { body })
+        return Future.joinObj({
+            endpoint: this.getAPIEndpoint(mart),
+            token: this.getToken(mart),
+        }).flatMap(({ endpoint, token }) =>
+            futureFetch("post", joinUrl(endpoint, `/origin/start`), { body, bearer: token })
         );
     }
 
@@ -119,9 +122,9 @@ export class XMartDefaultRepository implements XMartRepository {
             case "PUBLIC":
                 return Future.error("Unable to call xMART API for public data marts");
             case "PROD":
-                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/api");
+                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/api");
             case "UAT":
-                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/api");
+                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/api");
             default:
                 return Future.error("Unknown data mart type");
         }
