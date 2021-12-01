@@ -21,23 +21,50 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
         try {
             const objects = await this.dataStore.listObjectsInCollection<DataMart>(Namespaces.CONNECTIONS);
             const filteredDataBySearch = search
-            ? _.filter(objects, o =>
-                  _(o)
-                      .values()
-                      .some(value =>
-                          typeof value === "string" ? value.toLowerCase().includes(search.toLowerCase()) : false
-                      )
-              )
-            : objects;
+                ? _.filter(objects, o =>
+                      _(o)
+                          .values()
+                          .some(value =>
+                              typeof value === "string" ? value.toLowerCase().includes(search.toLowerCase()) : false
+                          )
+                  )
+                : objects;
 
             return filteredDataBySearch;
-
         } catch (error: any) {
             console.error(error);
             return [];
         }
+    }
 
-        
+    async save(connection: DataMart): Promise<void> {
+
+        /*const connectionData = {
+            ..._.omit(
+                connection.toObject(),
+                "publicAccess",
+                "userAccesses",
+                "externalAccess",
+                "userGroupAccesses",
+                "user",
+                "created",
+                "lastUpdated",
+                "lastUpdatedBy"
+            ),
+            url: connection.type === "local" ? "" : connection.url,
+            password: this.encryptPassword(connection.password),
+        };*/
+
+        await this.dataStore.saveObjectInCollection(Namespaces.CONNECTIONS, connection);
+
+        /*const objectSharing = {
+            publicAccess: connection.publicAccess,
+            externalAccess: false,
+            user: connection.user,
+            userAccesses: connection.userAccesses,
+            userGroupAccesses: connection.userGroupAccesses,
+        };*/
+
+        //await this.dataStore.saveObjectSharing(`${Namespaces.INSTANCES}-${instanceData.id}`, objectSharing);
     }
 }
-

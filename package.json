@@ -39,6 +39,7 @@
         "purify-ts-extra-codec": "0.6.0",
         "react": "17.0.2",
         "react-dom": "17.0.2",
+        "react-final-form": "^6.5.7",
         "react-json-view": "1.21.3",
         "react-router-dom": "5.3.0",
         "react-scripts": "4.0.3",

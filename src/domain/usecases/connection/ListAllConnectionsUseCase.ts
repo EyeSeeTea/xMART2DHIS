@@ -7,6 +7,5 @@ export class ListAllConnectionsUseCase implements UseCase {
 
     public execute(filters: ConnectionsFilter = {}): Promise<DataMart[]> {
         return this.connectionsRepository.listAll(filters);
-
     }
 }

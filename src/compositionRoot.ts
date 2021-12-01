@@ -13,14 +13,13 @@ import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCa
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
-
+import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
     const azureRepository = new AzureMSALRepository();
     const martRepository = new XMartDefaultRepository(azureRepository);
     const connectionRepository = new ConnectionsDataStoreRepository(instance);
-
 
     return {
         xmart: getExecute({
@@ -42,6 +41,7 @@ export function getCompositionRoot(instance: Instance) {
         }),
         connection: getExecute({
             listAll: new ListAllConnectionsUseCase(connectionRepository),
+            save: new SaveConnectionUseCase(connectionRepository),
         }),
     };
 }

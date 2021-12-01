@@ -9,6 +9,8 @@ import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
 import { NewActionPage } from "./new-action/NewActionPage";
+import { NewConnectionPage } from "./new-connection/NewConnectionPage";
+
 
 export const Router = () => {
     return (
@@ -31,6 +33,9 @@ export const Router = () => {
                         </RouterPage>
                     )}
                 />
+
+                <Route path={"/connections/:action(new|edit)/:id?"} render={() => <NewConnectionPage />} />
+
 
                 <Route
                     path="/connections"

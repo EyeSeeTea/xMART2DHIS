@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-01T09:36:21.185Z\n"
-"PO-Revision-Date: 2021-12-01T09:36:21.185Z\n"
+"POT-Creation-Date: 2021-12-01T11:30:12.521Z\n"
+"PO-Revision-Date: 2021-12-01T11:30:12.521Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -123,6 +123,12 @@ msgid "Run"
 msgstr ""
 
 msgid "Running actions..."
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Connection URL"
 msgstr ""
 
 msgid "xMART API"
