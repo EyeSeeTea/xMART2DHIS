@@ -61,7 +61,7 @@ export const ListActionsPage: React.FC = () => {
     }, [history]);
 
     useEffect(() => {
-        compositionRoot.actions.get().run(
+        compositionRoot.actions.list().run(
             rows => setRows(rows),
             error => snackbar.error(error)
         );

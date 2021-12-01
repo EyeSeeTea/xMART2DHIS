@@ -1,8 +1,10 @@
+import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
+import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
-import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUseCase";
+import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
@@ -16,6 +18,8 @@ export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
     const azureRepository = new AzureMSALRepository();
     const martRepository = new XMartDefaultRepository(azureRepository);
+    const dataStoreClient = new StorageDataStoreRepository("global", instance);
+    const actionRepository = new ActionDataStoreRepository(dataStoreClient);
 
     return {
         xmart: getExecute({
@@ -29,8 +33,8 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            get: new GetActionsUseCase(martRepository, instanceRepository),
-            exampleAction: new ExampleActionUseCase(martRepository, instanceRepository),
+            list: new GetActionsUseCase(actionRepository),
+            delete: new DeleteActionsUseCase(actionRepository),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

@@ -1,4 +1,17 @@
-import { ObjectsTable, TableAction, TableColumn, useSnackbar } from "@eyeseetea/d2-ui-components";
+import {
+    ConfirmationDialog,
+    ObjectsTable,
+    ObjectsTableDetailField,
+    ReferenceObject,
+    TableAction,
+    TableColumn,
+    TableSelection,
+    TableState,
+    useLoading,
+    useSnackbar,
+} from "@eyeseetea/d2-ui-components";
+import { Icon } from "@material-ui/core";
+import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/SyncAction";
@@ -9,11 +22,22 @@ import { useAppContext } from "../../contexts/app-context";
 
 export const ListActionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
+    const loading = useLoading();
     const snackbar = useSnackbar();
     const history = useHistory();
 
     const [rows, setRows] = useState<SyncAction[]>([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [selection, updateSelection] = useState<TableSelection[]>([]);
+    const [toDelete, setToDelete] = useState<string[]>([]);
     const [results, setResults] = useState<SyncResult[]>();
+
+    useEffect(() => {
+        compositionRoot.actions.list().run(
+            rows => setRows(rows),
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar, refreshKey]);
 
     const columns: TableColumn<SyncAction>[] = useMemo(
         () => [
@@ -23,27 +47,110 @@ export const ListActionsPage: React.FC = () => {
         []
     );
 
-    const actions: TableAction<SyncAction>[] = useMemo(() => [], []);
+    const details: ObjectsTableDetailField<SyncAction>[] = [
+        { name: "name", text: i18n.t("Name") },
+        { name: "description", text: i18n.t("Description") },
+    ];
 
     const goToCreateAction = useCallback(() => {
         history.push("/actions/new");
     }, [history]);
 
-    useEffect(() => {
-        compositionRoot.actions.get().run(
-            rows => setRows(rows),
-            error => snackbar.error(error)
+    const goToEditAction = useCallback(
+        (ids: string[]) => {
+            const id = _.first(ids);
+            if (!id) return;
+
+            history.push(`/actions/edit/${id}`);
+        },
+        [history]
+    );
+
+    const confirmDelete = useCallback(async () => {
+        loading.show(true, i18n.t("Deleting Actions"));
+
+        compositionRoot.actions.delete(toDelete).run(
+            () => {
+                snackbar.success(i18n.t("Successfully deleted {{total}} actions", { total: toDelete.length }));
+
+                loading.reset();
+                setToDelete([]);
+                updateSelection([]);
+                setRefreshKey(Math.random());
+            },
+            _error => {
+                loading.reset();
+                snackbar.error(i18n.t("An error has ocurred deleting actionn"));
+            }
         );
-    }, [compositionRoot, snackbar]);
+    }, [compositionRoot, loading, snackbar, toDelete]);
+
+    const handleTableChange = useCallback((tableState: TableState<ReferenceObject>) => {
+        const { selection } = tableState;
+        updateSelection(selection);
+    }, []);
+
+    const actions: TableAction<SyncAction>[] = useMemo(
+        () => [
+            {
+                name: "details",
+                text: i18n.t("Details"),
+                multiple: false,
+            },
+            {
+                name: "edit",
+                text: i18n.t("Edit"),
+                multiple: false,
+                onClick: goToEditAction,
+                primary: true,
+                icon: <Icon>edit</Icon>,
+            },
+            {
+                name: "delete",
+                text: i18n.t("Delete"),
+                multiple: true,
+                onClick: setToDelete,
+                icon: <Icon>delete</Icon>,
+            },
+            // {
+            //     name: "execute",
+            //     text: i18n.t("Execute"),
+            //     multiple: false,
+            //     onClick: executeRule,
+            //     icon: <Icon>settings_input_antenna</Icon>,
+            // }
+        ],
+        [goToEditAction]
+    );
 
     return (
         <React.Fragment>
             {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
 
+            {toDelete.length > 0 && (
+                <ConfirmationDialog
+                    isOpen={true}
+                    onSave={confirmDelete}
+                    onCancel={() => setToDelete([])}
+                    title={i18n.t("Delete Actions?")}
+                    description={
+                        toDelete
+                            ? i18n.t("Are you sure you want to delete {{total}} actions?", {
+                                  total: toDelete.length,
+                              })
+                            : ""
+                    }
+                    saveText={i18n.t("Ok")}
+                />
+            )}
+
             <ObjectsTable<SyncAction>
                 rows={rows}
                 columns={columns}
+                details={details}
+                selection={selection}
                 actions={actions}
+                onChange={handleTableChange}
                 onActionButtonClick={goToCreateAction}
             />
         </React.Fragment>
