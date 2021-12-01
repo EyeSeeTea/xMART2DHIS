@@ -1,6 +1,7 @@
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
+import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsDataStoreRepository";
 import { Instance } from "./domain/entities/Instance";
 import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
@@ -11,11 +12,15 @@ import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartC
 import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
+import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
+
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
     const azureRepository = new AzureMSALRepository();
     const martRepository = new XMartDefaultRepository(azureRepository);
+    const connectionRepository = new ConnectionsDataStoreRepository(instance);
+
 
     return {
         xmart: getExecute({
@@ -34,6 +39,9 @@ export function getCompositionRoot(instance: Instance) {
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),
+        }),
+        connection: getExecute({
+            listAll: new ListAllConnectionsUseCase(connectionRepository),
         }),
     };
 }

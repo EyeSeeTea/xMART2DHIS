@@ -1,81 +1,50 @@
-import { ObjectsTable, TableAction, TableColumn, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
-import { Sync } from "@material-ui/icons";
-import _ from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { Future } from "../../../domain/entities/Future";
-import { SyncAction } from "../../../domain/entities/SyncAction";
+import { ObjectsTable, TableColumn, useSnackbar } from "@eyeseetea/d2-ui-components";
+import React, { useEffect, useMemo, useState } from "react";
 import { SyncResult } from "../../../domain/entities/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
+import { DataMart } from "../../../domain/entities/XMart";
 
 export const ListConnectionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
-    const loading = useLoading();
-    const history = useHistory();
 
-    const [rows, setRows] = useState<SyncAction[]>([]);
+    const [rows, setRows] = useState<DataMart[]>([]);
+    const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<SyncResult[]>();
+    const [search, changeSearch] = useState<string>("");
 
-    const columns: TableColumn<SyncAction>[] = useMemo(
+
+    const columns: TableColumn<DataMart>[] = useMemo(
         () => [
             { name: "name", text: i18n.t("Name") },
-            { name: "description", text: i18n.t("Description") },
+            { name: "code", text: i18n.t("Code") },
+            { name: "type", text: i18n.t("Type") },
+            { name: "apiUrl", text: i18n.t("Connection URL") },
         ],
         []
     );
 
-    const actions: TableAction<SyncAction>[] = useMemo(
-        () => [
-            {
-                name: "run",
-                text: i18n.t("Run"),
-                icon: <Sync />,
-                multiple: true,
-                onClick: (ids: string[]) => {
-                    loading.show(true, i18n.t("Running actions..."));
-                    const futures = _.compact(ids.map(id => rows.find(item => item.id === id))).map(({ execute }) =>
-                        execute()
-                    );
-
-                    Future.parallel(futures, { maxConcurrency: 1 }).run(
-                        results => {
-                            loading.reset();
-                            setResults(results);
-                        },
-                        error => {
-                            loading.reset();
-                            snackbar.error(error);
-                        }
-                    );
-                },
-            },
-        ],
-        [snackbar, loading, rows]
-    );
-
-    const goToCreateAction = useCallback(() => {
-        history.push("/actions/new");
-    }, [history]);
-
     useEffect(() => {
-        compositionRoot.actions.get().run(
-            rows => setRows(rows),
-            error => snackbar.error(error)
-        );
-    }, [compositionRoot, snackbar]);
+        setLoading(true);
+        compositionRoot.connection.listAll({ search }).then(connections => {
+            setRows(connections);
+            setLoading(false);
+        });
+
+    }, [compositionRoot, snackbar, search]);
 
     return (
         <React.Fragment>
             {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
 
-            <ObjectsTable<SyncAction>
+            <ObjectsTable<DataMart>
                 rows={rows}
                 columns={columns}
-                actions={actions}
-                onActionButtonClick={goToCreateAction}
+                onChangeSearch={changeSearch}
+                loading={loading}
+
             />
         </React.Fragment>
     );

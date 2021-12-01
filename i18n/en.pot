@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-09T20:07:22.424Z\n"
-"PO-Revision-Date: 2021-11-09T20:07:22.424Z\n"
+"POT-Creation-Date: 2021-12-01T09:36:21.185Z\n"
+"PO-Revision-Date: 2021-12-01T09:36:21.185Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -95,6 +95,9 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
+msgid "Connections"
+msgstr ""
+
 msgid "Browse xMART"
 msgstr ""
 
@@ -105,6 +108,9 @@ msgid "Actions are a way to trigger events in your application"
 msgstr ""
 
 msgid "List table contents of the MART"
+msgstr ""
+
+msgid "List connections of the MART"
 msgstr ""
 
 msgid "Name"
