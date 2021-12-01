@@ -1,5 +1,5 @@
 import { Future, FutureData } from "../../domain/entities/Future";
-import { SyncAction } from "../../domain/entities/SyncAction";
+import { SyncAction, SyncActionData } from "../../domain/entities/SyncAction";
 import { ActionRepository } from "../../domain/repositories/ActionRepository";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageDefaultRepository } from "./StorageDefaultRepository";
@@ -10,19 +10,19 @@ export class ActionDataStoreRepository implements ActionRepository {
     //TODO: dataStoreClient should be refactor to futures to avoid Future.fromPromise here.
 
     getById(id: string): FutureData<SyncAction | undefined> {
-        return Future.fromPromise(
-            this.dataStoreClient.getObjectInCollection<SyncAction>(Namespaces.ACTIONS, id)
-        ).flatMapError(error => Future.error(String(error)));
+        return Future.fromPromise(this.dataStoreClient.getObjectInCollection<SyncActionData>(Namespaces.ACTIONS, id))
+            .flatMapError(error => Future.error(String(error)))
+            .map(actionData => (actionData ? SyncAction.build(actionData) : undefined));
     }
 
     list(): FutureData<SyncAction[]> {
-        return Future.fromPromise(
-            this.dataStoreClient.listObjectsInCollection<SyncAction>(Namespaces.ACTIONS)
-        ).flatMapError(error => Future.error(String(error)));
+        return Future.fromPromise(this.dataStoreClient.listObjectsInCollection<SyncActionData>(Namespaces.ACTIONS))
+            .flatMapError(error => Future.error(String(error)))
+            .map(actions => actions.map(actionData => SyncAction.build(actionData)));
     }
     save(action: SyncAction): FutureData<void> {
         return Future.fromPromise(
-            this.dataStoreClient.saveObjectInCollection<SyncAction>(Namespaces.ACTIONS, action)
+            this.dataStoreClient.saveObjectInCollection<SyncActionData>(Namespaces.ACTIONS, action.toData())
         ).flatMapError(error => Future.error(String(error)));
     }
 

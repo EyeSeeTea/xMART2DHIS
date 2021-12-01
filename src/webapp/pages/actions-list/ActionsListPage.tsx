@@ -20,7 +20,7 @@ import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 
-export const ListActionsPage: React.FC = () => {
+export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const loading = useLoading();
     const snackbar = useSnackbar();

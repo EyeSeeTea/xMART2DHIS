@@ -5,7 +5,9 @@ import { StorageDataStoreRepository } from "./data/repositories/StorageDataStore
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
 import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
+import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
+import { SaveActionsUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
@@ -34,7 +36,9 @@ export function getCompositionRoot(instance: Instance) {
         }),
         actions: getExecute({
             list: new GetActionsUseCase(actionRepository),
+            get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
+            save: new SaveActionsUseCase(actionRepository),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

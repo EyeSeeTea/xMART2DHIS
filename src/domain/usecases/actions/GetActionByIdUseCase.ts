@@ -3,10 +3,10 @@ import { FutureData } from "../../entities/Future";
 import { SyncAction } from "../../entities/SyncAction";
 import { ActionRepository } from "../../repositories/ActionRepository";
 
-export class GetActionsUseCase implements UseCase {
+export class GetActionByIdUseCase implements UseCase {
     constructor(private actionRepository: ActionRepository) {}
 
-    public execute(): FutureData<SyncAction[]> {
-        return this.actionRepository.list();
+    public execute(id: string): FutureData<SyncAction | undefined> {
+        return this.actionRepository.getById(id);
     }
 }
