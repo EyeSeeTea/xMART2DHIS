@@ -1,14 +1,12 @@
-export const dataStoreNamespace = "landing-page-app";
-export const constantPrefix = "Landing Page App Storage";
+export const dataStoreNamespace = "XMART2DHIS";
+export const constantPrefix = "XMART2DHIS App Storage";
 
 export type Namespace = typeof Namespaces[keyof typeof Namespaces];
 
 export const Namespaces = {
-    NOTIFICATIONS: "notifications",
-    CONFIG: "config",
+    INSTANCES: "instances",
 };
 
 export const NamespaceProperties: Record<Namespace, string[]> = {
-    [Namespaces.NOTIFICATIONS]: [],
-    [Namespaces.CONFIG]: [],
+    [Namespaces.INSTANCES]: [],
 };

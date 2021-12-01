@@ -6,6 +6,7 @@ import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
 import { LandingPage } from "./landing/LandingPage";
 import { ListActionsPage } from "./list-actions/ListActionsPage";
+import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
 import { NewActionPage } from "./new-action/NewActionPage";
 
@@ -27,6 +28,15 @@ export const Router = () => {
                     render={() => (
                         <RouterPage title={i18n.t("Actions")}>
                             <ListActionsPage />
+                        </RouterPage>
+                    )}
+                />
+
+                <Route
+                    path="/connections"
+                    render={() => (
+                        <RouterPage title={i18n.t("Connections")}>
+                            <ListConnectionsPage />
                         </RouterPage>
                     )}
                 />

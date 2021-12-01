@@ -24,6 +24,11 @@ export const LandingPage: React.FC = () => {
                         description: i18n.t("List table contents of the MART"),
                         listAction: () => history.push("/list"),
                     },
+                    {
+                        name: i18n.t("Connections"),
+                        description: i18n.t("List connections of the MART"),
+                        listAction: () => history.push("/connections"),
+                    },
                 ],
             },
         ],
