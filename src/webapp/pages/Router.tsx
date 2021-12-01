@@ -5,8 +5,8 @@ import i18n from "../../locales";
 import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
 import { LandingPage } from "./landing/LandingPage";
-import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
+import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { NewActionPage } from "./new-action/NewActionPage";
 
 export const Router = () => {
