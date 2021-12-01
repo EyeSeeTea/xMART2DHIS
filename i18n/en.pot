@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-01T09:49:08.533Z\n"
-"PO-Revision-Date: 2021-12-01T09:49:08.533Z\n"
+"POT-Creation-Date: 2021-12-01T12:41:30.524Z\n"
+"PO-Revision-Date: 2021-12-01T12:41:30.524Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -21,6 +21,18 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Field {{field}} cannot be blank"
+msgstr ""
+
+msgid "You need to select at least one {{field}}"
+msgstr ""
+
+msgid "Field {{field}} needs to be a valid url"
+msgstr ""
+
+msgid "Field {{field}} is not valid"
 msgstr ""
 
 msgid "Sign in with Microsoft"
@@ -89,7 +101,39 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-msgid "New action"
+msgid "General info"
+msgstr ""
+
+msgid "Name (*)"
+msgstr ""
+
+msgid "Source instance"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Cancel action wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Action Creation Wizard. All your changes will be "
+"lost. Are you sure you want to proceed?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Action"
 msgstr ""
 
 msgid "Actions"
@@ -101,16 +145,7 @@ msgstr ""
 msgid "xMART2DHIS"
 msgstr ""
 
-msgid "Actions are a way to trigger events in your application"
-msgstr ""
-
-msgid "List table contents of the MART"
-msgstr ""
-
-msgid "Name"
-msgstr ""
-
-msgid "Description"
+msgid "An error has ocurred loading the action"
 msgstr ""
 
 msgid "Deleting Actions"
@@ -138,6 +173,12 @@ msgid "Delete Actions?"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
+msgid "Actions are a way to trigger events in your application"
+msgstr ""
+
+msgid "List table contents of the MART"
 msgstr ""
 
 msgid "Run"
