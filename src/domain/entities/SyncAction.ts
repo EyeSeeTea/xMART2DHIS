@@ -1,24 +1,34 @@
 import { generateUid } from "../../utils/uid";
+import { DataSyncPeriod } from "./DataSyncPeriod";
 import { ModelValidation, validateModel, ValidationError } from "./Validations";
 
 export interface SyncActionData {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     connectionId: string;
+    period: DataSyncPeriod;
+    startDate?: Date;
+    endDate?: Date;
 }
 
 export class SyncAction implements SyncActionData {
     public readonly id: string;
     public readonly name: string;
-    public readonly description: string;
+    public readonly description?: string;
     public readonly connectionId: string;
+    public readonly period: DataSyncPeriod;
+    public readonly startDate?: Date;
+    public readonly endDate?: Date;
 
     constructor(data: SyncActionData) {
         this.id = data.id;
         this.name = data.name;
         this.description = data.description;
         this.connectionId = data.connectionId;
+        this.period = data.period;
+        this.startDate = data.startDate;
+        this.endDate = data.endDate;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -36,9 +46,19 @@ export class SyncAction implements SyncActionData {
     }
 
     private moduleValidations(): ModelValidation[] {
+        const dateValidations: ModelValidation[] =
+            this.period === "FIXED"
+                ? [
+                      { property: "startDate", validation: "hasValue" },
+                      { property: "endDate", validation: "hasValue" },
+                  ]
+                : [];
+
         return [
             { property: "name", validation: "hasText" },
             { property: "connectionId", validation: "hasValue" },
+            { property: "period", validation: "hasValue" },
+            ...dateValidations,
         ];
     }
 
@@ -48,6 +68,7 @@ export class SyncAction implements SyncActionData {
             name: "",
             description: "",
             connectionId: "",
+            period: "ALL",
         };
     };
 
@@ -57,6 +78,9 @@ export class SyncAction implements SyncActionData {
             name: this.name,
             description: this.description,
             connectionId: this.connectionId,
+            period: this.period,
+            startDate: this.startDate,
+            endDate: this.endDate,
         };
     }
 }

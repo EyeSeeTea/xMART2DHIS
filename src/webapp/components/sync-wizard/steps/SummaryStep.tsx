@@ -1,7 +1,9 @@
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { availablePeriods } from "../../../../domain/entities/DataSyncPeriod";
 import { SyncAction } from "../../../../domain/entities/SyncAction";
 import { DataMart } from "../../../../domain/entities/XMart";
 import i18n from "../../../../locales";
@@ -126,6 +128,19 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
             <LiEntry label={i18n.t("Connection")} value={connection?.name} />
 
             <LiEntry label={i18n.t("Description")} value={action.description} />
+
+            <LiEntry label={i18n.t("Period")} value={availablePeriods[action.period]?.name}>
+                {action.period === "FIXED" && (
+                    <ul>
+                        <LiEntry label={i18n.t("Start date")} value={moment(action.startDate).format("YYYY-MM-DD")} />
+                    </ul>
+                )}
+                {action.period === "FIXED" && (
+                    <ul>
+                        <LiEntry label={i18n.t("End date")} value={moment(action.endDate).format("YYYY-MM-DD")} />
+                    </ul>
+                )}
+            </LiEntry>
         </ul>
     );
 };

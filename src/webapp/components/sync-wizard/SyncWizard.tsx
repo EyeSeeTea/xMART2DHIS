@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/SyncAction";
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
+import PeriodSelectionStep from "./steps/PeriodSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";
 
 interface SyncWizardProps {
@@ -22,11 +23,16 @@ export const stepsBaseInfo: SyncWizardStep[] = [
         validationKeys: ["name"],
     },
     {
+        key: "period",
+        label: i18n.t("Period"),
+        component: PeriodSelectionStep,
+        validationKeys: ["startDate", "endDate"],
+    },
+    {
         key: "summary",
         label: i18n.t("Summary"),
         component: SummaryStep,
         validationKeys: [],
-        showOnSyncDialog: true,
     },
 ];
 
