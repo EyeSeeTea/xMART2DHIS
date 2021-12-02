@@ -1,14 +1,21 @@
+import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { makeStyles, TextField } from "@material-ui/core";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SyncAction } from "../../../../domain/entities/SyncAction";
+import { DataMart } from "../../../../domain/entities/XMart";
 import i18n from "../../../../locales";
 import { Dictionary } from "../../../../types/utils";
+import { useAppContext } from "../../../contexts/app-context";
+import Dropdown from "../../dropdown/Dropdown";
 import { SyncWizardStepProps } from "../SyncWizard";
 
 export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
     const classes = useStyles();
 
+    const [connections, setConnections] = useState<DataMart[]>([]);
     const [errors, setErrors] = useState<Dictionary<string>>({});
+    const { compositionRoot } = useAppContext();
+    const snackbar = useSnackbar();
 
     const onChangeField = useCallback(
         (field: keyof SyncAction) => {
@@ -22,21 +29,19 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
         [action, onChange]
     );
 
-    // const onChangeInstance = useCallback(
-    //     (_type: InstanceSelectionOption, instance?: Instance | Store) => {
-    //         const originInstance = instance?.id ?? "LOCAL";
-    //         const targetInstances = originInstance === "LOCAL" ? [] : ["LOCAL"];
+    useEffect(() => {
+        compositionRoot.xmart.listDataMarts().run(
+            dataMarts => setConnections(dataMarts),
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar]);
 
-    //         onChange(
-    //             syncRule
-    //                 .updateBuilder({ originInstance })
-    //                 .updateTargetInstances(targetInstances)
-    //                 .updateMetadataIds([])
-    //                 .updateExcludedIds([])
-    //         );
-    //     },
-    //     [syncRule, onChange]
-    // );
+    const onChangeConnection = useCallback(
+        (connectionId?: string) => {
+            onChange(action.update({ connectionId }));
+        },
+        [action, onChange]
+    );
 
     return (
         <React.Fragment>
@@ -50,15 +55,16 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
                 helperText={errors["name"]}
             />
 
-            {/* <div className={classes.row}>
-                <InstanceSelectionDropdown
-                    showInstances={{ local: true, remote: true }}
-                    selectedInstance={syncRule.originInstance}
-                    onChangeSelected={onChangeInstance}
-                    view="full-width"
-                    title={i18n.t("Source instance")}
+            <div className={classes.row}>
+                <Dropdown
+                    items={connections}
+                    value={action.connectionId ?? connections[0]?.id ?? ""}
+                    onValueChange={onChangeConnection}
+                    label={i18n.t("Connection")}
+                    hideEmpty={true}
+                    view={"full-width"}
                 />
-            </div> */}
+            </div>
 
             <TextField
                 className={classes.row}

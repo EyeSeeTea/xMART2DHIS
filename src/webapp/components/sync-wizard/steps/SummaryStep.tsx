@@ -1,8 +1,9 @@
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { SyncAction } from "../../../../domain/entities/SyncAction";
+import { DataMart } from "../../../../domain/entities/XMart";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
 import { SyncWizardStepProps } from "../SyncWizard";
@@ -103,10 +104,26 @@ interface SummaryStepContentProps {
 
 export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const { action } = props;
+    const { compositionRoot } = useAppContext();
+    const snackbar = useSnackbar();
+
+    const [connection, setConnection] = useState<DataMart>();
+
+    useEffect(() => {
+        compositionRoot.xmart.listDataMarts().run(
+            dataMarts => {
+                const connection = dataMarts.find(d => d.id === action.connectionId);
+                setConnection(connection);
+            },
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar, action]);
 
     return (
         <ul>
             <LiEntry label={i18n.t("Name")} value={action.name} />
+
+            <LiEntry label={i18n.t("Connection")} value={connection?.name} />
 
             <LiEntry label={i18n.t("Description")} value={action.description} />
         </ul>

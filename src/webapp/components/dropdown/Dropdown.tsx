@@ -8,6 +8,8 @@ export interface DropdownOption<T extends string | undefined = string | undefine
     name: string;
 }
 
+export type DropdownViewOption = "filter" | "inline" | "full-width";
+
 interface DropdownProps<T extends string | undefined = string | undefined> {
     items: DropdownOption<T>[];
     value: T;
@@ -17,12 +19,12 @@ interface DropdownProps<T extends string | undefined = string | undefined> {
     hideEmpty?: boolean;
     emptyLabel?: string;
     disabled?: boolean;
+    view?: DropdownViewOption;
+    className?: string;
 }
 
 const StyledFormControl = styled(FormControl)`
     min-width: 200px;
-    margin-top: -8px;
-    margin-left: 10px;
 `;
 
 export function Dropdown<T extends string | undefined = string | undefined>({
@@ -34,9 +36,11 @@ export function Dropdown<T extends string | undefined = string | undefined>({
     hideEmpty = false,
     emptyLabel,
     disabled = false,
+    view,
+    className
 }: DropdownProps<T>) {
     return (
-        <StyledFormControl>
+        <StyledFormControl fullWidth={view === "full-width"} className={className}>
             {label && <InputLabel>{label}</InputLabel>}
             <Select
                 key={`dropdown-select-${label}`}
