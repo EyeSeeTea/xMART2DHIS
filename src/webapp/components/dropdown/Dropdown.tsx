@@ -37,7 +37,7 @@ export function Dropdown<T extends string | undefined = string | undefined>({
     emptyLabel,
     disabled = false,
     view,
-    className
+    className,
 }: DropdownProps<T>) {
     return (
         <StyledFormControl fullWidth={view === "full-width"} className={className}>
