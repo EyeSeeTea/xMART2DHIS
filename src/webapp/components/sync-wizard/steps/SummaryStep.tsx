@@ -1,11 +1,14 @@
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
+import _ from "lodash";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { availablePeriods } from "../../../../domain/entities/DataSyncPeriod";
+import { MetadataEntities, MetadataEntity, MetadataPackage } from "../../../../domain/entities/Metadata";
 import { SyncAction } from "../../../../domain/entities/SyncAction";
 import { DataMart } from "../../../../domain/entities/XMart";
+import { cleanOrgUnitPaths } from "../../../../domain/utils";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
 import { SyncWizardStepProps } from "../SyncWizard";
@@ -110,6 +113,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const snackbar = useSnackbar();
 
     const [connection, setConnection] = useState<DataMart>();
+    const [metadata, updateMetadata] = useState<MetadataPackage<MetadataEntity>>({});
 
     useEffect(() => {
         compositionRoot.xmart.listDataMarts().run(
@@ -121,6 +125,18 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
         );
     }, [compositionRoot, snackbar, action]);
 
+    useEffect(() => {
+        const ids = [...cleanOrgUnitPaths(action.orgUnitPaths)];
+
+        compositionRoot.metadata.getByIds(ids, "id,name,type").run(
+            metadata => {
+                debugger;
+                updateMetadata(metadata);
+            },
+            () => snackbar.error("An error has ocurred loading metadata")
+        );
+    }, [compositionRoot, action, snackbar]);
+
     return (
         <ul>
             <LiEntry label={i18n.t("Name")} value={action.name} />
@@ -128,6 +144,26 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
             <LiEntry label={i18n.t("Connection")} value={connection?.name} />
 
             <LiEntry label={i18n.t("Description")} value={action.description} />
+
+            {_.keys(metadata).map(metadataType => {
+                const itemsByType = metadata[metadataType as keyof MetadataEntities] || [];
+
+                return (
+                    itemsByType.length > 0 && (
+                        <LiEntry
+                            key={metadataType}
+                            //@ts-ignore
+                            label={`${api.models[metadataType].schema.displayName} [${itemsByType.length}]`}
+                        >
+                            <ul>
+                                {itemsByType.map(({ id, name }) => (
+                                    <LiEntry key={id} label={`${name} (${id})`} />
+                                ))}
+                            </ul>
+                        </LiEntry>
+                    )
+                );
+            })}
 
             <LiEntry label={i18n.t("Period")} value={availablePeriods[action.period]?.name}>
                 {action.period === "FIXED" && (

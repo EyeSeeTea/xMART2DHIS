@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/SyncAction";
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
+import OrganisationUnitsSelectionStep from "./steps/OrganisationUnitsSelectionStep";
 import PeriodSelectionStep from "./steps/PeriodSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";
 
@@ -23,6 +24,12 @@ export const stepsBaseInfo: SyncWizardStep[] = [
         validationKeys: ["name"],
     },
     {
+        key: "organisations-units",
+        label: i18n.t("Organisation units"),
+        component: OrganisationUnitsSelectionStep,
+        validationKeys: ["orgUnitPaths"],
+    },
+    {
         key: "period",
         label: i18n.t("Period"),
         component: PeriodSelectionStep,
@@ -38,7 +45,6 @@ export const stepsBaseInfo: SyncWizardStep[] = [
 
 export interface SyncWizardStep extends WizardStep {
     validationKeys: string[];
-    showOnSyncDialog?: boolean;
     hidden?: (action: SyncAction) => boolean;
 }
 

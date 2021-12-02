@@ -1,6 +1,8 @@
+import { Id } from "../../types/d2-api";
 import { FutureData } from "../entities/Future";
 import { ImportResult } from "../entities/ImportResult";
-import { MetadataItem, MetadataModel, MetadataPayload } from "../entities/Metadata";
+import { MetadataItem, MetadataModel, MetadataPackage, MetadataPayload } from "../entities/Metadata";
+import { OrganisationUnit } from "../entities/OrganisationUnit";
 
 export interface MetadataRepository {
     list(options: ListMetadataOptions): FutureData<ListMetadataResponse>;
@@ -9,6 +11,8 @@ export interface MetadataRepository {
     getModelName(model: string): string;
     isShareable(model: string): boolean;
     isDataShareable(model: string): boolean;
+    getOrgUnitRoots(): FutureData<OrganisationUnit[]>;
+    getMetadataByIds<T>(ids: Id[], fields?: object | string, includeDefaults?: boolean): FutureData<MetadataPackage<T>>;
 }
 
 export interface ListMetadataOptions {

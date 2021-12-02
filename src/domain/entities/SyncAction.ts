@@ -10,6 +10,7 @@ export interface SyncActionData {
     period: DataSyncPeriod;
     startDate?: Date;
     endDate?: Date;
+    orgUnitPaths: string[];
 }
 
 export class SyncAction implements SyncActionData {
@@ -20,6 +21,7 @@ export class SyncAction implements SyncActionData {
     public readonly period: DataSyncPeriod;
     public readonly startDate?: Date;
     public readonly endDate?: Date;
+    public readonly orgUnitPaths: string[];
 
     constructor(data: SyncActionData) {
         this.id = data.id;
@@ -29,6 +31,7 @@ export class SyncAction implements SyncActionData {
         this.period = data.period;
         this.startDate = data.startDate;
         this.endDate = data.endDate;
+        this.orgUnitPaths = data.orgUnitPaths;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -58,6 +61,7 @@ export class SyncAction implements SyncActionData {
             { property: "name", validation: "hasText" },
             { property: "connectionId", validation: "hasValue" },
             { property: "period", validation: "hasValue" },
+            { property: "orgUnitPaths", validation: "hasItems" },
             ...dateValidations,
         ];
     }
@@ -69,6 +73,7 @@ export class SyncAction implements SyncActionData {
             description: "",
             connectionId: "",
             period: "ALL",
+            orgUnitPaths: [],
         };
     };
 
@@ -81,6 +86,7 @@ export class SyncAction implements SyncActionData {
             period: this.period,
             startDate: this.startDate,
             endDate: this.endDate,
+            orgUnitPaths: this.orgUnitPaths,
         };
     }
 }
