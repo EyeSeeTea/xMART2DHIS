@@ -21,6 +21,8 @@ export interface ListMetadataOptions {
     pageSize?: number;
     search?: string;
     sorting?: { field: string; order: "asc" | "desc" };
+    fields?: object;
+    selectedIds?: string[];
 }
 
 export interface ListMetadataResponse {

@@ -1,4 +1,6 @@
+import { DataSet } from "./DataSet";
 import { OrganisationUnit } from "./OrganisationUnit";
+import { Program } from "./Program";
 import { ProgramEvent } from "./ProgramEvent";
 import { Ref } from "./Ref";
 
@@ -36,6 +38,8 @@ export type MetadataEntity = OrganisationUnit;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
+    programs: Program[];
+    dataSets: DataSet[];
 };
 
 export type MetadataPackage<T = MetadataEntity> = Partial<Record<keyof MetadataEntities, T[]>>;

@@ -14,6 +14,7 @@ import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUser
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
+import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
@@ -42,6 +43,7 @@ export function getCompositionRoot(instance: Instance) {
         metadata: getExecute({
             getOrgUnitRoots: new GetRootOrgUnitUseCase(metadataRepository),
             getByIds: new GetMetadataByIdsUseCase(metadataRepository),
+            list: new ListMetadataUseCase(metadataRepository),
         }),
         actions: getExecute({
             list: new GetActionsUseCase(actionRepository),

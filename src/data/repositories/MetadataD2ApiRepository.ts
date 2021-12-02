@@ -23,7 +23,17 @@ export class MetadataD2ApiRepository implements MetadataRepository {
     }
 
     public list(options: ListMetadataOptions): FutureData<ListMetadataResponse> {
-        const { model, page, pageSize, search, sorting = { field: "id", order: "asc" } } = options;
+        const {
+            model,
+            page,
+            pageSize,
+            search,
+            sorting = { field: "id", order: "asc" },
+            selectedIds,
+            fields = { $owner: true },
+        } = options;
+
+        const idsFilter = selectedIds && selectedIds?.length > 0 ? { id: { in: selectedIds } } : {};
 
         return apiToFuture(
             //@ts-ignore: d2-api incorrectly guessing model with string access
@@ -31,8 +41,8 @@ export class MetadataD2ApiRepository implements MetadataRepository {
                 page,
                 pageSize,
                 paging: true,
-                filter: { identifiable: search ? { token: search } : undefined },
-                fields: { $owner: true },
+                filter: { identifiable: search ? { token: search } : undefined, ...idsFilter },
+                fields,
                 order: `${sorting.field}:${sorting.order}`,
             })
         );
@@ -112,7 +122,6 @@ export class MetadataD2ApiRepository implements MetadataRepository {
                     .getData()
             );
         }
-        debugger;
         const response = await Promise.all(promises);
         const results = deepMerge({}, ...response);
         if (results.system) delete results.system;

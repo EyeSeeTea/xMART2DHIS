@@ -126,15 +126,11 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     }, [compositionRoot, snackbar, action]);
 
     useEffect(() => {
-        const ids = [...cleanOrgUnitPaths(action.orgUnitPaths)];
+        const ids = [...action.metadataIds, ...cleanOrgUnitPaths(action.orgUnitPaths)];
 
-        compositionRoot.metadata.getByIds(ids, "id,name,type").run(
-            metadata => {
-                debugger;
-                updateMetadata(metadata);
-            },
-            () => snackbar.error("An error has ocurred loading metadata")
-        );
+        compositionRoot.metadata
+            .getByIds(ids, "id,name,type")
+            .run(updateMetadata, () => snackbar.error("An error has ocurred loading metadata"));
     }, [compositionRoot, action, snackbar]);
 
     return (

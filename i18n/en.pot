@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-02T06:21:32.144Z\n"
-"PO-Revision-Date: 2021-12-02T06:21:32.144Z\n"
+"POT-Creation-Date: 2021-12-02T08:41:26.091Z\n"
+"PO-Revision-Date: 2021-12-02T08:41:26.091Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -167,6 +167,9 @@ msgstr ""
 msgid "General info"
 msgstr ""
 
+msgid "Organisation units"
+msgstr ""
+
 msgid "Name (*)"
 msgstr ""
 
@@ -174,6 +177,9 @@ msgid "Connection"
 msgstr ""
 
 msgid "Description"
+msgstr ""
+
+msgid "You do not have assigned any organisation unit"
 msgstr ""
 
 msgid "Cancel action wizard"
