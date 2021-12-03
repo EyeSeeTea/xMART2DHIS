@@ -15,7 +15,7 @@ export const defaultConnection: DataMart = {
     name: "",
     code: "",
     type: "PUBLIC",
-    apiUrl: ""
+    apiUrl: "",
 };
 export interface MartTable {
     name: string;

@@ -1,4 +1,5 @@
-import { Button } from "@material-ui/core";
+//import { Button } from "@material-ui/core";
+import { Button } from "@dhis2/ui";
 import Editor, { Monaco } from "@monaco-editor/react";
 import _ from "lodash";
 import React, { useCallback, useState } from "react";
@@ -35,8 +36,8 @@ export const NewActionPage: React.FC = () => {
         <React.Fragment>
             <MonacoEditor value={value} onChange={setValue} />
 
-            <Center>
-                <Button variant="contained" onClick={execute} style={{ margin: "10px" }}>
+            <Center style={{ marginTop: 10 }}>
+                <Button type="button" onClick={execute}>
                     {i18n.t("Run")}
                 </Button>
             </Center>

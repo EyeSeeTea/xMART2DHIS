@@ -7,6 +7,7 @@ import { DataMart } from "../../domain/entities/XMart";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { StorageDataStoreRepository } from "./StorageDataStoreRepository";
+import { generateUid } from "../../utils/uid";
 
 export class ConnectionsDataStoreRepository implements ConnectionsRepository {
     private api: D2Api;
@@ -37,8 +38,7 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
         }
     }
 
-    async save(connection: DataMart): Promise<void> {
-
+    async save(connections: Omit<DataMart, "id">[]): Promise<void> {
         /*const connectionData = {
             ..._.omit(
                 connection.toObject(),
@@ -54,8 +54,8 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
             url: connection.type === "local" ? "" : connection.url,
             password: this.encryptPassword(connection.password),
         };*/
-
-        await this.dataStore.saveObjectInCollection(Namespaces.CONNECTIONS, connection);
+        const connectionsToSave: DataMart[] = connections.map(connection => ({ ...connection, id: generateUid() }));
+        await this.dataStore.saveObjectsInCollection(Namespaces.CONNECTIONS, connectionsToSave);
 
         /*const objectSharing = {
             publicAccess: connection.publicAccess,

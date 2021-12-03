@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-01T11:30:12.521Z\n"
-"PO-Revision-Date: 2021-12-01T11:30:12.521Z\n"
+"POT-Creation-Date: 2021-12-01T16:32:06.665Z\n"
+"PO-Revision-Date: 2021-12-01T16:32:06.665Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -135,4 +135,52 @@ msgid "xMART API"
 msgstr ""
 
 msgid "xMART Table"
+msgstr ""
+
+msgid "Saving connection"
+msgstr ""
+
+msgid "Network error"
+msgstr ""
+
+msgid "Server name (*)"
+msgstr ""
+
+msgid "Code (*)"
+msgstr ""
+
+msgid "Type (*)"
+msgstr ""
+
+msgid "API URL (*)"
+msgstr ""
+
+msgid "Error saving predictors"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "New Connection"
+msgstr ""
+
+msgid "Edit Connection"
+msgstr ""
+
+msgid "Cancel Connection Creation"
+msgstr ""
+
+msgid "Cancel Connection Editing"
+msgstr ""
+
+msgid "All your changes will be lost. Are you sure?"
+msgstr ""
+
+msgid "Create Connection"
 msgstr ""

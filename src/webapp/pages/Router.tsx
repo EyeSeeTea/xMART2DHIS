@@ -11,7 +11,6 @@ import { ListMartPage } from "./list-mart/ListMartPage";
 import { NewActionPage } from "./new-action/NewActionPage";
 import { NewConnectionPage } from "./new-connection/NewConnectionPage";
 
-
 export const Router = () => {
     return (
         <HashRouter>
@@ -34,8 +33,20 @@ export const Router = () => {
                     )}
                 />
 
-                <Route path={"/connections/:action(new|edit)/:id?"} render={() => <NewConnectionPage />} />
-
+                <Route
+                    path={"/connections/:action(new|edit)/:id?"}
+                    render={props => (
+                        <RouterPage
+                            title={
+                                props.match.params.action === "new"
+                                    ? i18n.t("New Connection")
+                                    : i18n.t("Edit Connection")
+                            }
+                        >
+                            <NewConnectionPage />
+                        </RouterPage>
+                    )}
+                />
 
                 <Route
                     path="/connections"

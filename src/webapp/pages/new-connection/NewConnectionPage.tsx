@@ -1,22 +1,27 @@
-import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
+import { NoticeBox, ButtonStrip, Button } from "@dhis2/ui";
+import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useCallback, useEffect, useState } from "react";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
-import { GeneralInfoForm } from "./GeneralInfoForm";
+import { Form } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 import { DataMart, defaultConnection } from "../../../domain/entities/XMart";
-import { PageHeader } from "../../components/page-header/PageHeader";
-
+import styled from "styled-components";
+import { useGoBack } from "../../hooks/useGoBack";
+import { getConnectionFieldName } from "./utils";
+import { RenderConnectionField } from "./ConnectionForm";
+import { Paper } from "@material-ui/core";
 
 export const NewConnectionPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
-    const history = useHistory();
     const { id, action } = useParams<{ id: string; action: "new" | "edit" }>();
     const location = useLocation<{ connection?: DataMart }>();
     const isEdit = action === "edit" && id;
-
-    const [error, setError] = useState<boolean>(false);
-    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const loading = useLoading();
+    const snackbar = useSnackbar();
+    const goBack = useGoBack();
+    const goHome = useCallback(() => goBack(true), [goBack]);
     const [connection, setConnection] = useState<DataMart>(defaultConnection);
 
     useEffect(() => {
@@ -36,42 +41,79 @@ export const NewConnectionPage: React.FC = () => {
         }
     }, [compositionRoot, id, isEdit, location]);
 
-    const cancelSave = useCallback(() => {
-        setDialogOpen(true);
-    }, []);
+    const onSubmit = useCallback(
+        async ({ connections }: { connections: DataMart[] }) => {
+            if (connections === undefined) return { FORM_ERROR };
 
-    const handleConfirm = useCallback(() => {
-        setDialogOpen(true);
-        history.push("/connections");
-    }, [history]);
+            loading.show(true, i18n.t("Saving connection"));
+            await compositionRoot.connection.save(connections);
+            snackbar.success(i18n.t("Connection successfully created"));
+            loading.reset();
+            goHome();
+        },
+        [compositionRoot, loading, snackbar, goHome]
+    );
 
-    const handleDialogCancel = useCallback(() => {
-        setDialogOpen(false);
-    }, []);
-
-    const onChange = useCallback((connection: DataMart) => {
-        setConnection(connection);
-    }, []);
-
-    const title = !isEdit ? i18n.t("New Connection") : i18n.t("Edit Connection");
-
-    const cancel = !isEdit ? i18n.t("Cancel Connection Creation") : i18n.t("Cancel Connection Editing");
-
-    if (error) return null;
+    const fields = ["name", "code", "type", "apiUrl"];
+    const cancel = !isEdit ? i18n.t("Cancel connection creation") : i18n.t("Cancel connection editing");
 
     return (
         <React.Fragment>
-            <ConfirmationDialog
-                isOpen={dialogOpen}
-                onSave={handleConfirm}
-                onCancel={handleDialogCancel}
-                title={cancel}
-                description={i18n.t("All your changes will be lost. Are you sure?")}
-                saveText={i18n.t("Ok")}
-            />
-            <PageHeader title={i18n.t("Create Connection")} onBackClick={() => window.history.back()} />
+            <Container>
+                <Form<{ connections: DataMart[] }>
+                    autocomplete="off"
+                    onSubmit={onSubmit}
+                    render={({ handleSubmit, submitError }) => (
+                        <form onSubmit={handleSubmit}>
+                            {submitError && (
+                                <NoticeBox title={i18n.t("Error saving connection")} error={true}>
+                                    {submitError}
+                                </NoticeBox>
+                            )}
+                            {fields.map(field => (
+                                <Row key={`connection-row-${field}`}>
+                                    <Label>{getConnectionFieldName(field)}</Label>
+                                    <RenderConnectionField row={0} field={field} />
+                                </Row>
+                            ))}
 
-            <GeneralInfoForm />
+                            <ButtonsRow>
+                                <div>
+                                    <Button type="submit" primary>
+                                        {i18n.t("Save")}
+                                    </Button>
+
+                                    <Button type="reset" onClick={goHome}>
+                                        {cancel}
+                                    </Button>
+                                </div>
+                                <div style={{ marginRight: 7 }}>
+                                    <Button>{i18n.t("Test connection")}</Button>
+                                </div>
+                            </ButtonsRow>
+                        </form>
+                    )}
+                />
+            </Container>
         </React.Fragment>
     );
 };
+
+const Row = styled.div`
+    margin: 20px 0;
+`;
+
+const Label = styled.b`
+    display: block;
+    margin-bottom: 15px;
+`;
+const Container = styled(Paper)`
+    margin: 20px;
+    padding: 40px;
+`;
+const ButtonsRow = styled(ButtonStrip)`
+    button:focus::after {
+        border-color: transparent !important;
+    }
+    justify-content: space-between;
+`;

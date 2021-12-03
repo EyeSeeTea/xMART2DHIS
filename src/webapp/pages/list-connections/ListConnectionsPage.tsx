@@ -41,11 +41,12 @@ export const ListConnectionsPage: React.FC = () => {
         <React.Fragment>
             {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
 
-            <ObjectsTable<DataMart> 
-            rows={rows} 
-            columns={columns} 
-            onChangeSearch={changeSearch} loading={loading} 
-            onActionButtonClick={createConnection}
+            <ObjectsTable<DataMart>
+                rows={rows}
+                columns={columns}
+                onChangeSearch={changeSearch}
+                loading={loading}
+                onActionButtonClick={createConnection}
             />
         </React.Fragment>
     );
