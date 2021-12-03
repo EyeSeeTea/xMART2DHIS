@@ -1,6 +1,6 @@
-import { generateUid } from "../../utils/uid";
-import { DataSyncPeriod } from "./DataSyncPeriod";
-import { ModelValidation, validateModel, ValidationError } from "./Validations";
+import { generateUid } from "../../../utils/uid";
+import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
+import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
 export interface SyncActionData {
     id: string;

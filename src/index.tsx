@@ -5,7 +5,7 @@ import { init } from "d2";
 import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
-import { Instance } from "./domain/entities/Instance";
+import { Instance } from "./domain/entities/instance/Instance";
 import { D2Api } from "./types/d2-api";
 import { getD2APiFromInstance } from "./utils/d2-api";
 import App from "./webapp/pages/app/App";

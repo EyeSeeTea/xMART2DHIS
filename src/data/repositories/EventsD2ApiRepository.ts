@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { Instance } from "../../domain/entities/Instance";
-import { ProgramEvent } from "../../domain/entities/ProgramEvent";
-import { SyncResult } from "../../domain/entities/SyncResult";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { ProgramEvent } from "../../domain/entities/data/ProgramEvent";
+import { SyncResult } from "../../domain/entities/data/SyncResult";
 import { EventsRepository, GetEventsFilters, SaveEventsParams } from "../../domain/repositories/EventsRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import i18n from "../../locales";

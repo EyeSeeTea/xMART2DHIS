@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
-import { Instance } from "../../domain/entities/Instance";
-import { MetadataPackage, MetadataPayload } from "../../domain/entities/Metadata";
-import { OrganisationUnit } from "../../domain/entities/OrganisationUnit";
+import { ImportResult, ImportStats } from "../../domain/entities/data/ImportResult";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { MetadataPackage, MetadataPayload } from "../../domain/entities/metadata/Metadata";
+import { OrganisationUnit } from "../../domain/entities/metadata/OrganisationUnit";
 import {
     ListMetadataResponse,
     ListMetadataOptions,

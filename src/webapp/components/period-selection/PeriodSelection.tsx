@@ -6,7 +6,7 @@ import React, { useCallback, useMemo } from "react";
 
 import Dropdown from "../dropdown/Dropdown";
 import { Maybe } from "../../../types/utils";
-import { availablePeriods, DataSyncPeriod, PeriodType } from "../../../domain/entities/DataSyncPeriod";
+import { availablePeriods, DataSyncPeriod, PeriodType } from "../../../domain/entities/metadata/DataSyncPeriod";
 import i18n from "../../../locales";
 
 export interface ObjectWithPeriodInput {

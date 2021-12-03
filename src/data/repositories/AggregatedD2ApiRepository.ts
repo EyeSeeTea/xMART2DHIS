@@ -1,7 +1,7 @@
-import { DataValue } from "../../domain/entities/DataValue";
+import { DataValue } from "../../domain/entities/data/DataValue";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { Instance } from "../../domain/entities/Instance";
-import { SyncResult } from "../../domain/entities/SyncResult";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { SyncResult } from "../../domain/entities/data/SyncResult";
 import {
     AggregatedRepository,
     GetAggregatedFilters,

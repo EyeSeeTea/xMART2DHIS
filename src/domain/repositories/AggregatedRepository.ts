@@ -1,7 +1,7 @@
-import { DataSyncPeriod } from "../entities/DataSyncPeriod";
-import { DataValue } from "../entities/DataValue";
+import { DataSyncPeriod } from "../entities/metadata/DataSyncPeriod";
+import { DataValue } from "../entities/data/DataValue";
 import { FutureData } from "../entities/Future";
-import { SyncResult } from "../entities/SyncResult";
+import { SyncResult } from "../entities/data/SyncResult";
 
 export interface AggregatedRepository {
     save(dataValues: DataValue[], params: SaveAggregatedParams): FutureData<SyncResult>;

@@ -1,6 +1,6 @@
 import { Enrollment } from "./Enrollment";
 import { Relationship } from "./Relationship";
-import { TrakedEntityAttribute } from "./TrackedEntityAttribute";
+import { TrakedEntityAttribute } from "../metadata/TrackedEntityAttribute";
 
 export interface ProgramOwner {
     ownerOrgUnit: string;

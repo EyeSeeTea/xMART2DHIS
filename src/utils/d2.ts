@@ -1,6 +1,6 @@
 import { ObjectsTableDetailField, TableColumn } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
-import { D2Model } from "../domain/entities/D2Model";
+import { D2Model } from "../domain/entities/models/D2Model";
 import i18n from "../locales";
 
 const include = true as const;

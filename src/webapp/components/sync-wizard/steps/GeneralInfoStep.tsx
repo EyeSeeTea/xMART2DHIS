@@ -1,8 +1,8 @@
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { makeStyles, TextField } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
-import { SyncAction } from "../../../../domain/entities/SyncAction";
-import { DataMart } from "../../../../domain/entities/XMart";
+import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
+import { DataMart } from "../../../../domain/entities/xmart/XMart";
 import i18n from "../../../../locales";
 import { Dictionary } from "../../../../types/utils";
 import { useAppContext } from "../../../contexts/app-context";

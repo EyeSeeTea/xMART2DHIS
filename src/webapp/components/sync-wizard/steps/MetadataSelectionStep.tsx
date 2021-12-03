@@ -3,10 +3,10 @@ import _ from "lodash";
 import React, { useCallback, useState } from "react";
 
 import MetadataTable from "../../metadata-table/MetadataTable";
-import { DataSetModel, ProgramModel } from "../../../../domain/entities/D2Models";
 import { SyncWizardStepProps } from "../SyncWizard";
 import { MetadataType } from "../../../../utils/d2";
 import i18n from "../../../../locales";
+import { DataSetModel, ProgramModel } from "../../../../domain/entities/models/D2Models";
 
 const models = [ProgramModel, DataSetModel];
 

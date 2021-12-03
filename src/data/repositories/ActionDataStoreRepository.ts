@@ -1,5 +1,5 @@
 import { Future, FutureData } from "../../domain/entities/Future";
-import { SyncAction, SyncActionData } from "../../domain/entities/SyncAction";
+import { SyncAction, SyncActionData } from "../../domain/entities/actions/SyncAction";
 import { ActionRepository } from "../../domain/repositories/ActionRepository";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageDefaultRepository } from "./StorageDefaultRepository";

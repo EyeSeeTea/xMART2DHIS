@@ -1,8 +1,8 @@
 import { Id } from "../../types/d2-api";
 import { FutureData } from "../entities/Future";
-import { ImportResult } from "../entities/ImportResult";
-import { MetadataItem, MetadataModel, MetadataPackage, MetadataPayload } from "../entities/Metadata";
-import { OrganisationUnit } from "../entities/OrganisationUnit";
+import { ImportResult } from "../entities/data/ImportResult";
+import { MetadataItem, MetadataModel, MetadataPackage, MetadataPayload } from "../entities/metadata/Metadata";
+import { OrganisationUnit } from "../entities/metadata/OrganisationUnit";
 
 export interface MetadataRepository {
     list(options: ListMetadataOptions): FutureData<ListMetadataResponse>;

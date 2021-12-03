@@ -1,4 +1,4 @@
-import { Ref } from "../entities/Ref";
+import { Ref } from "../entities/metadata/Ref";
 
 export interface StorageRepository {
     // Object operations

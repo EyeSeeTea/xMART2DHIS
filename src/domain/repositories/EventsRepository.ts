@@ -1,7 +1,7 @@
-import { DataSyncPeriod } from "../entities/DataSyncPeriod";
+import { DataSyncPeriod } from "../entities/metadata/DataSyncPeriod";
 import { FutureData } from "../entities/Future";
-import { ProgramEvent } from "../entities/ProgramEvent";
-import { SyncResult } from "../entities/SyncResult";
+import { ProgramEvent } from "../entities/data/ProgramEvent";
+import { SyncResult } from "../entities/data/SyncResult";
 
 export interface EventsRepository {
     save(events: ProgramEvent[], params?: SaveEventsParams): FutureData<SyncResult>;

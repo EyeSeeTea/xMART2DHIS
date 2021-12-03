@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { Instance } from "../../domain/entities/Instance";
-import { TrackedEntityInstance } from "../../domain/entities/TrackedEntityInstance";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { TrackedEntityInstance } from "../../domain/entities/data/TrackedEntityInstance";
 import { getTEIsFilters, TEIRepository } from "../../domain/repositories/TEIRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import { D2Api, Pager } from "../../types/d2-api";

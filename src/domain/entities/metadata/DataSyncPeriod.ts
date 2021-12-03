@@ -1,6 +1,6 @@
-import i18n from "../../locales";
+import i18n from "../../../locales";
 import { unitOfTime } from "moment";
-import { buildObject } from "../../types/utils";
+import { buildObject } from "../../../types/utils";
 
 export type DataSyncPeriod =
     | "ALL"

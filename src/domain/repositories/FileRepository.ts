@@ -1,4 +1,4 @@
-import { FileInfo } from "../entities/File";
+import { FileInfo } from "../entities/data/File";
 import { FutureData } from "../entities/Future";
 
 export interface FileRepository {

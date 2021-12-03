@@ -1,4 +1,4 @@
-import { dataSetFields, programFields } from "../../utils/d2";
+import { dataSetFields, programFields } from "../../../utils/d2";
 import { D2Model } from "./D2Model";
 
 export class DataSetModel extends D2Model {

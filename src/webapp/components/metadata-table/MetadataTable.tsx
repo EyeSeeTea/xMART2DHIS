@@ -15,9 +15,9 @@ import {
 import _ from "lodash";
 import React, { ChangeEvent, ReactNode, useCallback, useEffect, useState } from "react";
 import { MetadataType } from "../../../utils/d2";
-import { D2Model } from "../../../domain/entities/D2Model";
+import { D2Model } from "../../../domain/entities/models/D2Model";
 import { useAppContext } from "../../contexts/app-context";
-import { ProgramModel } from "../../../domain/entities/D2Models";
+import { ProgramModel } from "../../../domain/entities/models/D2Models";
 import { ListMetadataOptions } from "../../../domain/repositories/MetadataRepository";
 import i18n from "../../../locales";
 import { Dropdown } from "../dropdown/Dropdown";

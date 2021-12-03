@@ -1,4 +1,4 @@
-import { Id } from "./Ref";
+import { Id } from "../metadata/Ref";
 
 export interface FileInfo {
     id?: Id;

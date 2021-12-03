@@ -1,6 +1,6 @@
 import _ from "lodash";
 import i18n from "../../locales";
-import { Ref } from "./Ref";
+import { Ref } from "./metadata/Ref";
 
 export interface ValidationError {
     property: string;

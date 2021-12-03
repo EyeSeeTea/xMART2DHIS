@@ -1,7 +1,7 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/XMart";
+import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/xmart/XMart";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import { ListAllOptions, ListXMartOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
 import { generateUid } from "../../utils/uid";

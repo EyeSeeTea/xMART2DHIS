@@ -1,4 +1,4 @@
-import { NamedRef } from "../../domain/entities/Ref";
+import { NamedRef } from "./Ref";
 
 export interface User {
     id: string;

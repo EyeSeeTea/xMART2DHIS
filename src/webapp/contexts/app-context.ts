@@ -1,8 +1,8 @@
 import { PublicClientApplication } from "@azure/msal-browser";
 import React, { useContext } from "react";
 import { CompositionRoot } from "../../compositionRoot";
-import { Instance } from "../../domain/entities/Instance";
-import { User } from "../../domain/entities/User";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { User } from "../../domain/entities/metadata/User";
 import { D2Api } from "../../types/d2-api";
 
 export interface AppContextState {

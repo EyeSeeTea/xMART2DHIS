@@ -1,6 +1,6 @@
 import { Id } from "../../../types/d2-api";
 import { FutureData } from "../../entities/Future";
-import { MetadataPackage } from "../../entities/Metadata";
+import { MetadataPackage } from "../../entities/metadata/Metadata";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 
 export class GetMetadataByIdsUseCase {

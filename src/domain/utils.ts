@@ -1,6 +1,6 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { availablePeriods, DataSyncPeriod } from "./entities/DataSyncPeriod";
+import { availablePeriods, DataSyncPeriod } from "./entities/metadata/DataSyncPeriod";
 
 export function cleanOrgUnitPaths(orgUnitPaths: string[]): string[] {
     return orgUnitPaths.map(cleanOrgUnitPath);
