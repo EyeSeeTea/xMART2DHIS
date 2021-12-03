@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-03T09:41:41.532Z\n"
-"PO-Revision-Date: 2021-12-03T09:41:41.532Z\n"
+"POT-Creation-Date: 2021-12-03T16:58:17.599Z\n"
+"PO-Revision-Date: 2021-12-03T16:58:17.599Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -21,6 +21,18 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Field {{field}} cannot be blank"
+msgstr ""
+
+msgid "You need to select at least one {{field}}"
+msgstr ""
+
+msgid "Field {{field}} needs to be a valid url"
+msgstr ""
+
+msgid "Field {{field}} is not valid"
 msgstr ""
 
 msgid "All time"
@@ -75,18 +87,6 @@ msgid "Last year"
 msgstr ""
 
 msgid "Last 5 years"
-msgstr ""
-
-msgid "Field {{field}} cannot be blank"
-msgstr ""
-
-msgid "You need to select at least one {{field}}"
-msgstr ""
-
-msgid "Field {{field}} needs to be a valid url"
-msgstr ""
-
-msgid "Field {{field}} is not valid"
 msgstr ""
 
 msgid "Data values does not found"
