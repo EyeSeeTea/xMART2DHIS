@@ -92,14 +92,17 @@ export const ActionsListPage: React.FC = () => {
 
     const execute = useCallback(
         async (ids: string[]) => {
-            loading.show(true, i18n.t("execute action"));
+            loading.show(true, i18n.t("Executing the action"));
 
             const id = _.first(ids);
             if (!id) return;
 
             compositionRoot.actions.execute(id).run(
-                () => {
-                    snackbar.success(i18n.t("Successfully executed the action"));
+                result => {
+                    snackbar.success(
+                        i18n.t("Successfully executed the action:\n{{dataValues}}\n{{events}}\n{{teis}}", result),
+                        { autoHideDuration: null }
+                    );
 
                     loading.reset();
                     setToDelete([]);
@@ -108,7 +111,7 @@ export const ActionsListPage: React.FC = () => {
                 },
                 _error => {
                     loading.reset();
-                    snackbar.error(i18n.t("An error has ocurred executing the actionn"));
+                    snackbar.error(i18n.t("An error has ocurred executing the action"));
                 }
             );
         },

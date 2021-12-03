@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-02T11:19:48.754Z\n"
+"POT-Creation-Date: 2021-12-03T06:02:51.375Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -278,6 +278,15 @@ msgid "Successfully deleted {{total}} actions"
 msgstr ""
 
 msgid "An error has ocurred deleting actionn"
+msgstr ""
+
+msgid "execute action"
+msgstr ""
+
+msgid "Successfully executed the action"
+msgstr ""
+
+msgid "An error has ocurred executing the actionn"
 msgstr ""
 
 msgid "Edit"

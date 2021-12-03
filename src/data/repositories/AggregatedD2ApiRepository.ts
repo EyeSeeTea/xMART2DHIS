@@ -1,4 +1,4 @@
-import { DataValue, DataValueSet } from "../../domain/entities/DataValue";
+import { DataValue } from "../../domain/entities/DataValue";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { SyncResult } from "../../domain/entities/SyncResult";

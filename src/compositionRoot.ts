@@ -2,6 +2,7 @@ import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRe
 import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
+import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
@@ -35,6 +36,7 @@ export function getCompositionRoot(instance: Instance) {
     const eventsRepository = new EventsD2ApiRepository(instance);
     const teiRepository = new TEID2ApiRepository(instance);
     const aggregatedRespository = new AggregatedD2ApiRepository(instance);
+    const fileRepository = new FileD2ApiRepository(instance);
 
     return {
         xmart: getExecute({
@@ -62,7 +64,9 @@ export function getCompositionRoot(instance: Instance) {
                 metadataRepository,
                 eventsRepository,
                 teiRepository,
-                aggregatedRespository
+                aggregatedRespository,
+                fileRepository,
+                martRepository
             ),
         }),
         azure: getExecute({
