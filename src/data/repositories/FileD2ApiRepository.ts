@@ -9,7 +9,7 @@ import { apiToFuture } from "../../utils/futures";
 export class FileD2ApiRepository implements FileRepository {
     private api: D2Api;
 
-    constructor(private instance: Instance) {
+    constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
     }
 

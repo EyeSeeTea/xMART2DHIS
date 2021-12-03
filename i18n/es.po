@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-03T06:02:51.375Z\n"
+"POT-Creation-Date: 2021-12-03T09:41:41.532Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,6 +87,15 @@ msgid "Field {{field}} needs to be a valid url"
 msgstr ""
 
 msgid "Field {{field}} is not valid"
+msgstr ""
+
+msgid "Data values does not found"
+msgstr ""
+
+msgid "Events does not found"
+msgstr ""
+
+msgid "tracked entity instances does not found"
 msgstr ""
 
 msgid "Name"
@@ -280,13 +289,10 @@ msgstr ""
 msgid "An error has ocurred deleting actionn"
 msgstr ""
 
-msgid "execute action"
+msgid "Executing the action"
 msgstr ""
 
-msgid "Successfully executed the action"
-msgstr ""
-
-msgid "An error has ocurred executing the actionn"
+msgid "An error has ocurred executing the action"
 msgstr ""
 
 msgid "Edit"
