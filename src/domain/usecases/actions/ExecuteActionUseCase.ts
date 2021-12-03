@@ -1,19 +1,21 @@
 import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
-import { DataValue } from "../../entities/DataValue";
+import { DataValue } from "../../entities/data/DataValue";
 import { Future, FutureData } from "../../entities/Future";
-import { MetadataPackage } from "../../entities/Metadata";
-import { ProgramEvent } from "../../entities/ProgramEvent";
-import { TrackedEntityInstance } from "../../entities/TrackedEntityInstance";
-import { DataMart } from "../../entities/XMart";
+import { MetadataPackage } from "../../entities/metadata/Metadata";
+import { ProgramEvent } from "../../entities/data/ProgramEvent";
+import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
+import { DataMart } from "../../entities/xmart/XMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
 import { EventsRepository } from "../../repositories/EventsRepository";
-import { FileRepository } from "../../repositories/Filerepository";
+import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
+import { dataMarts } from "../xmart/ListDataMartsUseCase";
+import { xMartSyncTables } from "../../entities/xmart/xMartSyncTables";
 
 type SyncResult = {
     dataValues: string;
@@ -22,50 +24,7 @@ type SyncResult = {
 };
 
 //TODO: Remove this when the repositoryreturn data marts
-const dataMarts = Future.success<DataMart[]>([
-    {
-        id: "TRAINING",
-        name: "[UAT] EST Playground",
-        code: "TRAINING_ARC",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
-    },
-    {
-        id: "TRAINING_RJ",
-        name: "[UAT] NTD Playground",
-        code: "TRAINING_RJ",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_RJ",
-    },
-    {
-        id: "REFMART-UAT",
-        name: "[UAT] REFMART",
-        code: "REFMART",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/REFMART",
-    },
-    {
-        id: "REFMART-UAT-PUBLIC",
-        name: "[UAT] REFMART (Public)",
-        code: "REFMART",
-        type: "PUBLIC",
-        apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-r5quteqglawbs.azurefd.net/REFMART",
-    },
-    {
-        id: "REFMART-PROD",
-        name: "[PROD] REFMART",
-        code: "REFMART",
-        type: "PROD",
-        apiUrl: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata/REFMART",
-    },
-    {
-        id: "REFMART-PROD-PUBLIC",
-        name: "[PROD] REFMART (Public)",
-        code: "REFMART",
-        type: "PUBLIC",
-        apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-l4uikgap6gz3m.azurefd.net/REFMART",
-    },
-]);
+const listDataMarts = () => Future.success<DataMart[]>(dataMarts);
 
 export class ExecuteActionUseCase {
     constructor(
@@ -85,7 +44,7 @@ export class ExecuteActionUseCase {
                 return Future.joinObj({
                     action: Future.success(action),
                     metadata: this.extractMetadata(action.metadataIds),
-                    dataMart: dataMarts.flatMap(dataMarts => {
+                    dataMart: listDataMarts().flatMap(dataMarts => {
                         const dataMart = dataMarts.find(dataMart => dataMart.id === action.connectionId);
 
                         const dataMartResult: FutureData<DataMart> = dataMart
@@ -138,17 +97,20 @@ export class ExecuteActionUseCase {
 
         const fileInfo = this.generateFileInfo(dataValues);
 
-        return this.fileRepository
-            .uploadFileAsExternal(fileInfo)
-            .flatMap(url => {
-                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
-                    url,
-                    table: "AGGREGATED",
-                });
-            })
-            .flatMap(() =>
-                Future.success(i18n.t(`Send {{count}} data values succesfully`, { count: dataValues.length }))
-            );
+        return (
+            this.fileRepository
+                .uploadFileAsExternal(fileInfo)
+                //TODO: When xmart has a post endpoint this will be not necessary
+                .flatMap(url => {
+                    return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                        url,
+                        table: xMartSyncTables.dataValues.table.CODE,
+                    });
+                })
+                .flatMap(() =>
+                    Future.success(i18n.t(`Send {{count}} data values succesfully`, { count: dataValues.length }))
+                )
+        );
         //return Future.success(i18n.t(`send {{count}} succesfully`, { count: dataValues.length }));
     }
 
@@ -161,6 +123,7 @@ export class ExecuteActionUseCase {
 
         return (
             this.fileRepository
+                //TODO: When xmart has a post endpoint this will be not necessary
                 .uploadFileAsExternal(fileInfo)
                 // .flatMap(url => {
                 //     return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
@@ -183,6 +146,7 @@ export class ExecuteActionUseCase {
 
         return (
             this.fileRepository
+                //TODO: When xmart has a post endpoint this will be not necessary
                 .uploadFileAsExternal(fileInfo)
                 // .flatMap(url => {
                 //     return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
@@ -200,6 +164,7 @@ export class ExecuteActionUseCase {
         //return Future.success(i18n.t(`send {{count}} succesfully`, { count: teis.length }));
     }
 
+    //TODO: When xmart has a post endpoint this will be not necessary
     private generateFileInfo(teis: unknown[]) {
         const value = JSON.stringify(teis);
 

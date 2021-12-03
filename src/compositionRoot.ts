@@ -8,12 +8,12 @@ import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiReposi
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
-import { Instance } from "./domain/entities/Instance";
+import { Instance } from "./domain/entities/instance/Instance";
 import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
 import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUseCase";
 import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
-import { SaveActionsUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
+import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
@@ -58,7 +58,7 @@ export function getCompositionRoot(instance: Instance) {
             list: new GetActionsUseCase(actionRepository),
             get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
-            save: new SaveActionsUseCase(actionRepository),
+            save: new SaveActionUseCase(actionRepository, fileRepository, martRepository),
             execute: new ExecuteActionUseCase(
                 actionRepository,
                 metadataRepository,
