@@ -5,7 +5,7 @@ import { ConnectionsRepository } from "../../repositories/ConnectionsRepository"
 export class SaveConnectionUseCase implements UseCase {
     constructor(private connectionsRepository: ConnectionsRepository) {}
 
-    public execute(connections: Omit<DataMart, "id">[]): Promise<void> {
+    public execute(connections: Omit<DataMart, "loading" | "onChange" | "selected">[]): Promise<void> {
         return this.connectionsRepository.save(connections);
     }
 }

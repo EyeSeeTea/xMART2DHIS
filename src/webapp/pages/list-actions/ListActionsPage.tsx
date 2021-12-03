@@ -76,6 +76,7 @@ export const ListActionsPage: React.FC = () => {
                 columns={columns}
                 actions={actions}
                 onActionButtonClick={goToCreateAction}
+                
             />
         </React.Fragment>
     );

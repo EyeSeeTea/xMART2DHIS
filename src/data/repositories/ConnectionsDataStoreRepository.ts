@@ -38,7 +38,7 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
         }
     }
 
-    async save(connections: Omit<DataMart, "id">[]): Promise<void> {
+    public async save(connections: Omit<DataMart, "id">[]): Promise<void> {
         /*const connectionData = {
             ..._.omit(
                 connection.toObject(),
@@ -66,5 +66,8 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
         };*/
 
         //await this.dataStore.saveObjectSharing(`${Namespaces.INSTANCES}-${instanceData.id}`, objectSharing);
+    }
+    public async delete(connectionIds: string[]): Promise<void> {
+        await this.dataStore.removeObjectsInCollection(Namespaces.CONNECTIONS, connectionIds);
     }
 }

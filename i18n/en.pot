@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-01T16:32:06.665Z\n"
-"PO-Revision-Date: 2021-12-01T16:32:06.665Z\n"
+"POT-Creation-Date: 2021-12-03T10:39:15.257Z\n"
+"PO-Revision-Date: 2021-12-03T10:39:15.257Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -95,6 +95,12 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
+msgid "New Connection"
+msgstr ""
+
+msgid "Edit Connection"
+msgstr ""
+
 msgid "Connections"
 msgstr ""
 
@@ -140,47 +146,23 @@ msgstr ""
 msgid "Saving connection"
 msgstr ""
 
-msgid "Network error"
+msgid "Connection successfully created"
 msgstr ""
 
-msgid "Server name (*)"
+msgid "Cancel connection creation"
 msgstr ""
 
-msgid "Code (*)"
+msgid "Cancel connection editing"
 msgstr ""
 
-msgid "Type (*)"
-msgstr ""
-
-msgid "API URL (*)"
-msgstr ""
-
-msgid "Error saving predictors"
+msgid "Error saving connection"
 msgstr ""
 
 msgid "Save"
 msgstr ""
 
-msgid "Close"
-msgstr ""
-
 msgid "Test connection"
 msgstr ""
 
-msgid "New Connection"
-msgstr ""
-
-msgid "Edit Connection"
-msgstr ""
-
-msgid "Cancel Connection Creation"
-msgstr ""
-
-msgid "Cancel Connection Editing"
-msgstr ""
-
-msgid "All your changes will be lost. Are you sure?"
-msgstr ""
-
-msgid "Create Connection"
+msgid "API URL"
 msgstr ""

@@ -14,6 +14,7 @@ import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContent
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
 import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
+import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
@@ -42,6 +43,7 @@ export function getCompositionRoot(instance: Instance) {
         connection: getExecute({
             listAll: new ListAllConnectionsUseCase(connectionRepository),
             save: new SaveConnectionUseCase(connectionRepository),
+            delete: new DeleteConnectionsUseCase(connectionRepository)
         }),
     };
 }
