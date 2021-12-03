@@ -1,11 +1,15 @@
 import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRepository";
+import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
+import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
+import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
 import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
+import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUseCase";
 import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { SaveActionsUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
@@ -28,6 +32,9 @@ export function getCompositionRoot(instance: Instance) {
     const dataStoreClient = new StorageDataStoreRepository("global", instance);
     const actionRepository = new ActionDataStoreRepository(dataStoreClient);
     const metadataRepository = new MetadataD2ApiRepository(instance);
+    const eventsRepository = new EventsD2ApiRepository(instance);
+    const teiRepository = new TEID2ApiRepository(instance);
+    const aggregatedRespository = new AggregatedD2ApiRepository(instance);
 
     return {
         xmart: getExecute({
@@ -50,6 +57,13 @@ export function getCompositionRoot(instance: Instance) {
             get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
             save: new SaveActionsUseCase(actionRepository),
+            execute: new ExecuteActionUseCase(
+                actionRepository,
+                metadataRepository,
+                eventsRepository,
+                teiRepository,
+                aggregatedRespository
+            ),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

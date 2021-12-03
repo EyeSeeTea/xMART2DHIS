@@ -1,3 +1,4 @@
+import { DataSyncPeriod } from "../entities/DataSyncPeriod";
 import { FutureData } from "../entities/Future";
 import { ProgramEvent } from "../entities/ProgramEvent";
 import { SyncResult } from "../entities/SyncResult";
@@ -15,4 +16,10 @@ export type SaveEventsParams = {
     dryRun?: boolean;
 };
 
-export type GetEventsFilters = {};
+export type GetEventsFilters = {
+    orgUnitPaths?: string[];
+    programIds: string[];
+    period?: DataSyncPeriod;
+    startDate?: Date;
+    endDate?: Date;
+};

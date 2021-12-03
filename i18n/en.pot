@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-02T08:41:26.091Z\n"
-"PO-Revision-Date: 2021-12-02T08:41:26.091Z\n"
+"POT-Creation-Date: 2021-12-02T11:19:48.754Z\n"
+"PO-Revision-Date: 2021-12-02T11:19:48.754Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -89,6 +89,51 @@ msgstr ""
 msgid "Field {{field}} is not valid"
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
+msgid "Short name"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Last updated"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "API link"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Program Rule"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Option set"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Url"
+msgstr ""
+
 msgid "Sign in with Microsoft"
 msgstr ""
 
@@ -105,9 +150,6 @@ msgid "<No value>"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Created"
 msgstr ""
 
 msgid "Updated"
@@ -149,6 +191,21 @@ msgstr ""
 msgid "JSON Response"
 msgstr ""
 
+msgid "Metadata type"
+msgstr ""
+
+msgid "Only selected items"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Search by "
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -176,7 +233,10 @@ msgstr ""
 msgid "Connection"
 msgstr ""
 
-msgid "Description"
+msgid "Selected {{difference}} elements"
+msgstr ""
+
+msgid "Removed {{difference}} elements"
 msgstr ""
 
 msgid "You do not have assigned any organisation unit"
@@ -199,12 +259,6 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-msgid "Name"
-msgstr ""
-
-msgid "Action"
-msgstr ""
-
 msgid "Actions"
 msgstr ""
 
@@ -224,9 +278,6 @@ msgid "Successfully deleted {{total}} actions"
 msgstr ""
 
 msgid "An error has ocurred deleting actionn"
-msgstr ""
-
-msgid "Details"
 msgstr ""
 
 msgid "Edit"

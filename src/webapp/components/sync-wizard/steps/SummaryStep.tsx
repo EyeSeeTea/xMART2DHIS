@@ -5,7 +5,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { availablePeriods } from "../../../../domain/entities/DataSyncPeriod";
-import { MetadataEntities, MetadataEntity, MetadataPackage } from "../../../../domain/entities/Metadata";
+import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/Metadata";
 import { SyncAction } from "../../../../domain/entities/SyncAction";
 import { DataMart } from "../../../../domain/entities/XMart";
 import { cleanOrgUnitPaths } from "../../../../domain/utils";
@@ -113,7 +113,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const snackbar = useSnackbar();
 
     const [connection, setConnection] = useState<DataMart>();
-    const [metadata, updateMetadata] = useState<MetadataPackage<MetadataEntity>>({});
+    const [metadata, updateMetadata] = useState<MetadataPackage>({});
 
     useEffect(() => {
         compositionRoot.xmart.listDataMarts().run(

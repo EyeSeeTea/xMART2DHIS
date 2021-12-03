@@ -1,3 +1,4 @@
+import { DataSyncPeriod } from "../entities/DataSyncPeriod";
 import { DataValue } from "../entities/DataValue";
 import { FutureData } from "../entities/Future";
 import { SyncResult } from "../entities/SyncResult";
@@ -15,4 +16,10 @@ export type SaveAggregatedParams = {
     dryRun?: boolean;
 };
 
-export type GetAggregatedFilters = {};
+export type GetAggregatedFilters = {
+    orgUnitPaths?: string[];
+    dataSetIds: string[];
+    period?: DataSyncPeriod;
+    startDate?: Date;
+    endDate?: Date;
+};

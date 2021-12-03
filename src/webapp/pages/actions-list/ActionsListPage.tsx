@@ -90,6 +90,31 @@ export const ActionsListPage: React.FC = () => {
         updateSelection(selection);
     }, []);
 
+    const execute = useCallback(
+        async (ids: string[]) => {
+            loading.show(true, i18n.t("execute action"));
+
+            const id = _.first(ids);
+            if (!id) return;
+
+            compositionRoot.actions.execute(id).run(
+                () => {
+                    snackbar.success(i18n.t("Successfully executed the action"));
+
+                    loading.reset();
+                    setToDelete([]);
+                    updateSelection([]);
+                    setRefreshKey(Math.random());
+                },
+                _error => {
+                    loading.reset();
+                    snackbar.error(i18n.t("An error has ocurred executing the actionn"));
+                }
+            );
+        },
+        [compositionRoot, loading, snackbar]
+    );
+
     const actions: TableAction<SyncAction>[] = useMemo(
         () => [
             {
@@ -112,15 +137,15 @@ export const ActionsListPage: React.FC = () => {
                 onClick: setToDelete,
                 icon: <Icon>delete</Icon>,
             },
-            // {
-            //     name: "execute",
-            //     text: i18n.t("Execute"),
-            //     multiple: false,
-            //     onClick: executeRule,
-            //     icon: <Icon>settings_input_antenna</Icon>,
-            // }
+            {
+                name: "execute",
+                text: i18n.t("Execute"),
+                multiple: false,
+                onClick: execute,
+                icon: <Icon>settings_input_antenna</Icon>,
+            },
         ],
-        [goToEditAction]
+        [goToEditAction, execute]
     );
 
     return (

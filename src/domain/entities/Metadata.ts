@@ -34,7 +34,7 @@ export function isValidMetadataItem(item: any): item is MetadataItem {
     return item.id;
 }
 
-export type MetadataEntity = OrganisationUnit;
+export type MetadataEntity = OrganisationUnit | Program | DataSet;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
@@ -42,4 +42,4 @@ export type MetadataEntities = {
     dataSets: DataSet[];
 };
 
-export type MetadataPackage<T = MetadataEntity> = Partial<Record<keyof MetadataEntities, T[]>>;
+export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEntity[]>>;

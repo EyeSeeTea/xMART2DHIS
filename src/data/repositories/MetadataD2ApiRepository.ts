@@ -93,11 +93,11 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         ).map(response => response.objects);
     }
 
-    public getMetadataByIds<T>(
+    public getMetadataByIds(
         ids: string[],
         fields?: object | string,
         includeDefaults = false
-    ): FutureData<MetadataPackage<T>> {
+    ): FutureData<MetadataPackage> {
         const requestFields = typeof fields === "object" ? getFieldsAsString(fields) : fields;
         return Future.fromPromise(this.getMetadata<D2Model>(ids, requestFields, includeDefaults));
     }

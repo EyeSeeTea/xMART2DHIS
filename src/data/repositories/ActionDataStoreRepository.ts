@@ -9,10 +9,14 @@ export class ActionDataStoreRepository implements ActionRepository {
 
     //TODO: dataStoreClient should be refactor to futures to avoid Future.fromPromise here.
 
-    getById(id: string): FutureData<SyncAction | undefined> {
+    getById(id: string): FutureData<SyncAction> {
         return Future.fromPromise(this.dataStoreClient.getObjectInCollection<SyncActionData>(Namespaces.ACTIONS, id))
             .flatMapError(error => Future.error(String(error)))
-            .map(actionData => (actionData ? SyncAction.build(actionData) : undefined));
+            .flatMap(actionData =>
+                actionData
+                    ? Future.success(SyncAction.build(actionData))
+                    : Future.error(`The action ${id} doesnot exist`)
+            );
     }
 
     list(): FutureData<SyncAction[]> {

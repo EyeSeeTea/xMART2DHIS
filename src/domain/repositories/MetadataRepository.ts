@@ -12,7 +12,7 @@ export interface MetadataRepository {
     isShareable(model: string): boolean;
     isDataShareable(model: string): boolean;
     getOrgUnitRoots(): FutureData<OrganisationUnit[]>;
-    getMetadataByIds<T>(ids: Id[], fields?: object | string, includeDefaults?: boolean): FutureData<MetadataPackage<T>>;
+    getMetadataByIds(ids: Id[], fields?: object | string, includeDefaults?: boolean): FutureData<MetadataPackage>;
 }
 
 export interface ListMetadataOptions {

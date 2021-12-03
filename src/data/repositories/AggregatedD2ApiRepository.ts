@@ -1,4 +1,4 @@
-import { DataValue } from "../../domain/entities/DataValue";
+import { DataValue, DataValueSet } from "../../domain/entities/DataValue";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { SyncResult } from "../../domain/entities/SyncResult";
@@ -7,6 +7,7 @@ import {
     GetAggregatedFilters,
     SaveAggregatedParams,
 } from "../../domain/repositories/AggregatedRepository";
+import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
@@ -40,7 +41,25 @@ export class AggregatedD2ApiRepository implements AggregatedRepository {
         );
     }
 
-    public get(_filters: GetAggregatedFilters): FutureData<DataValue[]> {
-        throw new Error("Method not implemented.");
+    public get(filters: GetAggregatedFilters): FutureData<DataValue[]> {
+        const { orgUnitPaths = [], dataSetIds = [], period = "ALL", startDate, endDate } = filters;
+        if (dataSetIds.length === 0) return Future.success([]);
+
+        const { startDate: start, endDate: end } = buildPeriodFromParams({ period, startDate, endDate });
+
+        const orgUnits = cleanOrgUnitPaths(orgUnitPaths);
+
+        if (orgUnits.length === 0) return Future.success([]);
+
+        return apiToFuture(
+            this.api.dataValues
+                .getSet({
+                    dataSet: dataSetIds,
+                    orgUnit: orgUnits,
+                    startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
+                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
+                })
+                .map(response => response.data.dataValues)
+        );
     }
 }
