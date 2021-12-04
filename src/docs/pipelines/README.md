@@ -27,7 +27,7 @@ The ``LOAD_MODEL`` pipeline receives a ``url`` input variable.
 The JSON file loaded from the ``url`` has the following structure:
 
 ```ts
-interface LoadPipelineJson {
+interface LoadModelJson {
     tables: Table[];
     fields: Field[];
 }
@@ -69,7 +69,7 @@ The ``table`` property will set the destination table where the data will be loa
 The JSON file loaded from the ``url`` has the following structure:
 
 ```ts
-type LoadPipelineJson = Record<Column, Value>[];
+type LoadDataJson = Record<Column, Value>[];
 
 type Column = string;
 type Value = string | number | boolean;
