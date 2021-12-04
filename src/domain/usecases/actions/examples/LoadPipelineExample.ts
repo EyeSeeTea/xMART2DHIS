@@ -17,13 +17,13 @@ export class LoadPipelineExample implements UseCase {
 
         const pipelines: XMartPipelineDefinition[] = [
             {
-                Code: "LOAD_DATA",
-                Title: "[xMART2DHIS] Load data from URL",
+                CODE: "LOAD_DATA",
+                TITLE: "[xMART2DHIS] Load data from URL",
                 XML: loadDataPipelineXml,
             },
             {
-                Code: "LOAD_MODEL",
-                Title: "[xMART2DHIS] Load model from URL",
+                CODE: "LOAD_MODEL",
+                TITLE: "[xMART2DHIS] Load model from URL",
                 XML: loadModelPipelineXml,
             },
         ];
@@ -46,7 +46,7 @@ export class LoadPipelineExample implements UseCase {
                     ),
                 });
             })
-            .flatMap(({ url }) => this.martRepository.runPipeline(TRAINING_MART, "LOAD_PIPELINE", { url }))
+            .flatMap(({ url }) => this.martRepository.runPipeline(TRAINING_MART, "LOAD_PIPELINE", { url }));
     }
 }
 

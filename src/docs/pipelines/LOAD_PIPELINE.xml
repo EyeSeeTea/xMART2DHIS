@@ -14,15 +14,15 @@
   <Load>
     <LoadTable SourceTable="data" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
-        <AddColumn Name="Description" />
+        <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <FindReplace Find=" " ReplaceWith="_" Column="Code" />
-        <FindReplace Find="-" ReplaceWith="_" Column="Code" />
+        <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
       <ColumnMappings>
-        <ColumnMapping Source="Code" Target="Code" />
-        <ColumnMapping Source="Title" Target="Title" />
-        <ColumnMapping Source="Description" Target="Description" />
+        <ColumnMapping Source="CODE" Target="Code" />
+        <ColumnMapping Source="TITLE" Target="Title" />
+        <ColumnMapping Source="DESCRIPTION" Target="Description" />
         <ColumnMapping Source="XML" Target="XML_Draft" />
         <ColumnMapping Source="XML" Target="XML_Published" />
         <ColumnMapping Source="_Delete" Target="_Delete" />
@@ -30,19 +30,19 @@
     </LoadTable>
     <LoadTable SourceTable="data" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
-        <AddColumn Name="Description" />
+        <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <FindReplace Find=" " ReplaceWith="_" Column="Code" />
-        <FindReplace Find="-" ReplaceWith="_" Column="Code" />
+        <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
       <LookupIDs>
-        <StageLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[Code]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <StageLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <ColumnMappings>
-        <ColumnMapping Source="Code" Target="Code" />
+        <ColumnMapping Source="CODE" Target="Code" />
         <ColumnMapping Source="PipelineID" Target="PipelineID" />
-        <ColumnMapping Source="Title" Target="Title" />
-        <ColumnMapping Source="Description" Target="Description" />
+        <ColumnMapping Source="TITLE" Target="Title" />
+        <ColumnMapping Source="DESCRIPTION" Target="Description" />
         <ColumnMapping Source="_Delete" Target="_Delete" />
       </ColumnMappings>
     </LoadTable>

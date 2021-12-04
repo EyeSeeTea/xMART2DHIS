@@ -24,9 +24,9 @@ export interface XMartFieldDefinition {
 }
 
 export interface XMartPipelineDefinition {
-    Code: string;
-    Title: string;
-    Description?: string;
+    CODE: string;
+    TITLE: string;
+    DESCRIPTION?: string;
     XML: string;
     _Delete?: 0 | 1;
 }
