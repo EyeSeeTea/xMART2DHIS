@@ -46,7 +46,7 @@ export class LoadPipelineExample implements UseCase {
                     ),
                 });
             })
-            .flatMap(({ url }) => this.martRepository.runPipeline(TRAINING_MART, "LOAD_PIPELINES", { url }))
+            .flatMap(({ url }) => this.martRepository.runPipeline(TRAINING_MART, "LOAD_PIPELINE", { url }))
     }
 }
 
