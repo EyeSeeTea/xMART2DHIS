@@ -1,0 +1,50 @@
+<XmartPipeline IsStructure="true">
+  <Context>
+    <Inputs>
+      <Add Key="url" Type="text" />
+    </Inputs>
+  </Context>
+  <Extract>
+    <GetWebService Url="${url}">
+      <GetJson OutputTableName="data">
+        <Path>$</Path>
+      </GetJson>
+    </GetWebService>
+  </Extract>
+  <Load>
+    <LoadTable SourceTable="data" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
+      <Transform>
+        <AddColumn Name="Description" />
+        <AddColumn Name="_Delete" FillWith="0" />
+        <FindReplace Find=" " ReplaceWith="_" Column="Code" />
+        <FindReplace Find="-" ReplaceWith="_" Column="Code" />
+      </Transform>
+      <ColumnMappings>
+        <ColumnMapping Source="Code" Target="Code" />
+        <ColumnMapping Source="Title" Target="Title" />
+        <ColumnMapping Source="Description" Target="Description" />
+        <ColumnMapping Source="XML" Target="XML_Draft" />
+        <ColumnMapping Source="XML" Target="XML_Published" />
+        <ColumnMapping Source="_Delete" Target="_Delete" />
+      </ColumnMappings>
+    </LoadTable>
+    <LoadTable SourceTable="data" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
+      <Transform>
+        <AddColumn Name="Description" />
+        <AddColumn Name="_Delete" FillWith="0" />
+        <FindReplace Find=" " ReplaceWith="_" Column="Code" />
+        <FindReplace Find="-" ReplaceWith="_" Column="Code" />
+      </Transform>
+      <LookupIDs>
+        <StageLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[Code]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+      </LookupIDs>
+      <ColumnMappings>
+        <ColumnMapping Source="Code" Target="Code" />
+        <ColumnMapping Source="PipelineID" Target="PipelineID" />
+        <ColumnMapping Source="Title" Target="Title" />
+        <ColumnMapping Source="Description" Target="Description" />
+        <ColumnMapping Source="_Delete" Target="_Delete" />
+      </ColumnMappings>
+    </LoadTable>
+  </Load>
+</XmartPipeline>

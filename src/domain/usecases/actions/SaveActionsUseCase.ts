@@ -70,7 +70,8 @@ export class SaveActionUseCase implements UseCase {
                         table: "TABLE_FIELD",
                     })
                 );
-            });
+            })
+            .map(() => undefined);
     }
 
     private generateFileInfo(teis: unknown, key: string) {

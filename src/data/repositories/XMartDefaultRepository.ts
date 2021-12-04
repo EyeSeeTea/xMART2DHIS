@@ -85,7 +85,7 @@ export class XMartDefaultRepository implements XMartRepository {
         mart: DataMart,
         pipeline: string,
         params: Record<string, string | number | boolean>
-    ): FutureData<void> {
+    ): FutureData<number> {
         const body = JSON.stringify(
             {
                 martCode: mart.code,
@@ -100,9 +100,23 @@ export class XMartDefaultRepository implements XMartRepository {
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart),
             token: this.getToken(mart),
-        }).flatMap(({ endpoint, token }) =>
-            futureFetch("post", joinUrl(endpoint, `/origin/start`), { body, bearer: token })
-        );
+        })
+            .flatMap(({ endpoint, token }) =>
+                futureFetch<{ batchID: number; success?: boolean; errorMessage: string | null }>(
+                    "post",
+                    joinUrl(endpoint, `/origin/start`),
+                    { body, bearer: token }
+                )
+            )
+            .flatMap(({ errorMessage, batchID }) => {
+                if (errorMessage) {
+                    return Future.error(errorMessage);
+                } else if (batchID === null) {
+                    return Future.error("Unknown batch id");
+                } else {
+                    return Future.success(batchID);
+                }
+            });
     }
 
     private requestMart<Data>(
