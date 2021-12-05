@@ -99,7 +99,7 @@ export const ActionsListPage: React.FC = () => {
 
             compositionRoot.actions.execute(id).run(
                 result => {
-                    snackbar.success(i18n.t("Successfully executed the action. {{result}}", { result }), {
+                    snackbar.success(i18n.t("Successfully executed the action.\n{{result}}", { result }), {
                         autoHideDuration: null,
                     });
 
@@ -108,9 +108,9 @@ export const ActionsListPage: React.FC = () => {
                     updateSelection([]);
                     setRefreshKey(Math.random());
                 },
-                _error => {
+                error => {
                     loading.reset();
-                    snackbar.error(i18n.t("An error has ocurred executing the action"));
+                    snackbar.error(i18n.t("An error has ocurred executing the action. {{error}}", { error }));
                 }
             );
         },

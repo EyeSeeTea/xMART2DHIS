@@ -21,7 +21,6 @@ export const Router = () => {
                 <Route
                     path="/actions/:action(new|edit)/:id?"
                     render={() => (
-                        //TODO: write new action or edit action
                         <RouterPage title={i18n.t("Action")}>
                             <ActionDetailPage />
                         </RouterPage>
