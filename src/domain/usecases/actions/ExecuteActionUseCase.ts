@@ -128,6 +128,7 @@ export class ExecuteActionUseCase {
             })
             .flatMap(() => {
                 const eventValues = events.map(e => e.dataValues.map(v => ({ ...v, event: e.event }))).flat();
+                console.log({ eventValues });
 
                 const eventValuesFileInfo = this.generateFileInfo(eventValues, "Event_Values");
 
@@ -146,7 +147,7 @@ export class ExecuteActionUseCase {
 
         if (teis.length === 0) return Future.success(i18n.t(`tracked entity instances does not found`));
 
-        const eventsFileInfo = this.generateFileInfo(teis, "TEIs");
+        const eventsFileInfo = this.generateFileInfo(teis, "teis");
 
         return this.fileRepository
             .uploadFileAsExternal(eventsFileInfo)
@@ -161,7 +162,9 @@ export class ExecuteActionUseCase {
                     .map(t => t.attributes.map(att => ({ ...att, trackedEntityInstance: t.trackedEntityInstance })))
                     .flat();
 
-                const attributesFileInfo = this.generateFileInfo(teiAttributes, "TEI_ATTRIBUTES");
+                console.log({ teiAttributes });
+
+                const attributesFileInfo = this.generateFileInfo(teiAttributes, "Tei_Attributes");
 
                 return this.fileRepository.uploadFileAsExternal(attributesFileInfo).flatMap(url =>
                     this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
@@ -172,6 +175,8 @@ export class ExecuteActionUseCase {
             })
             .flatMap(() => {
                 const enrollments = teis.map(t => t.enrollments).flat();
+
+                console.log({ enrollments });
 
                 const enrollmentsFileInfo = this.generateFileInfo(enrollments, "Enrollments");
 
