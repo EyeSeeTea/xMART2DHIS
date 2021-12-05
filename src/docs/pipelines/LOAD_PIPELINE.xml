@@ -6,13 +6,13 @@
   </Context>
   <Extract>
     <GetWebService Url="${url}">
-      <GetJson OutputTableName="data">
+      <GetJson OutputTableName="PIPELINE">
         <Path>$</Path>
       </GetJson>
     </GetWebService>
   </Extract>
   <Load>
-    <LoadTable SourceTable="data" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
+    <LoadTable SourceTable="PIPELINE" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
@@ -28,7 +28,7 @@
         <ColumnMapping Source="_Delete" Target="_Delete" />
       </ColumnMappings>
     </LoadTable>
-    <LoadTable SourceTable="data" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
+    <LoadTable SourceTable="PIPELINE" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
