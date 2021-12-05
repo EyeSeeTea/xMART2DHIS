@@ -99,10 +99,9 @@ export const ActionsListPage: React.FC = () => {
 
             compositionRoot.actions.execute(id).run(
                 result => {
-                    snackbar.success(
-                        i18n.t("Successfully executed the action:\n{{dataValues}}\n{{events}}\n{{teis}}", result),
-                        { autoHideDuration: null }
-                    );
+                    snackbar.success(i18n.t("Successfully executed the action. {{result}}", { result }), {
+                        autoHideDuration: null,
+                    });
 
                     loading.reset();
                     setToDelete([]);
