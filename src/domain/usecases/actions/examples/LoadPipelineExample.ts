@@ -104,7 +104,8 @@ const loadPipelineXml = `
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
       <LookupIDs>
-        <SysIDLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <StoreLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE], [MART_ID]" LookupResultColumn="Sys_ID" LookupColumns="Code, MartID__Sys_ID" RegisterMissingAsIssues="false" />
+        <StageLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <ColumnMappings>
         <ColumnMapping Source="CODE" Target="Code" />
