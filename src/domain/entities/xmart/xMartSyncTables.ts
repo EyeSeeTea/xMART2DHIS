@@ -298,15 +298,6 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
             },
             {
                 TABLE_CODE: tableCodes.teiAttributes,
-                CODE: "code",
-                TITLE: "Code",
-                FIELD_TYPE_CODE: "TEXT_50",
-                IS_REQUIRED: 1,
-                IS_PRIMARY_KEY: 0,
-                IS_ROW_TITLE: 0,
-            },
-            {
-                TABLE_CODE: tableCodes.teiAttributes,
                 CODE: "displayName",
                 TITLE: "Display Name",
                 FIELD_TYPE_CODE: "TEXT_50",

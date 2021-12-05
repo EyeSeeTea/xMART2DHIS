@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-05T08:09:05.970Z\n"
-"PO-Revision-Date: 2021-12-05T08:09:05.970Z\n"
+"POT-Creation-Date: 2021-12-05T15:17:35.442Z\n"
+"PO-Revision-Date: 2021-12-05T15:17:35.442Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -87,15 +87,6 @@ msgid "Last year"
 msgstr ""
 
 msgid "Last 5 years"
-msgstr ""
-
-msgid "Data values does not found"
-msgstr ""
-
-msgid "Events does not found"
-msgstr ""
-
-msgid "tracked entity instances does not found"
 msgstr ""
 
 msgid "Name"
@@ -290,6 +281,11 @@ msgid "An error has ocurred deleting actionn"
 msgstr ""
 
 msgid "Executing the action"
+msgstr ""
+
+msgid ""
+"Successfully executed the action.\n"
+"{{result}}"
 msgstr ""
 
 msgid "An error has ocurred executing the action"

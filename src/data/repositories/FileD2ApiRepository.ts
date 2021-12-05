@@ -31,9 +31,6 @@ export class FileD2ApiRepository implements FileRepository {
                     ),
                 });
             })
-            .map(({ url }) => {
-                console.log({ url });
-                return url;
-            });
+            .map(({ url }) => url);
     }
 }
