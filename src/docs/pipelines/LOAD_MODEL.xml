@@ -55,9 +55,9 @@
         <FindReplace Find="-" ReplaceWith="_" Column="TABLE_CODE" />
       </Transform>
       <LookupIDs>
-        <StageLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <StageLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <StoreLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <SysIDLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <SysIDLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <SysIDLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <Validate>
         <TestNotEmpty Impact="Error_RemoveRow" Tag="Field Type Not found.  Check all field types in the model template Excel Spreadsheet." ContextColumns="TABLE_CODE,FIELD_TYPE_CODE" Column="FIELD_TYPE_ID" />
