@@ -39,12 +39,12 @@ export interface xMartTable {
 export type xMartTableKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments";
 
 const tableCodes = {
-    dataValues: "DATA_VALUES_",
-    events: "EVENTS",
-    eventValues: "EVENT_VALUES",
-    teis: "TRACKED_ENTITY_INSTANCES",
-    teiAttributes: "TEI_ATTRIBUTES",
-    enrollments: "ENROLLMENTS_",
+    dataValues: "DHIS2_DATA_VALUES",
+    events: "DHIS2_EVENTS",
+    eventValues: "DHIS2_EVENT_VALUES",
+    teis: "DHIS2_TRACKED_ENTITY_INSTANCES",
+    teiAttributes: "DHIS2_TEI_ATTRIBUTES",
+    enrollments: "DHIS2_ENROLLMENTS",
 };
 
 export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
@@ -160,7 +160,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 CODE: "enrollment",
                 TITLE: "Enrollment",
                 FIELD_TYPE_CODE: "TEXT_50",
-                IS_REQUIRED: 1,
+                IS_REQUIRED: 0,
                 IS_PRIMARY_KEY: 0,
                 IS_ROW_TITLE: 0,
             },
@@ -211,7 +211,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 TITLE: "Event",
                 FIELD_TYPE_CODE: "TEXT_50",
                 IS_REQUIRED: 1,
-                IS_PRIMARY_KEY: 0,
+                IS_PRIMARY_KEY: 1,
                 IS_ROW_TITLE: 0,
             },
             {
@@ -220,7 +220,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 TITLE: "Data Element",
                 FIELD_TYPE_CODE: "TEXT_50",
                 IS_REQUIRED: 1,
-                IS_PRIMARY_KEY: 0,
+                IS_PRIMARY_KEY: 1,
                 IS_ROW_TITLE: 0,
             },
             {

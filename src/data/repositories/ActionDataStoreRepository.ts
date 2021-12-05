@@ -24,7 +24,7 @@ export class ActionDataStoreRepository implements ActionRepository {
             .flatMapError(error => Future.error(String(error)))
             .map(actions => actions.map(actionData => SyncAction.build(actionData)));
     }
-    
+
     save(action: SyncAction): FutureData<void> {
         return Future.fromPromise(
             this.dataStoreClient.saveObjectInCollection<SyncActionData>(Namespaces.ACTIONS, action.toData())
