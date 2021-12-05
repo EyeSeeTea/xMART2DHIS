@@ -23,8 +23,17 @@ type SyncResult = {
     teis: string;
 };
 
-//TODO: Remove this when the repositoryreturn data marts
-const listDataMarts = () => Future.success<DataMart[]>(dataMarts);
+//TODO: Remove this when the repository return data marts
+const getDataMartById = (id: string) =>
+    Future.success<DataMart[]>(dataMarts).flatMap(dataMarts => {
+        const dataMart = dataMarts.find(dataMart => dataMart.id === id);
+
+        const dataMartResult: FutureData<DataMart> = dataMart
+            ? Future.success(dataMart)
+            : Future.error("Data mart not found");
+
+        return dataMartResult;
+    });
 
 export class ExecuteActionUseCase {
     constructor(
@@ -44,15 +53,7 @@ export class ExecuteActionUseCase {
                 return Future.joinObj({
                     action: Future.success(action),
                     metadata: this.extractMetadata(action.metadataIds),
-                    dataMart: listDataMarts().flatMap(dataMarts => {
-                        const dataMart = dataMarts.find(dataMart => dataMart.id === action.connectionId);
-
-                        const dataMartResult: FutureData<DataMart> = dataMart
-                            ? Future.success(dataMart)
-                            : Future.error("Data mart not found");
-
-                        return dataMartResult;
-                    }),
+                    dataMart: getDataMartById(action.connectionId),
                 });
             })
             .flatMap(({ action, metadata, dataMart }) => {
@@ -95,23 +96,19 @@ export class ExecuteActionUseCase {
 
         if (dataValues.length === 0) return Future.success(i18n.t(`Data values does not found`));
 
-        const fileInfo = this.generateFileInfo(dataValues);
+        const fileInfo = this.generateFileInfo(dataValues, `Aggregated`);
 
-        return (
-            this.fileRepository
-                .uploadFileAsExternal(fileInfo)
-                //TODO: When xmart has a post endpoint this will be not necessary
-                .flatMap(url => {
-                    return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
-                        url,
-                        table: xMartSyncTables.dataValues.table.CODE,
-                    });
-                })
-                .flatMap(() =>
-                    Future.success(i18n.t(`Send {{count}} data values succesfully`, { count: dataValues.length }))
-                )
-        );
-        //return Future.success(i18n.t(`send {{count}} succesfully`, { count: dataValues.length }));
+        return this.fileRepository
+            .uploadFileAsExternal(fileInfo)
+            .flatMap(url => {
+                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                    url,
+                    table: xMartSyncTables.dataValues.table.CODE,
+                });
+            })
+            .flatMap(() =>
+                Future.success(i18n.t(`Send {{count}} data values succesfully`, { count: dataValues.length }))
+            );
     }
 
     private sendEvents(events: ProgramEvent[], dataMart: DataMart): FutureData<string> {
@@ -119,22 +116,29 @@ export class ExecuteActionUseCase {
 
         if (events.length === 0) return Future.success(i18n.t(`Events does not found`));
 
-        const fileInfo = this.generateFileInfo(events);
+        const eventsFileInfo = this.generateFileInfo(events, "Events");
 
-        return (
-            this.fileRepository
-                //TODO: When xmart has a post endpoint this will be not necessary
-                .uploadFileAsExternal(fileInfo)
-                // .flatMap(url => {
-                //     return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
-                //         url,
-                //         table: "AGGREGATED",
-                //     });
-                // })
-                .flatMap(() => Future.success(i18n.t(`Send {{count}} events succesfully`, { count: events.length })))
-        );
+        return this.fileRepository
+            .uploadFileAsExternal(eventsFileInfo)
+            .flatMap(url => {
+                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                    url,
+                    table: xMartSyncTables.events.table.CODE,
+                });
+            })
+            .flatMap(() => {
+                const eventValues = events.map(e => e.dataValues.map(v => ({ ...v, event: e.event }))).flat();
 
-        //return Future.success(i18n.t(`send {{count}} succesfully`, { count: events.length }));
+                const eventValuesFileInfo = this.generateFileInfo(eventValues, "Event_Values");
+
+                return this.fileRepository.uploadFileAsExternal(eventValuesFileInfo).flatMap(url =>
+                    this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                        url,
+                        table: xMartSyncTables.eventValues.table.CODE,
+                    })
+                );
+            })
+            .flatMap(() => Future.success(i18n.t(`Send {{count}} events succesfully`, { count: events.length })));
     }
 
     private sendTeis(teis: TrackedEntityInstance[], dataMart: DataMart): FutureData<string> {
@@ -142,35 +146,53 @@ export class ExecuteActionUseCase {
 
         if (teis.length === 0) return Future.success(i18n.t(`tracked entity instances does not found`));
 
-        const fileInfo = this.generateFileInfo(teis);
+        const eventsFileInfo = this.generateFileInfo(teis, "TEIs");
 
-        return (
-            this.fileRepository
-                //TODO: When xmart has a post endpoint this will be not necessary
-                .uploadFileAsExternal(fileInfo)
-                // .flatMap(url => {
-                //     return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
-                //         url,
-                //         table: "AGGREGATED",
-                //     });
-                // })
-                .flatMap(() =>
-                    Future.success(
-                        i18n.t(`Send {{count}} tracked entity instances succesfully`, { count: teis.length })
-                    )
-                )
-        );
+        return this.fileRepository
+            .uploadFileAsExternal(eventsFileInfo)
+            .flatMap(url => {
+                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                    url,
+                    table: xMartSyncTables.teis.table.CODE,
+                });
+            })
+            .flatMap(() => {
+                const teiAttributes = teis
+                    .map(t => t.attributes.map(att => ({ ...att, trackedEntityInstance: t.trackedEntityInstance })))
+                    .flat();
 
-        //return Future.success(i18n.t(`send {{count}} succesfully`, { count: teis.length }));
+                const attributesFileInfo = this.generateFileInfo(teiAttributes, "TEI_ATTRIBUTES");
+
+                return this.fileRepository.uploadFileAsExternal(attributesFileInfo).flatMap(url =>
+                    this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                        url,
+                        table: xMartSyncTables.teiAttributes.table.CODE,
+                    })
+                );
+            })
+            .flatMap(() => {
+                const enrollments = teis.map(t => t.enrollments).flat();
+
+                const enrollmentsFileInfo = this.generateFileInfo(enrollments, "Enrollments");
+
+                return this.fileRepository.uploadFileAsExternal(enrollmentsFileInfo).flatMap(url =>
+                    this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
+                        url,
+                        table: xMartSyncTables.enrollments.table.CODE,
+                    })
+                );
+            })
+            .flatMap(() =>
+                Future.success(i18n.t(`Send {{count}} tracked entity instances succesfully`, { count: teis.length }))
+            );
     }
 
-    //TODO: When xmart has a post endpoint this will be not necessary
-    private generateFileInfo(teis: unknown[]) {
+    private generateFileInfo(teis: unknown, key: string) {
         const value = JSON.stringify(teis);
 
         const blob = new Blob([value], { type: "application/json" });
 
-        const fileInfo = { id: getUid("xMART2DHIS"), name: "xMART2DHIS file", data: blob };
+        const fileInfo = { id: getUid(`xMART2DHIS_${key}`), name: `xMART2DHIS_${key} file`, data: blob };
 
         return fileInfo;
     }

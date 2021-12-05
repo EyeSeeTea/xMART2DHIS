@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-03T16:58:17.599Z\n"
+"POT-Creation-Date: 2021-12-05T08:09:05.970Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -316,6 +316,18 @@ msgstr ""
 msgid "List table contents of the MART"
 msgstr ""
 
+msgid "Examples"
+msgstr ""
+
+msgid "Load pipelines"
+msgstr ""
+
+msgid "Load data"
+msgstr ""
+
+msgid "Load model"
+msgstr ""
+
 msgid "Run"
 msgstr ""
 
@@ -326,4 +338,16 @@ msgid "xMART API"
 msgstr ""
 
 msgid "xMART Table"
+msgstr ""
+
+msgctxt "MODEL pipelines"
+msgid "Initial load of LOAD_DATA and LOAD"
+msgstr ""
+
+msgctxt "DATA example"
+msgid "LOAD"
+msgstr ""
+
+msgctxt "MODEL example"
+msgid "LOAD"
 msgstr ""
