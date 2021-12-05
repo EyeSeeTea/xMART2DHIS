@@ -36,7 +36,7 @@
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
       <LookupIDs>
-        <StageLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <SysIDLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <ColumnMappings>
         <ColumnMapping Source="CODE" Target="Code" />

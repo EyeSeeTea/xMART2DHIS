@@ -17,6 +17,11 @@ export class LoadPipelineExample implements UseCase {
 
         const pipelines: XMartPipelineDefinition[] = [
             {
+                CODE: "LOAD_PIPELINE",
+                TITLE: "[xMART2DHIS] Load pipeline from URL",
+                XML: loadPipelineXml,
+            },
+            {
                 CODE: "LOAD_DATA",
                 TITLE: "[xMART2DHIS] Load data from URL",
                 XML: loadDataPipelineXml,
@@ -57,6 +62,59 @@ const TRAINING_MART = {
     type: "UAT",
     apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
 } as const;
+
+const loadPipelineXml = `
+<XmartPipeline IsStructure="true">
+  <Context>
+    <Inputs>
+      <Add Key="url" Type="text" />
+    </Inputs>
+  </Context>
+  <Extract>
+    <GetWebService Url="\${url}">
+      <GetJson OutputTableName="data">
+        <Path>$</Path>
+      </GetJson>
+    </GetWebService>
+  </Extract>
+  <Load>
+    <LoadTable SourceTable="data" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
+      <Transform>
+        <AddColumn Name="DESCRIPTION" />
+        <AddColumn Name="_Delete" FillWith="0" />
+        <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
+      </Transform>
+      <ColumnMappings>
+        <ColumnMapping Source="CODE" Target="Code" />
+        <ColumnMapping Source="TITLE" Target="Title" />
+        <ColumnMapping Source="DESCRIPTION" Target="Description" />
+        <ColumnMapping Source="XML" Target="XML_Draft" />
+        <ColumnMapping Source="XML" Target="XML_Published" />
+        <ColumnMapping Source="_Delete" Target="_Delete" />
+      </ColumnMappings>
+    </LoadTable>
+    <LoadTable SourceTable="data" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
+      <Transform>
+        <AddColumn Name="DESCRIPTION" />
+        <AddColumn Name="_Delete" FillWith="0" />
+        <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
+      </Transform>
+      <LookupIDs>
+        <SysIDLookup LookupTable="PIPELINE" SourceResultColumn="PipelineID" SourceColumns="[CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+      </LookupIDs>
+      <ColumnMappings>
+        <ColumnMapping Source="CODE" Target="Code" />
+        <ColumnMapping Source="PipelineID" Target="PipelineID" />
+        <ColumnMapping Source="TITLE" Target="Title" />
+        <ColumnMapping Source="DESCRIPTION" Target="Description" />
+        <ColumnMapping Source="_Delete" Target="_Delete" />
+      </ColumnMappings>
+    </LoadTable>
+  </Load>
+</XmartPipeline>
+`;
 
 const loadDataPipelineXml = `
 <XmartPipeline>
@@ -139,14 +197,14 @@ const loadModelPipelineXml = `
         <FindReplace Find="-" ReplaceWith="_" Column="TABLE_CODE" />
       </Transform>
       <LookupIDs>
-        <StageLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <StageLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <StoreLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <SysIDLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <SysIDLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <SysIDLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <Validate>
         <TestNotEmpty Impact="Error_RemoveRow" Tag="Field Type Not found.  Check all field types in the model template Excel Spreadsheet." ContextColumns="TABLE_CODE,FIELD_TYPE_CODE" Column="FIELD_TYPE_ID" />
-        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\s*(?!sys_).*?$" />
-        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\s*(?!_Record)(?!_Delete).*?$" />
+        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\\s*(?!sys_).*?$" />
+        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\\s*(?!_Record)(?!_Delete).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must only contain alpha-numeric or underscore characters" Column="CODE" Pattern="^[A-Za-z0-9_]+$" />
         <TestRow Impact="Error_RemoveRow" Tag="TEXT_MAX not allowed as BPK" ContextColumns="CODE,FIELD_TYPE,IS_PRIMARY_KEY">
           <Expression>row["IS_PRIMARY_KEY"].NumberValue == 0 || row["FIELD_TYPE_CODE"].StringValue != "TEXT_MAX"</Expression>
