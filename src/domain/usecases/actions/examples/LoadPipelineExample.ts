@@ -72,16 +72,17 @@ const loadPipelineXml = `
   </Context>
   <Extract>
     <GetWebService Url="\${url}">
-      <GetJson OutputTableName="data">
+      <GetJson OutputTableName="PIPELINE">
         <Path>$</Path>
       </GetJson>
     </GetWebService>
   </Extract>
   <Load>
-    <LoadTable SourceTable="data" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
+    <LoadTable SourceTable="PIPELINE" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -94,10 +95,11 @@ const loadPipelineXml = `
         <ColumnMapping Source="_Delete" Target="_Delete" />
       </ColumnMappings>
     </LoadTable>
-    <LoadTable SourceTable="data" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
+    <LoadTable SourceTable="PIPELINE" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -165,6 +167,7 @@ const loadModelPipelineXml = `
         <AddColumn Name="ON_DELETE_CASCADE" FillWith="0" />
         <AddColumn Name="_RecordID" />
         <AddColumn Name="_Delete" FillWith="0" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -191,18 +194,21 @@ const loadModelPipelineXml = `
         <AddColumn Name="DO_NOT_COMPARE" FillWith="0" />
         <AddColumn Name="_RecordID" />
         <AddColumn Name="_Delete" FillWith="0" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
-        <FindReplace Find=" " ReplaceWith="_" Column="TABLE_CODE" />
-        <FindReplace Find="-" ReplaceWith="_" Column="TABLE_CODE" />
+        <FindReplace Find=" " ReplaceWith="_" Column="FK_TABLE_CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="FK_TABLE_CODE" />
       </Transform>
       <LookupIDs>
-        <SysIDLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <SysIDLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
-        <SysIDLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
+        <StoreLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE], [MART_ID]" LookupResultColumn="Sys_ID" LookupColumns="CODE, MART_ID__Sys_ID" RegisterMissingAsIssues="false" />
+        <StageLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <StoreLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE], [MART_ID]" LookupResultColumn="Sys_ID" LookupColumns="CODE, MART_ID__Sys_ID" RegisterMissingAsIssues="false" />
+        <StageLookup LookupTable="TABLES" SourceResultColumn="FK_TABLE_ID" SourceColumns="[FK_TABLE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="CODE" />
+        <StoreLookup LookupTable="FIELD_TYPE" SourceResultColumn="FIELD_TYPE_ID" SourceColumns="[FIELD_TYPE_CODE]" LookupResultColumn="Sys_ID" LookupColumns="Code" />
       </LookupIDs>
       <Validate>
-        <TestNotEmpty Impact="Error_RemoveRow" Tag="Field Type Not found.  Check all field types in the model template Excel Spreadsheet." ContextColumns="TABLE_CODE,FIELD_TYPE_CODE" Column="FIELD_TYPE_ID" />
+        <TestNotEmpty Impact="Error_RemoveRow" Tag="Field Type Not found." ContextColumns="CODE,FIELD_TYPE_CODE" Column="FIELD_TYPE_ID" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\\s*(?!sys_).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\\s*(?!_Record)(?!_Delete).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must only contain alpha-numeric or underscore characters" Column="CODE" Pattern="^[A-Za-z0-9_]+$" />
