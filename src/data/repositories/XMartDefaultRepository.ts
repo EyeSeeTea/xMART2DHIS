@@ -124,8 +124,8 @@ export class XMartDefaultRepository implements XMartRepository {
                  * TODO: Implement polling
                  {
                     "BatchID": 194103,
-                    "ProcessStepCode": "COMPLETED",
-                    "ProcessResultCode": "SUCCESS",
+                    "ProcessStepCode": "COMPLETED", // NONE, INITIATING, STAGING, PREVIEWING, APPROVING, COMMIT_QUEUING, COMMITTING, FINALIZING, COMPLETED, STAGE_QUEUING
+                    "ProcessResultCode": "SUCCESS", // If COMPLETED: SYSTEM_ERROR, REJECTED, INVALID, SUCCESS, CANCELED, TIMEOUT_CANCELED
                     "MartCode": "TRAINING_ARC",
                     "OriginCode": "LOAD_PIPELINE",
                     "PipelineCode": "LOAD_PIPELINE",
