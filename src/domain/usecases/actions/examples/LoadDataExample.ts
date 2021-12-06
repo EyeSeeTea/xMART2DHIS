@@ -1,7 +1,7 @@
 import { UseCase } from "../../../../compositionRoot";
 import { getD2APiFromInstance } from "../../../../utils/d2-api";
 import { apiToFuture } from "../../../../utils/futures";
-import { getUid } from "../../../../utils/uid";
+import { generateUid } from "../../../../utils/uid";
 import { Future, FutureData } from "../../../entities/Future";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
@@ -27,7 +27,7 @@ export class LoadDataExample implements UseCase {
                 const value = JSON.stringify(dataValues);
                 const data = new Blob([value], { type: "application/json" });
 
-                return apiToFuture(api.files.upload({ id: getUid("EXAMPLE"), name: "Example file", data }));
+                return apiToFuture(api.files.upload({ id: generateUid(), name: "Example file", data }));
             })
             .flatMap(({ id }) => {
                 const baseUrl =
@@ -38,16 +38,23 @@ export class LoadDataExample implements UseCase {
                 const url = `${baseUrl}/api/documents/${id}/data`;
                 return Future.joinObj({
                     url: Future.success(url),
+                    id: Future.success(id),
                     sharing: apiToFuture(
                         api.sharing.post({ id, type: "document" }, { publicAccess: "--------", externalAccess: true })
                     ),
                 });
             })
-            .flatMap(({ url }) => {
-                return this.martRepository.runPipeline(TRAINING_MART, "LOAD_DATA", {
-                    url,
-                    table: "AGGREGATED",
+            .flatMap(({ url, id }) => {
+                return Future.joinObj({
+                    batch: this.martRepository.runPipeline(TRAINING_MART, "LOAD_DATA", {
+                        url,
+                        table: "AGGREGATED",
+                    }),
+                    id: Future.success(id),
                 });
+            }).flatMap(({ batch, id }) => {
+                // TODO: Clean-up document
+                return Future.success(batch);
             });
     }
 }
