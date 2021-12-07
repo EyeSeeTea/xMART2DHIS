@@ -5,8 +5,8 @@ import { TrackedEntityInstance } from "../../domain/entities/data/TrackedEntityI
 import { getTEIsFilters, TEIRepository } from "../../domain/repositories/TEIRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import { D2Api, Pager } from "../../types/d2-api";
-import { promiseMap } from "../../utils/common";
 import { getD2APiFromInstance } from "../../utils/d2-api";
+import { apiToFuture } from "../../utils/futures";
 
 export class TEID2ApiRepository implements TEIRepository {
     private api: D2Api;
@@ -16,7 +16,7 @@ export class TEID2ApiRepository implements TEIRepository {
     private fields =
         "trackedEntityInstance, created,orgUnit,createdAtClient,lastUpdated,trackedEntityType,lastUpdatedAtClient,inactive,deleted,featureType,programOwners,enrollments,relationships,attributes";
 
-    constructor(private instance: Instance) {
+    constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
     }
 
@@ -28,9 +28,9 @@ export class TEID2ApiRepository implements TEIRepository {
 
         if (orgUnits.length === 0) return Future.success([]);
 
-        const fetchApi = async (program: string, page: number) => {
-            return this.api
-                .get<TEIsResponse>("/trackedEntityInstances", {
+        const fetchApi = (program: string, page: number) => {
+            return apiToFuture(
+                this.api.get<TEIsResponse>("/trackedEntityInstances", {
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -40,22 +40,29 @@ export class TEID2ApiRepository implements TEIRepository {
                     programStartDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
                     programEndDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
                 })
-                .getData();
+            );
         };
 
-        return Future.fromPromise(
-            promiseMap(programIds, async programId => {
-                const { trackedEntityInstances, pager } = await fetchApi(programId, 1);
-
-                const paginatedETeis = await promiseMap(_.range(2, pager.pageCount + 1), async page => {
-                    const { trackedEntityInstances } = await fetchApi(programId, page);
-                    return trackedEntityInstances;
+        return Future.sequential(
+            programIds.map(programId => {
+                return fetchApi(programId, 1).flatMap(({ trackedEntityInstances, pager }) => {
+                    return Future.joinObj({
+                        trackedEntityInstances: Future.success(trackedEntityInstances),
+                        paginatedTEIs: Future.sequential(
+                            _.range(2, pager.pageCount + 1).map(page => {
+                                return fetchApi(programId, page).map(
+                                    ({ trackedEntityInstances }) => trackedEntityInstances
+                                );
+                            })
+                        ),
+                    }).map(({ trackedEntityInstances, paginatedTEIs }) => [
+                        ...trackedEntityInstances,
+                        ..._.flatten(paginatedTEIs),
+                    ]);
                 });
-
-                return [...trackedEntityInstances, ..._.flatten(paginatedETeis)];
             })
         )
-            .flatMapError(() => Future.error("An error has occurred rerieving events"))
+            .flatMapError(() => Future.error("An error has occurred rerieving TEIs"))
             .map(result => _(result).flatten().value());
     }
 }
