@@ -81,7 +81,7 @@ export class ExecuteActionUseCase {
                     this.sendData(eventValues, dataMart, "Event values", xMartSyncTables.eventValues.table.CODE),
                     this.sendData(teis, dataMart, "Tracked entitiy instances", xMartSyncTables.teis.table.CODE),
                     this.sendData(teiAttributes, dataMart, "TEI attributes", xMartSyncTables.teiAttributes.table.CODE),
-                    this.sendData(enrollments, dataMart, "Enrrollents", xMartSyncTables.enrollments.table.CODE),
+                    this.sendData(enrollments, dataMart, "Enrollents", xMartSyncTables.enrollments.table.CODE),
                 ]).map((results: string[]) => results.join("\n"));
             });
     }

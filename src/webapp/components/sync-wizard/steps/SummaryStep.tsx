@@ -63,8 +63,8 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
                     onCancel();
                     setIsSaving(false);
                 },
-                () => {
-                    snackbar.error("An error has occurred saving the action");
+                error => {
+                    snackbar.error(error);
                     setIsSaving(false);
                 }
             );

@@ -8,28 +8,88 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { getUid } from "../../../utils/uid";
 import { XMartRepository } from "../../repositories/XMartRepository";
 import { xMartSyncTables } from "../../entities/xmart/xMartSyncTables";
-
+import { MetadataRepository } from "../../repositories/MetadataRepository";
+import { Program } from "../../entities/metadata/Program";
+import i18n from "../../../locales";
 //TODO: Remove this when the repository return data marts
-const listDataMarts = () => Future.success<DataMart[]>(dataMarts);
+const listDataMarts = () => Future.success(dataMarts).flatMapError(error => Future.error(String(error)));
 
 export class SaveActionUseCase implements UseCase {
     constructor(
         private actionRepository: ActionRepository,
+        private metadataRepository: MetadataRepository,
         private fileRepository: FileRepository,
         private xMartRepository: XMartRepository
     ) {}
 
     public execute(action: SyncAction): FutureData<void> {
-        return Future.joinObj({
-            saveResult: this.actionRepository.save(action),
-            dataMart: this.getDataMartByAction(action),
-        })
+        return this.validateAction(action)
+            .flatMap(action =>
+                Future.joinObj({
+                    saveResult: this.actionRepository.save(action),
+                    dataMart: this.getDataMartByAction(action),
+                })
+            )
             .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart))
             .flatMap(() => Future.success(undefined))
-            .flatMapError(error => Future.error(`An error has ocurred saving the action:\n${String(error)}`));
+            .flatMapError(error => {
+                debugger;
+                return Future.error(
+                    i18n.t(`An error has occurred saving the action:\n{{error}}`, { error: String(error) })
+                );
+            });
     }
 
-    private getDataMartByAction(action: SyncAction): Future<unknown, DataMart> {
+    validateAction(action: SyncAction): FutureData<SyncAction> {
+        return this.metadataRepository.getMetadataByIds(action.metadataIds, "id,programType").flatMap(metadata => {
+            const existsNormalPrograms = metadata.programs?.some(
+                program => (program as Program).programType === "WITHOUT_REGISTRATION"
+            );
+            const existsTrackerPrograms = metadata.programs?.some(
+                program => (program as Program).programType === "WITH_REGISTRATION"
+            );
+            const existsDataSets = metadata.dataSets && metadata.dataSets?.length > 0;
+
+            const validationErrors = Object.values({
+                dataValues:
+                    existsDataSets && !action.mappings.events
+                        ? i18n.t("You need to select one dataValues mapping")
+                        : null,
+                events:
+                    (existsNormalPrograms || existsTrackerPrograms) && !action.mappings.events
+                        ? i18n.t("You need to select one events mapping")
+                        : null,
+                eventValues:
+                    (existsNormalPrograms || existsTrackerPrograms) && !action.mappings.eventValues
+                        ? i18n.t("You need to select one eventValues mapping")
+                        : null,
+                teis:
+                    existsTrackerPrograms && !action.mappings.teis
+                        ? i18n.t("You need to select one tracked entity instances mapping")
+                        : null,
+                teiAttributes:
+                    existsTrackerPrograms && !action.mappings.teiAttributes
+                        ? i18n.t("You need to select one tracked entity instance attributes mapping")
+                        : null,
+                enrollments:
+                    existsTrackerPrograms && !action.mappings.events
+                        ? i18n.t("You need to select one enrollent mapping")
+                        : null,
+            })
+                .flat()
+                .filter(error => error !== null);
+
+            console.log({ validationErrors });
+
+            if (validationErrors.length > 0) {
+                return Future.error(validationErrors.join("\n"));
+            }
+
+            return Future.success(action);
+        });
+    }
+
+    private getDataMartByAction(action: SyncAction): FutureData<DataMart> {
         return listDataMarts().flatMap(dataMarts => {
             const dataMart = dataMarts.find(dataMart => dataMart.id === action.connectionId);
 
@@ -71,29 +131,6 @@ export class SaveActionUseCase implements UseCase {
             )
             .map(() => undefined);
     }
-
-    // private loadModelsInXMart(dataMart: DataMart): FutureData<void> {
-    //     return this.loadModelInXMart(dataMart, xMartSyncTables.dataValues, "dataValues");
-    //     // .flatMap(() => this.loadModelInXMart(dataMart, xMartSyncTables.events, "events"))
-    //     // .flatMap(() => this.loadModelInXMart(dataMart, xMartSyncTables.eventValues, "eventValues"))
-    //     // .flatMap(() => this.loadModelInXMart(dataMart, xMartSyncTables.teis, "teis"))
-    //     // .flatMap(() => this.loadModelInXMart(dataMart, xMartSyncTables.teiAttributes, "teiAttributes"))
-    //     // .flatMap(() => this.loadModelInXMart(dataMart, xMartSyncTables.enrollments, "enrollments"));
-    // }
-
-    // private loadModelInXMart(dataMart: DataMart, xmartTable: xMartTable, key: string): FutureData<void> {
-    //     const models = { tables: [xmartTable.table], fields: [...xmartTable.fields] };
-    //     const tableFileInfo = this.generateFileInfo(models, `${key}`);
-
-    //     return this.fileRepository
-    //         .uploadFileAsExternal(tableFileInfo)
-    //         .flatMap(url =>
-    //             this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", {
-    //                 url,
-    //             })
-    //         )
-    //         .map(() => undefined);
-    // }
 
     private generateFileInfo(teis: unknown, key: string) {
         const value = JSON.stringify(teis);

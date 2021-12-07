@@ -1,7 +1,6 @@
 import { DataSet } from "./DataSet";
 import { OrganisationUnit } from "./OrganisationUnit";
 import { Program } from "./Program";
-import { ProgramEvent } from "../data/ProgramEvent";
 import { Ref } from "./Ref";
 
 export type MetadataModel = "categoryOptionCombos" | "categoryOptions" | "optionSets" | "organisationUnits";

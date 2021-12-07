@@ -1,4 +1,5 @@
 import { generateUid } from "../../../utils/uid";
+import { Dhis2ModelKey } from "../mapping/Mapping";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
@@ -12,6 +13,7 @@ export interface SyncActionData {
     endDate?: Date;
     orgUnitPaths: string[];
     metadataIds: string[];
+    mappings: Partial<Record<Dhis2ModelKey, string>>;
 }
 
 export class SyncAction implements SyncActionData {
@@ -24,6 +26,7 @@ export class SyncAction implements SyncActionData {
     public readonly endDate?: Date;
     public readonly orgUnitPaths: string[];
     public readonly metadataIds: string[];
+    public readonly mappings: Partial<Record<Dhis2ModelKey, string>>;
 
     constructor(data: SyncActionData) {
         this.id = data.id;
@@ -35,6 +38,7 @@ export class SyncAction implements SyncActionData {
         this.endDate = data.endDate;
         this.orgUnitPaths = data.orgUnitPaths;
         this.metadataIds = data.metadataIds;
+        this.mappings = data.mappings;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -79,6 +83,7 @@ export class SyncAction implements SyncActionData {
             period: "ALL",
             orgUnitPaths: [],
             metadataIds: [],
+            mappings: {},
         };
     };
 
@@ -93,6 +98,7 @@ export class SyncAction implements SyncActionData {
             endDate: this.endDate,
             orgUnitPaths: this.orgUnitPaths,
             metadataIds: this.metadataIds,
+            mappings: this.mappings,
         };
     }
 }

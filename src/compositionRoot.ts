@@ -64,7 +64,7 @@ export function getCompositionRoot(instance: Instance) {
             list: new GetActionsUseCase(actionRepository),
             get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
-            save: new SaveActionUseCase(actionRepository, fileRepository, martRepository),
+            save: new SaveActionUseCase(actionRepository, metadataRepository, fileRepository, martRepository),
             execute: new ExecuteActionUseCase(
                 actionRepository,
                 metadataRepository,
