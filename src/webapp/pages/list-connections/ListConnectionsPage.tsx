@@ -1,4 +1,11 @@
-import { ObjectsTable, TableColumn, useSnackbar, useLoading, TableSelection, TableAction  } from "@eyeseetea/d2-ui-components";
+import {
+    ObjectsTable,
+    TableColumn,
+    useSnackbar,
+    useLoading,
+    TableSelection,
+    TableAction,
+} from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useMemo, useState } from "react";
 import { SyncResult } from "../../../domain/entities/SyncResult";
 import { useHistory } from "react-router-dom";
@@ -8,7 +15,6 @@ import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 import { DataMart } from "../../../domain/entities/XMart";
 import { Delete } from "@material-ui/icons";
-
 
 export const ListConnectionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -23,7 +29,6 @@ export const ListConnectionsPage: React.FC = () => {
     const [search, changeSearch] = useState<string>("");
     const [selection, setSelection] = useState<TableSelection[]>([]);
     const [reloadKey, reload] = useReload();
-
 
     const columns: TableColumn<DataMart>[] = useMemo(
         () => [
@@ -47,7 +52,6 @@ export const ListConnectionsPage: React.FC = () => {
                     setSelection([]);
                     loadingScreen.reset();
                     reload();
-
                 },
             },
         ],
@@ -75,7 +79,6 @@ export const ListConnectionsPage: React.FC = () => {
                 loading={loading}
                 onActionButtonClick={createConnection}
                 selection={selection}
-
             />
         </React.Fragment>
     );

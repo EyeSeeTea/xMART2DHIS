@@ -4,9 +4,15 @@ import { NamedRef } from "../../domain/entities/Ref";
 export interface User {
     id: string;
     name: string;
+    email: string;
     username: string;
-    userRoles: UserRole[];
     userGroups: NamedRef[];
+    userRoles: UserRole[];
+    organisationUnits: NamedRef[];
+    dataViewOrganisationUnits: NamedRef[];
+    isGlobalAdmin: boolean;
+    isAppConfigurator: boolean;
+    isAppExecutor: boolean;
 }
 
 export interface UserRole extends NamedRef {

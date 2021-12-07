@@ -16,6 +16,32 @@ import { EventsD2ApiRepository } from "./EventsD2ApiRepository";
 import { MetadataD2ApiRepository } from "./MetadataD2ApiRepository";
 import _ from "lodash";
 
+
+const AppRoles: {
+    [key: string]: {
+        name: string;
+        description: string;
+        initialize: boolean;
+    };
+} = {
+    CONFIGURATION_ACCESS: {
+        name: "METADATA_SYNC_CONFIGURATOR",
+        description:
+            "APP - This role allows to create new instances and synchronization rules in the Metadata Sync app",
+        initialize: true,
+    },
+    SYNC_RULE_EXECUTION_ACCESS: {
+        name: "METADATA_SYNC_EXECUTOR",
+        description: "APP - This role allows to execute synchronization rules in the Metadata Sync app",
+        initialize: true,
+    },
+    SHOW_DELETED_OBJECTS: {
+        name: "METADATA_SYNC_SHOW_DELETED_OBJECTS",
+        description: "APP - This role allows the user to synchronize deleted objects",
+        initialize: false,
+    },
+};
+
 export class InstanceD2ApiRepository implements InstanceRepository {
     private api: D2Api;
 
@@ -51,19 +77,50 @@ export class InstanceD2ApiRepository implements InstanceRepository {
                 fields: {
                     id: true,
                     displayName: true,
+                    email: true,
                     userGroups: { id: true, name: true },
                     userCredentials: {
                         username: true,
                         userRoles: { id: true, name: true, authorities: true },
                     },
+                    organisationUnits: { id: true, name: true },
+                    dataViewOrganisationUnits: { id: true, name: true },
                 },
             })
-        ).map(user => ({
+        ).map(user => {
+            const isGlobalAdmin = !!user.userCredentials.userRoles.find((role: any) =>
+            role.authorities.find((authority: string) => authority === "ALL")
+            );
+            return ({
+                id: user.id,
+                name: user.displayName,
+                email: user.email,
+                username: user.userCredentials.username,
+                userGroups: user.userGroups,
+                userRoles: user.userCredentials.userRoles,
+                organisationUnits: user.organisationUnits,
+                dataViewOrganisationUnits: user.dataViewOrganisationUnits,
+                isGlobalAdmin,
+                isAppConfigurator:
+                    isGlobalAdmin ||
+                    !!user.userCredentials.userRoles.find(
+                        (role: any) => role.name === AppRoles?.CONFIGURATION_ACCESS?.name
+                    ),
+                isAppExecutor:
+                    isGlobalAdmin ||
+                    !!user.userCredentials.userRoles.find(
+                        (role: any) => role.name === AppRoles?.SYNC_RULE_EXECUTION_ACCESS?.name
+                    ),
+            });
+        }
+           /* ({
             id: user.id,
             name: user.displayName,
             userGroups: user.userGroups,
             ...user.userCredentials,
-        }));
+        })*/
+        
+        );
     }
 
     @cache()

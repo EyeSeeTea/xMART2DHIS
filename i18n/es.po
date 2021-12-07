@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-03T10:39:15.257Z\n"
+"POT-Creation-Date: 2021-12-03T15:41:28.492Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -135,6 +135,12 @@ msgid "Code"
 msgstr ""
 
 msgid "Connection URL"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Deleting connections"
 msgstr ""
 
 msgid "xMART API"

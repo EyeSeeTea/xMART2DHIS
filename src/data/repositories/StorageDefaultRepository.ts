@@ -2,6 +2,19 @@ import _ from "lodash";
 import { Ref } from "../../domain/entities/Ref";
 import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { Namespace, NamespaceProperties } from "../utils/Namespaces";
+import { SharingSetting } from "../../domain/entities/SharingSetting";
+
+
+export interface ObjectSharing {
+    publicAccess: string;
+    externalAccess: boolean;
+    user: {
+        id: string;
+        name: string;
+    };
+    userAccesses: SharingSetting[];
+    userGroupAccesses: SharingSetting[];
+}
 
 export abstract class StorageDefaultRepository implements StorageRepository {
     // Object operations
@@ -9,6 +22,8 @@ export abstract class StorageDefaultRepository implements StorageRepository {
     public abstract getOrCreateObject<T extends object>(key: string, defaultValue: T): Promise<T>;
     public abstract saveObject<T extends object>(key: string, value: T): Promise<void>;
     public abstract removeObject(key: string): Promise<void>;
+    public abstract getObjectSharing(key: string): Promise<ObjectSharing | undefined>;
+    public abstract saveObjectSharing(key: string, object: ObjectSharing): Promise<void>;
 
     public async listObjectsInCollection<T extends Ref>(key: string): Promise<T[]> {
         return (await this.getObject<T[]>(key)) ?? [];
@@ -88,4 +103,5 @@ export abstract class StorageDefaultRepository implements StorageRepository {
             }
         }
     }
+
 }

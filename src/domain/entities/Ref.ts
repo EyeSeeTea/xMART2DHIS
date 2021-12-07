@@ -1,3 +1,5 @@
+import { SharingSetting } from "./SharingSetting";
+
 export type Id = string;
 
 export interface Ref {
@@ -8,7 +10,7 @@ export interface NamedRef extends Ref {
     name: string;
 }
 
-/*export interface DatedRef extends NamedRef {
+export interface DatedRef extends NamedRef {
     user: NamedRef;
     created: Date;
     lastUpdated: Date;
@@ -26,4 +28,4 @@ export interface SharedRef extends DatedRef {
     publicAccess: string;
     userAccesses: SharingSetting[];
     userGroupAccesses: SharingSetting[];
-}*/
+}

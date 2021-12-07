@@ -43,7 +43,7 @@ export function getCompositionRoot(instance: Instance) {
         connection: getExecute({
             listAll: new ListAllConnectionsUseCase(connectionRepository),
             save: new SaveConnectionUseCase(connectionRepository),
-            delete: new DeleteConnectionsUseCase(connectionRepository)
+            delete: new DeleteConnectionsUseCase(connectionRepository),
         }),
     };
 }
