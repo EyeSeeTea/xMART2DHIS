@@ -74,20 +74,6 @@ const SyncWizard: React.FC<SyncWizardProps> = ({ action, onCancel, onChange }) =
         return _.flatten(validationMessages);
     };
 
-    // This effect should only run in the first load
-    // useEffect(() => {
-    //     getMetadata(api, memoizedRule.current.metadataIds, "id").then(metadata => {
-    //         const types = _.keys(metadata);
-    //         onChange(
-    //             memoizedRule.current
-    //                 .updateMetadataTypes(types)
-    //                 .updateDataSyncEnableAggregation(
-    //                     types.includes("indicators") || types.includes("programIndicators")
-    //                 )
-    //         );
-    //     });
-    // }, [api, onChange, action]);
-
     const urlHash = location.hash.slice(1);
     const stepExists = steps.find(step => step.key === urlHash);
     const firstStepKey = steps.map(step => step.key)[0];

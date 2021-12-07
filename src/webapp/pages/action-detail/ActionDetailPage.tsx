@@ -24,7 +24,7 @@ export const ActionDetailPage: React.FC = () => {
 
     useEffect(() => {
         if (action === "edit" && !!id) {
-            loading.show(true, "Loading sync rule");
+            loading.show(true, "Loading action");
 
             compositionRoot.actions.get(id).run(
                 action => {
