@@ -144,7 +144,7 @@ export class EventsD2ApiRepository implements EventsRepository {
                             }).map(({ events, paginatedEvents }) => [...events, ..._.flatten(paginatedEvents)]);
                         });
                     })
-                ).map(events=> _.flatten(events));
+                ).map(events => _.flatten(events));
             })
         )
             .flatMapError(() => Future.error("An error has occurred rerieving events"))

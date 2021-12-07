@@ -1,3 +1,5 @@
+import { Dhis2ModelKey } from "../mapping/Mapping";
+
 export interface XMartTableDefinition {
     CODE: string;
     TITLE: string;
@@ -36,9 +38,7 @@ export interface xMartTable {
     fields: XMartFieldDefinition[];
 }
 
-export type xMartTableKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments";
-
-const tableCodes = {
+export const xMARTdefaultTableCodes = {
     dataValues: "DHIS2_DATA_VALUES",
     events: "DHIS2_EVENTS",
     eventValues: "DHIS2_EVENT_VALUES",
@@ -47,12 +47,12 @@ const tableCodes = {
     enrollments: "DHIS2_ENROLLMENTS",
 };
 
-export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
+export const xMartSyncTables: Record<Dhis2ModelKey, xMartTable> = {
     dataValues: {
-        table: { CODE: tableCodes.dataValues, TITLE: "Data Values" },
+        table: { CODE: xMARTdefaultTableCodes.dataValues, TITLE: "Data Values" },
         fields: [
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "value",
                 TITLE: "Value",
                 FIELD_TYPE_CODE: "TEXT_MAX",
@@ -61,7 +61,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "period",
                 TITLE: "Period",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -70,7 +70,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "orgUnit",
                 TITLE: "Organisation Unit",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -79,7 +79,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "dataElement",
                 TITLE: "Data Element",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -88,7 +88,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "attributeOptionCombo",
                 TITLE: "Attribute Option Combo",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -97,7 +97,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "categoryOptionCombo",
                 TITLE: "Category Option Combo",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -106,7 +106,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.dataValues,
+                TABLE_CODE: xMARTdefaultTableCodes.dataValues,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -117,10 +117,10 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
         ],
     },
     events: {
-        table: { CODE: tableCodes.events, TITLE: "Events" },
+        table: { CODE: xMARTdefaultTableCodes.events, TITLE: "Events" },
         fields: [
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "event",
                 TITLE: "Event",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -129,7 +129,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "program",
                 TITLE: "Program",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -138,7 +138,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "programStage",
                 TITLE: "Program Stage",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -147,7 +147,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "orgUnit",
                 TITLE: "Organisation Unit",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -156,7 +156,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "enrollment",
                 TITLE: "Enrollment",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -165,7 +165,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "attributeCategoryOptions",
                 TITLE: "Attribute Category Options",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -174,7 +174,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "attributeOptionCombo",
                 TITLE: "Attribute Option Combo",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -183,7 +183,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "dueDate",
                 TITLE: "Due Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -192,7 +192,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.events,
+                TABLE_CODE: xMARTdefaultTableCodes.events,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -203,10 +203,10 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
         ],
     },
     eventValues: {
-        table: { CODE: tableCodes.eventValues, TITLE: "Event Values" },
+        table: { CODE: xMARTdefaultTableCodes.eventValues, TITLE: "Event Values" },
         fields: [
             {
-                TABLE_CODE: tableCodes.eventValues,
+                TABLE_CODE: xMARTdefaultTableCodes.eventValues,
                 CODE: "event",
                 TITLE: "Event",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -215,7 +215,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.eventValues,
+                TABLE_CODE: xMARTdefaultTableCodes.eventValues,
                 CODE: "dataElement",
                 TITLE: "Data Element",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -224,7 +224,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.eventValues,
+                TABLE_CODE: xMARTdefaultTableCodes.eventValues,
                 CODE: "value",
                 TITLE: "Value",
                 FIELD_TYPE_CODE: "TEXT_MAX",
@@ -233,7 +233,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.eventValues,
+                TABLE_CODE: xMARTdefaultTableCodes.eventValues,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -244,10 +244,10 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
         ],
     },
     teis: {
-        table: { CODE: tableCodes.teis, TITLE: "Tracked Entity Instances" },
+        table: { CODE: xMARTdefaultTableCodes.teis, TITLE: "Tracked Entity Instances" },
         fields: [
             {
-                TABLE_CODE: tableCodes.teis,
+                TABLE_CODE: xMARTdefaultTableCodes.teis,
                 CODE: "trackedEntityInstance",
                 TITLE: "Tracked Entity Instance",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -256,7 +256,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teis,
+                TABLE_CODE: xMARTdefaultTableCodes.teis,
                 CODE: "trackedEntityType",
                 TITLE: "Tracked Entity Type",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -265,7 +265,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teis,
+                TABLE_CODE: xMARTdefaultTableCodes.teis,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -276,10 +276,10 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
         ],
     },
     teiAttributes: {
-        table: { CODE: tableCodes.teiAttributes, TITLE: "TEI Attributes" },
+        table: { CODE: xMARTdefaultTableCodes.teiAttributes, TITLE: "TEI Attributes" },
         fields: [
             {
-                TABLE_CODE: tableCodes.teiAttributes,
+                TABLE_CODE: xMARTdefaultTableCodes.teiAttributes,
                 CODE: "trackedentityInstance",
                 TITLE: "Tracked EntityInstance",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -288,7 +288,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teiAttributes,
+                TABLE_CODE: xMARTdefaultTableCodes.teiAttributes,
                 CODE: "attribute",
                 TITLE: "Attribute",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -297,7 +297,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teiAttributes,
+                TABLE_CODE: xMARTdefaultTableCodes.teiAttributes,
                 CODE: "displayName",
                 TITLE: "Display Name",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -306,7 +306,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teiAttributes,
+                TABLE_CODE: xMARTdefaultTableCodes.teiAttributes,
                 CODE: "value",
                 TITLE: "Value",
                 FIELD_TYPE_CODE: "TEXT_MAX",
@@ -315,7 +315,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.teiAttributes,
+                TABLE_CODE: xMARTdefaultTableCodes.teiAttributes,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -326,10 +326,10 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
         ],
     },
     enrollments: {
-        table: { CODE: tableCodes.enrollments, TITLE: "Enrollments" },
+        table: { CODE: xMARTdefaultTableCodes.enrollments, TITLE: "Enrollments" },
         fields: [
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "enrollment",
                 TITLE: "Enrollment",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -338,7 +338,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "trackedEntityInstance",
                 TITLE: "Tracked Entity Instance",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -347,7 +347,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "program",
                 TITLE: "Program",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -356,7 +356,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "orgUnit",
                 TITLE: "Organisation Unit",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -365,7 +365,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "created",
                 TITLE: "Created Date",
                 FIELD_TYPE_CODE: "TEXT_50",
@@ -374,7 +374,7 @@ export const xMartSyncTables: Record<xMartTableKey, xMartTable> = {
                 IS_ROW_TITLE: 0,
             },
             {
-                TABLE_CODE: tableCodes.enrollments,
+                TABLE_CODE: xMARTdefaultTableCodes.enrollments,
                 CODE: "enrollmentDate",
                 TITLE: "Enrollment Date",
                 FIELD_TYPE_CODE: "TEXT_50",

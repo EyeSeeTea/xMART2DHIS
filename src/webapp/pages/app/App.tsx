@@ -36,6 +36,8 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             setAppContext({ api, instance, currentUser, compositionRoot, azureInstance });
 
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
+            compositionRoot.app.initialize().runAsync();
+
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);
