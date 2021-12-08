@@ -11,7 +11,15 @@ export interface ValidationError {
 export interface ModelValidation {
     property: string;
     alias?: string;
-    validation: keyof typeof availableValidations;
+    validation:
+        | { type: "Standard"; validation: keyof typeof availableValidations }
+        | { type: "Custom"; validation: Validation };
+}
+
+export interface Validation {
+    error: string;
+    getDescription: (field: string) => string;
+    check: (value?: string) => boolean;
 }
 
 // Diego Perini (License: MIT)
@@ -48,7 +56,8 @@ const availableValidations = {
 
 export function validateModel<T>(item: T, validations: ModelValidation[]): ValidationError[] {
     return validations.reduce((acc: ValidationError[], { property, validation, alias }: ModelValidation) => {
-        const { check, error, getDescription } = availableValidations[validation];
+        const { check, error, getDescription } =
+            validation.type === "Standard" ? availableValidations[validation.validation] : validation.validation;
         const value = _.get(item, property);
         const description = getDescription(alias ?? property);
 

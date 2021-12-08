@@ -173,6 +173,20 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
                     </ul>
                 )}
             </LiEntry>
+
+            <LiEntry
+                //@ts-ignore
+                label={i18n.t("Model mappings")}
+            >
+                <ul>
+                    {action.modelMappings.map(modelMapping => (
+                        <LiEntry
+                            key={modelMapping.dhis2Model}
+                            label={`${modelMapping.dhis2Model} -> ${modelMapping.xMARTTable}`}
+                        />
+                    ))}
+                </ul>
+            </LiEntry>
         </ul>
     );
 };

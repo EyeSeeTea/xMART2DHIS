@@ -7,7 +7,12 @@ import { dataMarts } from "../xmart/ListDataMartsUseCase";
 import { FileRepository } from "../../repositories/FileRepository";
 import { getUid } from "../../../utils/uid";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { xMartSyncTables } from "../../entities/xmart/xMartSyncTables";
+import {
+    XMartFieldDefinition,
+    XMartLoadModelData,
+    xMartSyncTableTemplates,
+    XMartTableDefinition,
+} from "../../entities/xmart/xMartSyncTables";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { Program } from "../../entities/metadata/Program";
 import i18n from "../../../locales";
@@ -23,24 +28,23 @@ export class SaveActionUseCase implements UseCase {
     ) {}
 
     public execute(action: SyncAction): FutureData<void> {
-        return this.validateAction(action)
+        return this.validateModelMappings(action)
             .flatMap(action =>
                 Future.joinObj({
                     saveResult: this.actionRepository.save(action),
                     dataMart: this.getDataMartByAction(action),
                 })
             )
-            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart))
+            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action))
             .flatMap(() => Future.success(undefined))
             .flatMapError(error => {
-                debugger;
                 return Future.error(
                     i18n.t(`An error has occurred saving the action:\n{{error}}`, { error: String(error) })
                 );
             });
     }
 
-    validateAction(action: SyncAction): FutureData<SyncAction> {
+    validateModelMappings(action: SyncAction): FutureData<SyncAction> {
         return this.metadataRepository.getMetadataByIds(action.metadataIds, "id,programType").flatMap(metadata => {
             const existsNormalPrograms = metadata.programs?.some(
                 program => (program as Program).programType === "WITHOUT_REGISTRATION"
@@ -52,34 +56,35 @@ export class SaveActionUseCase implements UseCase {
 
             const validationErrors = Object.values({
                 dataValues:
-                    existsDataSets && !action.mappings.events
+                    existsDataSets && !action.modelMappings.some(mapping => mapping.dhis2Model === "dataValues")
                         ? i18n.t("You need to select one dataValues mapping")
                         : null,
                 events:
-                    (existsNormalPrograms || existsTrackerPrograms) && !action.mappings.events
+                    (existsNormalPrograms || existsTrackerPrograms) &&
+                    !action.modelMappings.some(mapping => mapping.dhis2Model === "events")
                         ? i18n.t("You need to select one events mapping")
                         : null,
                 eventValues:
-                    (existsNormalPrograms || existsTrackerPrograms) && !action.mappings.eventValues
+                    (existsNormalPrograms || existsTrackerPrograms) &&
+                    !action.modelMappings.some(mapping => mapping.dhis2Model === "eventValues")
                         ? i18n.t("You need to select one eventValues mapping")
                         : null,
                 teis:
-                    existsTrackerPrograms && !action.mappings.teis
+                    existsTrackerPrograms && !action.modelMappings.some(mapping => mapping.dhis2Model === "teis")
                         ? i18n.t("You need to select one tracked entity instances mapping")
                         : null,
                 teiAttributes:
-                    existsTrackerPrograms && !action.mappings.teiAttributes
+                    existsTrackerPrograms &&
+                    !action.modelMappings.some(mapping => mapping.dhis2Model === "teiAttributes")
                         ? i18n.t("You need to select one tracked entity instance attributes mapping")
                         : null,
                 enrollments:
-                    existsTrackerPrograms && !action.mappings.events
+                    existsTrackerPrograms && !action.modelMappings.some(mapping => mapping.dhis2Model === "enrollments")
                         ? i18n.t("You need to select one enrollent mapping")
                         : null,
             })
                 .flat()
                 .filter(error => error !== null);
-
-            console.log({ validationErrors });
 
             if (validationErrors.length > 0) {
                 return Future.error(validationErrors.join("\n"));
@@ -101,26 +106,25 @@ export class SaveActionUseCase implements UseCase {
         });
     }
 
-    private loadModelsInXMart(dataMart: DataMart): FutureData<void> {
-        const models = {
-            tables: [
-                xMartSyncTables.dataValues.table,
-                xMartSyncTables.events.table,
-                xMartSyncTables.eventValues.table,
-                xMartSyncTables.teis.table,
-                xMartSyncTables.teiAttributes.table,
-                xMartSyncTables.enrollments.table,
-            ],
-            fields: [
-                ...xMartSyncTables.dataValues.fields,
-                ...xMartSyncTables.events.fields,
-                ...xMartSyncTables.eventValues.fields,
-                ...xMartSyncTables.teis.fields,
-                ...xMartSyncTables.teiAttributes.fields,
-                ...xMartSyncTables.enrollments.fields,
-            ],
-        };
-        const tableFileInfo = this.generateFileInfo(models, `Models`);
+    private loadModelsInXMart(dataMart: DataMart, action: SyncAction): FutureData<void> {
+        const initialXMARTModels: XMartLoadModelData = { tables: [], fields: [] };
+
+        const xMARTModels: XMartLoadModelData = action.modelMappings.reduce((acc, modelMapping) => {
+            const newTableDefinition: XMartTableDefinition = {
+                ...xMartSyncTableTemplates[modelMapping.dhis2Model].table,
+                CODE: modelMapping.xMARTTable,
+                TITLE: modelMapping.xMARTTable,
+            };
+            const newfieldsDefinition: XMartFieldDefinition[] = xMartSyncTableTemplates[
+                modelMapping.dhis2Model
+            ].fields.map(field => ({
+                ...field,
+                TABLE_CODE: newTableDefinition.CODE,
+            }));
+            return { tables: [...acc.tables, newTableDefinition], fields: [...acc.fields, ...newfieldsDefinition] };
+        }, initialXMARTModels);
+
+        const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
 
         return this.fileRepository
             .uploadFileAsExternal(tableFileInfo)

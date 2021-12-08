@@ -1,37 +1,49 @@
 import { Future, FutureData } from "../../domain/entities/Future";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageDefaultRepository } from "./StorageDefaultRepository";
-import { MappingRepository } from "../../domain/repositories/MappingRepository";
-import { Mapping, MappingData } from "../../domain/entities/mapping/Mapping";
+import { MappingTemplate, MappingTemplateData } from "../../domain/entities/mapping-template/MappingTemplate";
+import { MappingTemplateRepository } from "../../domain/repositories/MappingTemplateRepository";
 
-export class MappingDataStoreRepository implements MappingRepository {
+export class MappingTemplateDataStoreRepository implements MappingTemplateRepository {
     constructor(private dataStoreClient: StorageDefaultRepository) {}
 
     //TODO: dataStoreClient should be refactor to futures to avoid Future.fromPromise here.
 
-    getById(id: string): FutureData<Mapping> {
-        return Future.fromPromise(this.dataStoreClient.getObjectInCollection<MappingData>(Namespaces.MAPPINGS, id))
+    getById(id: string): FutureData<MappingTemplate> {
+        return Future.fromPromise(
+            this.dataStoreClient.getObjectInCollection<MappingTemplateData>(Namespaces.MAPPINGS, id)
+        )
             .flatMapError(error => Future.error(String(error)))
             .flatMap(data =>
-                data ? Future.success(Mapping.build(data)) : Future.error(`The action ${id} doesnot exist`)
+                data ? Future.success(MappingTemplate.build(data)) : Future.error(`The action ${id} doesnot exist`)
             );
     }
 
-    list(): FutureData<Mapping[]> {
-        return Future.fromPromise(this.dataStoreClient.listObjectsInCollection<MappingData>(Namespaces.MAPPINGS))
+    getByIds(ids: string[]): FutureData<MappingTemplate[]> {
+        return Future.fromPromise(
+            this.dataStoreClient.listObjectsInCollection<MappingTemplateData>(Namespaces.MAPPINGS)
+        )
             .flatMapError(error => Future.error(String(error)))
-            .map(dataList => dataList.map(data => Mapping.build(data)));
+            .map(dataList => dataList.filter(data => ids.includes(data.id)).map(data => MappingTemplate.build(data)));
     }
 
-    save(mapping: Mapping): FutureData<void> {
+    list(): FutureData<MappingTemplate[]> {
         return Future.fromPromise(
-            this.dataStoreClient.saveObjectInCollection<MappingData>(Namespaces.MAPPINGS, mapping.toData())
+            this.dataStoreClient.listObjectsInCollection<MappingTemplateData>(Namespaces.MAPPINGS)
+        )
+            .flatMapError(error => Future.error(String(error)))
+            .map(dataList => dataList.map(data => MappingTemplate.build(data)));
+    }
+
+    save(mapping: MappingTemplate): FutureData<void> {
+        return Future.fromPromise(
+            this.dataStoreClient.saveObjectInCollection<MappingTemplateData>(Namespaces.MAPPINGS, mapping.toData())
         ).flatMapError(error => Future.error(String(error)));
     }
 
-    saveList(mappings: Mapping[]): FutureData<void> {
+    saveList(mappings: MappingTemplate[]): FutureData<void> {
         return Future.fromPromise(
-            this.dataStoreClient.saveObjectsInCollection<MappingData>(
+            this.dataStoreClient.saveObjectsInCollection<MappingTemplateData>(
                 Namespaces.MAPPINGS,
                 mappings.map(mapping => mapping.toData())
             )
