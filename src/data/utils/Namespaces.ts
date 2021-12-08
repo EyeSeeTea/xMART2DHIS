@@ -1,4 +1,4 @@
-export const dataStoreNamespace = "XMART2DHIS";
+export const dataStoreNamespace = "xMART2DHIS";
 export const constantPrefix = "XMART2DHIS App Storage";
 
 export type Namespace = typeof Namespaces[keyof typeof Namespaces];

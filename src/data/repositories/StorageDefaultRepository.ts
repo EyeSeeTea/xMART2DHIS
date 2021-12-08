@@ -2,18 +2,6 @@ import _ from "lodash";
 import { Ref } from "../../domain/entities/metadata/Ref";
 import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { Namespace, NamespaceProperties } from "../utils/Namespaces";
-import { SharingSetting } from "../../domain/entities/metadata/SharingSetting";
-
-export interface ObjectSharing {
-    publicAccess: string;
-    externalAccess: boolean;
-    user: {
-        id: string;
-        name: string;
-    };
-    userAccesses: SharingSetting[];
-    userGroupAccesses: SharingSetting[];
-}
 
 export abstract class StorageDefaultRepository implements StorageRepository {
     // Object operations

@@ -1,4 +1,3 @@
-//import { Button } from "@material-ui/core";
 import { Button } from "@dhis2/ui";
 import Editor, { Monaco } from "@monaco-editor/react";
 import _ from "lodash";

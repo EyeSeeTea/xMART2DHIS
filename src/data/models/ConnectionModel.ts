@@ -1,6 +1,5 @@
 import { ConnectionData } from "../../domain/entities/xmart/XMart";
 import { SharingSetting } from "../../domain/entities/metadata/SharingSetting";
-
 import { Codec, Schema } from "../../utils/codec";
 import { NamedRefModel } from "./DHIS2Model";
 

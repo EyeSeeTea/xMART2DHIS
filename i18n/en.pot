@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-07T06:51:18.325Z\n"
-"PO-Revision-Date: 2021-12-07T06:51:18.325Z\n"
+"POT-Creation-Date: 2021-12-08T20:49:31.806Z\n"
+"PO-Revision-Date: 2021-12-08T20:49:31.807Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -324,7 +324,6 @@ msgstr ""
 msgid "List connections of the MART"
 msgstr ""
 
-msgid "Name"
 msgid "Examples"
 msgstr ""
 
@@ -337,22 +336,49 @@ msgstr ""
 msgid "Load model"
 msgstr ""
 
+msgid "Connection URL"
+msgstr ""
+
+msgid "Deleting connections"
+msgstr ""
+
+msgid "Successfully deleted {{total}} connections"
+msgstr ""
+
+msgid "An error has ocurred deleting connection(s)"
+msgstr ""
+
+msgid "Connection not found"
+msgstr ""
+
+msgid "Updating sharing settings"
+msgstr ""
+
+msgid "Successfully updated sharing settings"
+msgstr ""
+
+msgid "Testing connection"
+msgstr ""
+
+msgid "Connection name"
+msgstr ""
+
+msgid "API URL"
+msgstr ""
+
+msgid "Replicate"
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "Sharing settings"
+msgstr ""
+
 msgid "Run"
 msgstr ""
 
 msgid "Running actions..."
-msgstr ""
-
-msgid "Code"
-msgstr ""
-
-msgid "Connection URL"
-msgstr ""
-
-msgid "Delete"
-msgstr ""
-
-msgid "Deleting connections"
 msgstr ""
 
 msgid "xMART API"
@@ -362,6 +388,9 @@ msgid "xMART Table"
 msgstr ""
 
 msgid "Saving connection"
+msgstr ""
+
+msgid "Connection successfully edited"
 msgstr ""
 
 msgid "Connection successfully created"
@@ -376,13 +405,6 @@ msgstr ""
 msgid "Error saving connection"
 msgstr ""
 
-msgid "Save"
-msgstr ""
-
-msgid "Test connection"
-msgstr ""
-
-msgid "API URL"
 msgctxt "MODEL pipelines"
 msgid "Initial load of LOAD_DATA and LOAD"
 msgstr ""
