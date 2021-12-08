@@ -1,3 +1,4 @@
+import { D2UserSchema, SelectedPick } from "@eyeseetea/d2-api/2.34";
 import { FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { User } from "../../domain/entities/User";
@@ -14,33 +15,9 @@ import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { AggregatedD2ApiRepository } from "./AggregatedD2ApiRepository";
 import { EventsD2ApiRepository } from "./EventsD2ApiRepository";
 import { MetadataD2ApiRepository } from "./MetadataD2ApiRepository";
+import { UserSearch } from "../../domain/entities/SearchUser";
+
 import _ from "lodash";
-
-
-const AppRoles: {
-    [key: string]: {
-        name: string;
-        description: string;
-        initialize: boolean;
-    };
-} = {
-    CONFIGURATION_ACCESS: {
-        name: "METADATA_SYNC_CONFIGURATOR",
-        description:
-            "APP - This role allows to create new instances and synchronization rules in the Metadata Sync app",
-        initialize: true,
-    },
-    SYNC_RULE_EXECUTION_ACCESS: {
-        name: "METADATA_SYNC_EXECUTOR",
-        description: "APP - This role allows to execute synchronization rules in the Metadata Sync app",
-        initialize: true,
-    },
-    SHOW_DELETED_OBJECTS: {
-        name: "METADATA_SYNC_SHOW_DELETED_OBJECTS",
-        description: "APP - This role allows the user to synchronize deleted objects",
-        initialize: false,
-    },
-};
 
 export class InstanceD2ApiRepository implements InstanceRepository {
     private api: D2Api;
@@ -70,61 +47,64 @@ export class InstanceD2ApiRepository implements InstanceRepository {
         return _.flatMap(user.userRoles, ({ authorities }) => authorities).includes("ALL");
     }
 
+    public async searchUsers(query: string): Promise<UserSearch> {
+        const options = { fields, filter: { displayName: { ilike: query } } };
+        return this.api.metadata.get({ users: options, userGroups: options }).getData();
+    }
+
     @cache()
     public getCurrentUser(): FutureData<User> {
-        return apiToFuture(
-            this.api.currentUser.get({
-                fields: {
-                    id: true,
-                    displayName: true,
-                    email: true,
-                    userGroups: { id: true, name: true },
-                    userCredentials: {
-                        username: true,
-                        userRoles: { id: true, name: true, authorities: true },
-                    },
-                    organisationUnits: { id: true, name: true },
-                    dataViewOrganisationUnits: { id: true, name: true },
-                },
-            })
-        ).map(user => {
-            const isGlobalAdmin = !!user.userCredentials.userRoles.find((role: any) =>
-            role.authorities.find((authority: string) => authority === "ALL")
-            );
-            return ({
-                id: user.id,
-                name: user.displayName,
-                email: user.email,
-                username: user.userCredentials.username,
-                userGroups: user.userGroups,
-                userRoles: user.userCredentials.userRoles,
-                organisationUnits: user.organisationUnits,
-                dataViewOrganisationUnits: user.dataViewOrganisationUnits,
-                isGlobalAdmin,
-                isAppConfigurator:
-                    isGlobalAdmin ||
-                    !!user.userCredentials.userRoles.find(
-                        (role: any) => role.name === AppRoles?.CONFIGURATION_ACCESS?.name
-                    ),
-                isAppExecutor:
-                    isGlobalAdmin ||
-                    !!user.userCredentials.userRoles.find(
-                        (role: any) => role.name === AppRoles?.SYNC_RULE_EXECUTION_ACCESS?.name
-                    ),
-            });
-        }
-           /* ({
-            id: user.id,
-            name: user.displayName,
-            userGroups: user.userGroups,
-            ...user.userCredentials,
-        })*/
-        
-        );
+        return apiToFuture(this.api.currentUser.get({ fields })).map(user => this.mapUser(user));
     }
 
     @cache()
     public getInstanceVersion(): FutureData<string> {
         return apiToFuture(this.api.system.info).map(({ version }) => version);
     }
+    private mapUser(user: D2ApiUser): User {
+        const { userCredentials } = user;
+        return {
+            id: user.id,
+            name: user.displayName,
+            firstName: user.firstName,
+            surname: user.surname,
+            email: user.email,
+            lastUpdated: user.lastUpdated,
+            created: user.created,
+            userGroups: user.userGroups,
+            username: user.userCredentials.username,
+            apiUrl: `${this.api.baseUrl}/api/users/${user.id}.json`,
+            userRoles: user.userCredentials.userRoles,
+            lastLogin: userCredentials.lastLogin ? userCredentials.lastLogin : undefined,
+            disabled: user.userCredentials.disabled,
+            organisationUnits: user.organisationUnits,
+            dataViewOrganisationUnits: user.dataViewOrganisationUnits,
+            access: user.access,
+            openId: userCredentials.openId,
+        };
+    }
 }
+const fields = {
+    id: true,
+    displayName: true,
+    name: true,
+    firstName: true,
+    surname: true,
+    email: true,
+    lastUpdated: true,
+    created: true,
+    userGroups: { id: true, name: true },
+    userCredentials: {
+        username: true,
+        userRoles: { id: true, name: true, authorities: true },
+        lastLogin: true,
+        disabled: true,
+        openId: true,
+    },
+    organisationUnits: { id: true, name: true },
+    dataViewOrganisationUnits: { id: true, name: true },
+    access: true,
+} as const;
+
+type D2ApiUser = SelectedPick<D2UserSchema, typeof fields>;
+

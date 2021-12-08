@@ -8,6 +8,8 @@ import {
 } from "@dhis2/ui";
 import React from "react";
 import { FormField } from "../../components/form/FormField";
+import { DataMartEndpoint } from "../../../domain/entities/XMart";
+
 import { getConnectionFieldName, ConnectionFormField, connectionRequiredFields } from "./utils";
 
 const useValidations = (field: ConnectionFormField): { validation?: (...args: any[]) => any; props?: object } => {
@@ -25,7 +27,10 @@ const useValidations = (field: ConnectionFormField): { validation?: (...args: an
         }
     }
 };
-
+interface TypeOption {
+    label: string;
+    value: DataMartEndpoint;
+}
 export const RenderConnectionField: React.FC<{ row: number; field: ConnectionFormField }> = ({ row, field }) => {
     const name = `connections[${row}].${field}`;
     const { validation, props: validationProps = {} } = useValidations(field);
@@ -35,7 +40,8 @@ export const RenderConnectionField: React.FC<{ row: number; field: ConnectionFor
         validate: validation,
         ...validationProps,
     };
-    const typeOptions = [
+
+    const typeOptions: TypeOption[] = [
         { label: "Public", value: "PUBLIC" },
         { label: "Prod", value: "PROD" },
         { label: "UAT", value: "UAT" },

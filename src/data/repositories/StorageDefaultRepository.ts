@@ -4,7 +4,6 @@ import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { Namespace, NamespaceProperties } from "../utils/Namespaces";
 import { SharingSetting } from "../../domain/entities/SharingSetting";
 
-
 export interface ObjectSharing {
     publicAccess: string;
     externalAccess: boolean;
@@ -103,5 +102,4 @@ export abstract class StorageDefaultRepository implements StorageRepository {
             }
         }
     }
-
 }

@@ -11,7 +11,7 @@ export interface NamedRef extends Ref {
 }
 
 export interface DatedRef extends NamedRef {
-    user: NamedRef;
+    owner: NamedRef;
     created: Date;
     lastUpdated: Date;
     lastUpdatedBy: NamedRef;

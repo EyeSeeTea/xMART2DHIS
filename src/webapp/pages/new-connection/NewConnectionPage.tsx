@@ -6,38 +6,50 @@ import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
 import { Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
-import { DataMart, defaultConnection } from "../../../domain/entities/XMart";
+import { DataMart, ConnectionData } from "../../../domain/entities/XMart";
 import styled from "styled-components";
 import { useGoBack } from "../../hooks/useGoBack";
 import { getConnectionFieldName } from "./utils";
 import { RenderConnectionField } from "./ConnectionForm";
 import { Paper } from "@material-ui/core";
+import { generateUid } from "../../../utils/uid";
 
 export const NewConnectionPage: React.FC = () => {
-    const { compositionRoot } = useAppContext();
+    const { compositionRoot, currentUser } = useAppContext();
     const { id, action } = useParams<{ id: string; action: "new" | "edit" }>();
-    const location = useLocation<{ connection?: DataMart }>();
-    const isEdit = action === "edit" && id;
+    const location = useLocation<{ connection?: ConnectionData }>();
+    const isEdit = (action === "edit" && id) ? true : false;
     const loading = useLoading();
     const snackbar = useSnackbar();
     const goBack = useGoBack();
     const goHome = useCallback(() => goBack(true), [goBack]);
-    const [connection, setConnection] = useState<DataMart>(defaultConnection);
+    const defaultConnectionData: ConnectionData = {
+        id: generateUid(),
+        name: "",
+        code: "",
+        type: "PUBLIC",
+        apiUrl: "",
+        owner: { id: currentUser.id, name: currentUser.name },
+        created: new Date(),
+        lastUpdated: new Date(),
+        lastUpdatedBy: { id: currentUser.id, name: currentUser.name },
+        publicAccess: "--------",
+        userAccesses: [],
+        userGroupAccesses: []
+    };
+    const [initialConnection, setInitialConnection] = useState<ConnectionData>(defaultConnectionData);
+    const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         if (location.state?.connection) {
-            setConnection(location.state?.connection);
+            setInitialConnection(location.state?.connection);
         } else if (isEdit) {
-            //TODO
-            console.log("TODO: isEdit form");
-            /*compositionRoot.connection.getById(id).then(result =>
-                result.match({
-                    success: setConnection,
-                    error: () => {
-                        setError(true);
-                    },
-                })
-            );*/
+            compositionRoot.connection.getById(id).then(result => {
+                if(result === undefined) {
+                    setError(true);
+                }
+                else setInitialConnection(result);
+            });
         }
     }, [compositionRoot, id, isEdit, location]);
 
@@ -46,16 +58,25 @@ export const NewConnectionPage: React.FC = () => {
             if (connections === undefined) return { FORM_ERROR };
 
             loading.show(true, i18n.t("Saving connection"));
-            await compositionRoot.connection.save(connections);
-            snackbar.success(i18n.t("Connection successfully created"));
+            let connectionToSave: ConnectionData;
+
+            if(connections[0]) {
+                connectionToSave = ({
+                    ...initialConnection, 
+                    ...connections[0],
+                });
+                await compositionRoot.connection.save(connectionToSave);
+                snackbar.success(isEdit ? i18n.t("Connection successfully edited") : i18n.t("Connection successfully created"));
+            }
             loading.reset();
             goHome();
         },
-        [compositionRoot, loading, snackbar, goHome]
+        [compositionRoot, loading, snackbar, goHome, currentUser]
     );
 
     const fields = ["name", "code", "type", "apiUrl"];
     const cancel = !isEdit ? i18n.t("Cancel connection creation") : i18n.t("Cancel connection editing");
+    if (error) return null;
 
     return (
         <React.Fragment>
@@ -63,6 +84,7 @@ export const NewConnectionPage: React.FC = () => {
                 <Form<{ connections: DataMart[] }>
                     autocomplete="off"
                     onSubmit={onSubmit}
+                    initialValues={{ connections: [initialConnection] }}
                     render={({ handleSubmit, submitError }) => (
                         <form onSubmit={handleSubmit}>
                             {submitError && (

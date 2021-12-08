@@ -1,28 +1,27 @@
-import { ConnectionData, DataMartEndpoint } from "../../domain/entities/XMart";
+import { ConnectionData } from "../../domain/entities/XMart";
 import { SharingSetting } from "../../domain/entities/SharingSetting";
 
-import { Codec, Schema, FromType } from "../../utils/codec";
+import { Codec, Schema } from "../../utils/codec";
 import { NamedRefModel } from "./DHIS2Model";
 
 export const SharingSettingModel: Codec<SharingSetting> = Schema.object({
-    access: Schema.nonEmptyString,
-    displayName: Schema.nonEmptyString,
-    id: Schema.nonEmptyString,
+    access: Schema.string,
+    displayName: Schema.string,
+    id: Schema.string,
     name: Schema.optional(Schema.string),
 });
 
-/*FromType<DataMartEndpoint>*/
 export const ConnectionModel: Codec<ConnectionData> = Schema.object({
     id: Schema.nonEmptyString,
     name: Schema.nonEmptyString,
     code: Schema.nonEmptyString,
     apiUrl: Schema.nonEmptyString,
-    type: Schema.nonEmptyString,
-    user: NamedRefModel,
+    type: Schema.oneOf([Schema.exact("PUBLIC"), Schema.exact("PROD"), Schema.exact("UAT")]),
+    owner: NamedRefModel,
     created: Schema.date,
     lastUpdated: Schema.date,
     lastUpdatedBy: NamedRefModel,
-    publicAccess: Schema.nonEmptyString,
+    publicAccess: Schema.string,
     userAccesses: Schema.array(SharingSettingModel),
     userGroupAccesses: Schema.array(SharingSettingModel),
 });

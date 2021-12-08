@@ -1,9 +1,11 @@
-import { DataMart } from "../entities/XMart";
+import { ConnectionData } from "../entities/XMart";
 
 export interface ConnectionsRepository {
-    listAll({ search }: ConnectionsFilter): Promise<DataMart[]>;
-    save(connections: Omit<DataMart, "id">[]): Promise<void>;
+    listAll({ search }: ConnectionsFilter): Promise<ConnectionData[]>;
+    save(connection: ConnectionData): Promise<void>;
     delete(connectionIds: string[]): Promise<void>;
+    getById(id: string): Promise<ConnectionData | undefined>;
+
 }
 
 export interface ConnectionsFilter {

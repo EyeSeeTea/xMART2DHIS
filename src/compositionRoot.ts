@@ -7,6 +7,7 @@ import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUse
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
+import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
@@ -15,6 +16,7 @@ import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUse
 import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
 import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
 import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
+import { GetConnectionByIdUseCase } from "./domain/usecases/connection/GetConnectionByIdUseCase";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
@@ -32,6 +34,7 @@ export function getCompositionRoot(instance: Instance) {
         instance: getExecute({
             getCurrentUser: new GetCurrentUserUseCase(instanceRepository),
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
+            searchUsers: new SearchUsersUseCase(instanceRepository),
         }),
         actions: getExecute({
             get: new GetActionsUseCase(martRepository, instanceRepository),
@@ -44,6 +47,7 @@ export function getCompositionRoot(instance: Instance) {
             listAll: new ListAllConnectionsUseCase(connectionRepository),
             save: new SaveConnectionUseCase(connectionRepository),
             delete: new DeleteConnectionsUseCase(connectionRepository),
+            getById: new GetConnectionByIdUseCase(connectionRepository)
         }),
     };
 }
