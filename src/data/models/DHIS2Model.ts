@@ -1,4 +1,4 @@
-import { NamedRef, Ref } from "../../domain/entities/Ref";
+import { NamedRef, Ref } from "../../domain/entities/metadata/Ref";
 import { Codec, Schema } from "../../utils/codec";
 
 export const RefModel: Codec<Ref> = Schema.object({

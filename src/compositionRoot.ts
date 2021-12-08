@@ -1,14 +1,29 @@
+import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRepository";
+import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
+import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
+import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
+import { MappingDataStoreRepository } from "./data/repositories/MappingDataStoreRepository";
+import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
+import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
+import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsDataStoreRepository";
-import { Instance } from "./domain/entities/Instance";
-import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUseCase";
+import { Instance } from "./domain/entities/instance/Instance";
+import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
+import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUseCase";
+import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
+import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
+import { StartAppUseCase } from "./domain/usecases/app/StartAppUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
+import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
+import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
+import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
@@ -17,14 +32,27 @@ import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllC
 import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
 import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
 import { GetConnectionByIdUseCase } from "./domain/usecases/connection/GetConnectionByIdUseCase";
+import { TestConnectionUseCase } from "./domain/usecases/connection/TestConnectionUseCase";
+import { getD2APiFromInstance } from "./utils/d2-api";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
     const azureRepository = new AzureMSALRepository();
     const martRepository = new XMartDefaultRepository(azureRepository);
-    const connectionRepository = new ConnectionsDataStoreRepository(instance);
+    const dataStoreClient = new StorageDataStoreRepository("global", instance);
+    const connectionRepository = new ConnectionsDataStoreRepository(dataStoreClient);
+    const actionRepository = new ActionDataStoreRepository(dataStoreClient);
+    const metadataRepository = new MetadataD2ApiRepository(instance);
+    const eventsRepository = new EventsD2ApiRepository(instance);
+    const teiRepository = new TEID2ApiRepository(instance);
+    const aggregatedRespository = new AggregatedD2ApiRepository(instance);
+    const fileRepository = new FileD2ApiRepository(instance);
+    const mappingRepository = new MappingDataStoreRepository(dataStoreClient);
 
     return {
+        app: getExecute({
+            initialize: new StartAppUseCase(mappingRepository),
+        }),
         xmart: getExecute({
             listTables: new ListMartTablesUseCase(martRepository),
             listTableContent: new ListMartContentsUseCase(martRepository),
@@ -36,9 +64,25 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
             searchUsers: new SearchUsersUseCase(instanceRepository),
         }),
+        metadata: getExecute({
+            getOrgUnitRoots: new GetRootOrgUnitUseCase(metadataRepository),
+            getByIds: new GetMetadataByIdsUseCase(metadataRepository),
+            list: new ListMetadataUseCase(metadataRepository),
+        }),
         actions: getExecute({
-            get: new GetActionsUseCase(martRepository, instanceRepository),
-            exampleAction: new ExampleActionUseCase(martRepository, instanceRepository),
+            list: new GetActionsUseCase(actionRepository),
+            get: new GetActionByIdUseCase(actionRepository),
+            delete: new DeleteActionsUseCase(actionRepository),
+            save: new SaveActionUseCase(actionRepository, fileRepository, martRepository),
+            execute: new ExecuteActionUseCase(
+                actionRepository,
+                metadataRepository,
+                eventsRepository,
+                teiRepository,
+                aggregatedRespository,
+                fileRepository,
+                martRepository
+            ),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),
@@ -47,8 +91,10 @@ export function getCompositionRoot(instance: Instance) {
             listAll: new ListAllConnectionsUseCase(connectionRepository),
             save: new SaveConnectionUseCase(connectionRepository),
             delete: new DeleteConnectionsUseCase(connectionRepository),
-            getById: new GetConnectionByIdUseCase(connectionRepository)
+            getById: new GetConnectionByIdUseCase(connectionRepository),
+            testConnection: new TestConnectionUseCase(martRepository, instanceRepository),
         }),
+        d2Api: getD2APiFromInstance(instance),
     };
 }
 

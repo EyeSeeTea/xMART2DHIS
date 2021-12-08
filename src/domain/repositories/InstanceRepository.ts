@@ -1,11 +1,11 @@
 import { StorageRepository } from "./StorageRepository";
 import { FutureData } from "../entities/Future";
-import { User } from "../entities/User";
 import { UserSearch } from "../entities/SearchUser";
+import { User } from "../entities/metadata/User";
 import { AggregatedRepository } from "./AggregatedRepository";
 import { EventsRepository } from "./EventsRepository";
 import { MetadataRepository } from "./MetadataRepository";
-import { Instance } from "../entities/Instance";
+import { Instance } from "../entities/instance/Instance";
 
 export interface InstanceRepository {
     metadata: MetadataRepository;
@@ -19,5 +19,4 @@ export interface InstanceRepository {
     getInstanceVersion(): FutureData<string>;
     isAdmin(user: User): boolean;
     searchUsers(query: string): Promise<UserSearch>;
-
 }

@@ -5,21 +5,26 @@ import i18n from "../../locales";
 import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
 import { LandingPage } from "./landing/LandingPage";
-import { ListActionsPage } from "./list-actions/ListActionsPage";
 import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
-import { ListMartPage } from "./list-mart/ListMartPage";
-import { NewActionPage } from "./new-action/NewActionPage";
 import { NewConnectionPage } from "./new-connection/NewConnectionPage";
+import { ListMartPage } from "./list-mart/ListMartPage";
+import { ActionsListPage } from "./actions-list/ActionsListPage";
+import { ActionDetailPage } from "./action-detail/ActionDetailPage";
+
+export interface DetailPageParams {
+    id: string;
+    action: "edit" | "new";
+}
 
 export const Router = () => {
     return (
         <HashRouter>
             <Switch>
                 <Route
-                    path="/actions/new"
+                    path="/actions/:action(new|edit)/:id?"
                     render={() => (
-                        <RouterPage title={i18n.t("New action")}>
-                            <NewActionPage />
+                        <RouterPage title={i18n.t("Action")}>
+                            <ActionDetailPage />
                         </RouterPage>
                     )}
                 />
@@ -28,7 +33,7 @@ export const Router = () => {
                     path="/actions"
                     render={() => (
                         <RouterPage title={i18n.t("Actions")}>
-                            <ListActionsPage />
+                            <ActionsListPage />
                         </RouterPage>
                     )}
                 />

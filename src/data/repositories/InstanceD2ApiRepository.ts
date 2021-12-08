@@ -1,7 +1,7 @@
 import { D2UserSchema, SelectedPick } from "@eyeseetea/d2-api/2.34";
 import { FutureData } from "../../domain/entities/Future";
-import { Instance } from "../../domain/entities/Instance";
-import { User } from "../../domain/entities/User";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { User } from "../../domain/entities/metadata/User";
 import { AggregatedRepository } from "../../domain/repositories/AggregatedRepository";
 import { EventsRepository } from "../../domain/repositories/EventsRepository";
 import { InstanceRepository } from "../../domain/repositories/InstanceRepository";
@@ -107,4 +107,3 @@ const fields = {
 } as const;
 
 type D2ApiUser = SelectedPick<D2UserSchema, typeof fields>;
-

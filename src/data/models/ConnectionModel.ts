@@ -1,5 +1,5 @@
-import { ConnectionData } from "../../domain/entities/XMart";
-import { SharingSetting } from "../../domain/entities/SharingSetting";
+import { ConnectionData } from "../../domain/entities/xmart/XMart";
+import { SharingSetting } from "../../domain/entities/metadata/SharingSetting";
 
 import { Codec, Schema } from "../../utils/codec";
 import { NamedRefModel } from "./DHIS2Model";
@@ -14,7 +14,7 @@ export const SharingSettingModel: Codec<SharingSetting> = Schema.object({
 export const ConnectionModel: Codec<ConnectionData> = Schema.object({
     id: Schema.nonEmptyString,
     name: Schema.nonEmptyString,
-    code: Schema.nonEmptyString,
+    code: Schema.string,
     apiUrl: Schema.nonEmptyString,
     type: Schema.oneOf([Schema.exact("PUBLIC"), Schema.exact("PROD"), Schema.exact("UAT")]),
     owner: NamedRefModel,

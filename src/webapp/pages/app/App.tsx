@@ -9,7 +9,7 @@ import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import React, { useEffect, useState } from "react";
 import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../compositionRoot";
-import { Instance } from "../../../domain/entities/Instance";
+import { Instance } from "../../../domain/entities/instance/Instance";
 import { D2Api } from "../../../types/d2-api";
 import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
@@ -36,6 +36,8 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             setAppContext({ api, instance, currentUser, compositionRoot, azureInstance });
 
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
+            compositionRoot.app.initialize().runAsync();
+
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);

@@ -6,7 +6,7 @@ import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
 import { Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
-import { DataMart, ConnectionData } from "../../../domain/entities/XMart";
+import { DataMart, ConnectionData } from "../../../domain/entities/xmart/XMart";
 import styled from "styled-components";
 import { useGoBack } from "../../hooks/useGoBack";
 import { getConnectionFieldName } from "./utils";
@@ -18,7 +18,7 @@ export const NewConnectionPage: React.FC = () => {
     const { compositionRoot, currentUser } = useAppContext();
     const { id, action } = useParams<{ id: string; action: "new" | "edit" }>();
     const location = useLocation<{ connection?: ConnectionData }>();
-    const isEdit = (action === "edit" && id) ? true : false;
+    const isEdit = action === "edit" && id ? true : false;
     const loading = useLoading();
     const snackbar = useSnackbar();
     const goBack = useGoBack();
@@ -35,7 +35,7 @@ export const NewConnectionPage: React.FC = () => {
         lastUpdatedBy: { id: currentUser.id, name: currentUser.name },
         publicAccess: "--------",
         userAccesses: [],
-        userGroupAccesses: []
+        userGroupAccesses: [],
     };
     const [initialConnection, setInitialConnection] = useState<ConnectionData>(defaultConnectionData);
     const [error, setError] = useState<boolean>(false);
@@ -44,14 +44,28 @@ export const NewConnectionPage: React.FC = () => {
         if (location.state?.connection) {
             setInitialConnection(location.state?.connection);
         } else if (isEdit) {
-            compositionRoot.connection.getById(id).then(result => {
-                if(result === undefined) {
-                    setError(true);
-                }
-                else setInitialConnection(result);
-            });
+            compositionRoot.connection.getById(id).run(
+                result => setInitialConnection(result),
+                () => setError(true)
+            );
         }
     }, [compositionRoot, id, isEdit, location]);
+
+    const testConnection = async ({ connections }: { connections: DataMart[] }) => {
+        loading.show(true, i18n.t("Testing connection"));
+        if (connections && connections[0]) {
+            compositionRoot.connection.testConnection(connections[0]).run(
+                batch => {
+                    snackbar.success(`Connection tested successfully. Batch: ${batch}`);
+                    loading.reset();
+                },
+                error => {
+                    snackbar.error(error);
+                    loading.reset();
+                }
+            );
+        }
+    };
 
     const onSubmit = useCallback(
         async ({ connections }: { connections: DataMart[] }) => {
@@ -60,18 +74,30 @@ export const NewConnectionPage: React.FC = () => {
             loading.show(true, i18n.t("Saving connection"));
             let connectionToSave: ConnectionData;
 
-            if(connections[0]) {
-                connectionToSave = ({
-                    ...initialConnection, 
+            if (connections[0]) {
+                connectionToSave = {
+                    ...initialConnection,
                     ...connections[0],
-                });
-                await compositionRoot.connection.save(connectionToSave);
-                snackbar.success(isEdit ? i18n.t("Connection successfully edited") : i18n.t("Connection successfully created"));
+                };
+                compositionRoot.connection.save(connectionToSave).run(
+                    () => {
+                        snackbar.success(
+                            isEdit
+                                ? i18n.t("Connection successfully edited")
+                                : i18n.t("Connection successfully created")
+                        );
+                        loading.reset();
+                        goHome();
+                    },
+                    () => {
+                        snackbar.error("An error has occurred saving the connection");
+                        loading.reset();
+                        goHome();
+                    }
+                );
             }
-            loading.reset();
-            goHome();
         },
-        [compositionRoot, loading, snackbar, goHome, currentUser]
+        [compositionRoot, loading, snackbar, goHome, initialConnection, isEdit]
     );
 
     const fields = ["name", "code", "type", "apiUrl"];
@@ -85,7 +111,7 @@ export const NewConnectionPage: React.FC = () => {
                     autocomplete="off"
                     onSubmit={onSubmit}
                     initialValues={{ connections: [initialConnection] }}
-                    render={({ handleSubmit, submitError }) => (
+                    render={({ handleSubmit, values, submitError }) => (
                         <form onSubmit={handleSubmit}>
                             {submitError && (
                                 <NoticeBox title={i18n.t("Error saving connection")} error={true}>
@@ -110,7 +136,9 @@ export const NewConnectionPage: React.FC = () => {
                                     </Button>
                                 </div>
                                 <div style={{ marginRight: 7 }}>
-                                    <Button>{i18n.t("Test connection")}</Button>
+                                    <Button type="button" onClick={() => testConnection(values)}>
+                                        {i18n.t("Test connection")}
+                                    </Button>
                                 </div>
                             </ButtonsRow>
                         </form>

@@ -1,16 +1,4 @@
-import { Ref } from "../entities/Ref";
-import { SharingSetting } from "../entities/SharingSetting";
-
-export interface ObjectSharing {
-    publicAccess: string;
-    externalAccess: boolean;
-    user: {
-        id: string;
-        name: string;
-    };
-    userAccesses: SharingSetting[];
-    userGroupAccesses: SharingSetting[];
-}
+import { Ref } from "../entities/metadata/Ref";
 
 export interface StorageRepository {
     // Object operations

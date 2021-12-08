@@ -7,20 +7,18 @@ import {
     useLoading,
     TableSelection,
     TableAction,
-    TableState
+    TableState,
 } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import i18n from "../../../locales";
 import { useReload } from "../../hooks/useReload";
-import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
-import { DataMart, ConnectionData } from "../../../domain/entities/XMart";
-import { User, isSuperAdmin } from "../../../domain/entities/User";
-import { Delete, Share, Edit, FileCopy } from "@material-ui/icons";
+import { ConnectionData } from "../../../domain/entities/xmart/XMart";
+import { User, isSuperAdmin } from "../../../domain/entities/metadata/User";
+import { Delete, Share, Edit, FileCopy, SettingsInputAntenna } from "@material-ui/icons";
 import { SharingSettingsDialog, SharingSettingsDialogProps } from "./SharingSettingsDialog";
 import { generateUid } from "../../../utils/uid";
-
 
 export const ListConnectionsPage: React.FC = () => {
     const { compositionRoot, currentUser } = useAppContext();
@@ -47,67 +45,127 @@ export const ListConnectionsPage: React.FC = () => {
         []
     );
 
-    const verifyUserCanEdit = (connections: ConnectionData[]) => {
-        if (!currentUser) return false;
-        return connections.every((value) => hasPermissions(value, "write", currentUser));
-        };
+    const verifyUserCanEdit = useCallback(
+        (connections: ConnectionData[]) => {
+            if (!currentUser) return false;
+            return connections.every(value => hasPermissions(value, "write", currentUser));
+        },
+        [currentUser]
+    );
 
-    const verifyUserCanRead = (connections: ConnectionData[]) => {
-        if (!currentUser) return false;
+    const editConnection = useCallback(
+        async (ids: string[]) => {
+            const connection = rows.find(row => row.id === ids[0]);
+            if (connection) {
+                history.push(`/connections/edit/${connection.id}`);
+            }
+        },
+        [history, rows]
+    );
 
-        return connections.every((value) => hasPermissions(value, "read", currentUser));
-    };
-
-    const editConnection = async (ids: string[]) => {
-        const connection = rows.find(row => row.id === ids[0]);
-        if(connection) {
-            history.push(`/connections/edit/${connection.id}`);
-        }
-    };
-
-    const replicateConnection = async (ids: string[]) => {
-        const connection = rows.find(row => row.id === ids[0]);
-        if(connection) {
-            compositionRoot.connection.getById(connection.id).then(result => {
-                if(result === undefined) {
-                    snackbar.error(i18n.t("Connection not found"));
-
+    const deleteConnections = useCallback(
+        async (ids: string[]) => {
+            loadingScreen.show(true, i18n.t("Deleting connections"));
+            compositionRoot.connection.delete(ids).run(
+                () => {
+                    snackbar.success(i18n.t("Successfully deleted {{total}} connections", { total: ids.length }));
+                    setSelection([]);
+                    loadingScreen.reset();
+                    reload();
+                },
+                _error => {
+                    loadingScreen.reset();
+                    snackbar.error(i18n.t("An error has ocurred deleting connection(s)"));
                 }
-                else history.push({
-                    pathname: "/connections/new",
-                    state: { 
-                        connection: {
-                        ...connection, 
-                        name: `Copy of ${connection.name}`, 
-                        id: generateUid() }
-                     },
+            );
+        },
+        [compositionRoot.connection, loadingScreen, reload, snackbar]
+    );
+
+    const replicateConnection = useCallback(
+        async (ids: string[]) => {
+            const connection = rows.find(row => row.id === ids[0]);
+            if (connection) {
+                compositionRoot.connection.getById(connection.id).run(
+                    connection =>
+                        history.push({
+                            pathname: "/connections/new",
+                            state: {
+                                connection: {
+                                    ...connection,
+                                    name: `Copy of ${connection.name}`,
+                                    id: generateUid(),
+                                },
+                            },
+                        }),
+                    () => snackbar.error(i18n.t("Connection not found"))
+                );
+            }
+        },
+        [compositionRoot.connection, history, rows, snackbar]
+    );
+
+    const setSharingSettings = useCallback(
+        async (ids: string[]) => {
+            const connection = rows.find(({ id }) => id === ids[0]);
+            if (!connection) return;
+            if (connection) {
+                setCreateDialogProps({
+                    initialConnection: connection,
+                    onClose: () => setCreateDialogProps(undefined),
+                    onSave: async (connection: ConnectionData) => {
+                        loadingScreen.show(true, i18n.t("Updating sharing settings"));
+                        const connectionWithLastUpdatedInfo = {
+                            ...connection,
+                            lastUpdated: new Date(),
+                            lastUpdatedBy: { id: currentUser.id, name: currentUser.name },
+                        };
+                        compositionRoot.connection.save(connectionWithLastUpdatedInfo).run(
+                            () => {
+                                snackbar.success(i18n.t("Successfully updated sharing settings"));
+                                loadingScreen.reset();
+                                reload();
+                            },
+                            () => {
+                                snackbar.error("An error has occurred saving the sharing settings");
+                                loadingScreen.reset();
+                                reload();
+                            }
+                        );
+                    },
                 });
-            });
+            }
+        },
+        [compositionRoot.connection, currentUser.id, currentUser.name, loadingScreen, reload, rows, snackbar]
+    );
 
-        }
-    };
-
-    const hasPermissions = (connection: ConnectionData,  permission: "read" | "write", currentUser: User) => {
-        if (isSuperAdmin(currentUser)) return true;
-
-        const { publicAccess = "--------", userAccesses = [], userGroupAccesses = [], owner } = connection;
-        const token = permission === "read" ? "r" : "w";
-
-        const isUserOwner = owner?.id === currentUser.id;
-        const isPublic = publicAccess.substring(0, 2).includes(token);
-
-        const hasUserAccess = !!_(userAccesses)
-            .filter(({ access }) => access.substring(0, 2).includes(token))
-            .find(({ id }) => id === currentUser.id);
-
-        const hasGroupAccess =
-            _(userGroupAccesses)
-                .filter(({ access }) => access.substring(0, 2).includes(token))
-                .intersectionBy(currentUser.userGroups, "id")
-                .value().length > 0;
-
-        return isUserOwner || isPublic || hasUserAccess || hasGroupAccess;
-    }
+    const testConnection = useCallback(
+        async (ids: string[]) => {
+            loadingScreen.show(true, i18n.t("Testing connection"));
+            const connection = rows.find(row => row.id === ids[0]);
+            if (connection) {
+                compositionRoot.connection
+                    .testConnection({
+                        id: connection.id,
+                        name: connection.name,
+                        code: connection.code,
+                        type: connection.type,
+                        apiUrl: connection.apiUrl,
+                    })
+                    .run(
+                        batch => {
+                            snackbar.success(`Connection tested successfully. Batch: ${batch}`);
+                            loadingScreen.reset();
+                        },
+                        error => {
+                            snackbar.error(error);
+                            loadingScreen.reset();
+                        }
+                    );
+            }
+        },
+        [compositionRoot.connection, loadingScreen, rows, snackbar]
+    );
 
     const details: ObjectsTableDetailField<ConnectionData>[] = [
         { name: "name" as const, text: i18n.t("Connection name") },
@@ -138,20 +196,21 @@ export const ListConnectionsPage: React.FC = () => {
                 multiple: false,
                 isActive: rows => verifyUserCanEdit(rows),
                 onClick: replicateConnection,
-                icon: <FileCopy/>,
+                icon: <FileCopy />,
             },
             {
                 name: "delete",
                 text: i18n.t("Delete"),
                 icon: <Delete />,
                 multiple: true,
-                onClick: async (ids: string[]) => {
-                    loadingScreen.show(true, i18n.t("Deleting connections"));
-                    await compositionRoot.connection.delete(ids);
-                    setSelection([]);
-                    loadingScreen.reset();
-                    reload();
-                },
+                onClick: deleteConnections,
+            },
+            {
+                name: "testConnection",
+                text: i18n.t("Test connection"),
+                multiple: false,
+                icon: <SettingsInputAntenna />,
+                onClick: testConnection,
             },
             {
                 name: "sharingSettings",
@@ -159,33 +218,20 @@ export const ListConnectionsPage: React.FC = () => {
                 isActive: verifyUserCanEdit,
                 multiple: false,
                 icon: <Share />,
-                onClick: ids => {
-                    const connection = rows.find(({ id }) => id === ids[0]);
-                    if (!connection) return;
-                    if(connection) {
-                        setCreateDialogProps({
-                            initialConnection: connection,
-                            onClose: () => setCreateDialogProps(undefined),
-                            onSave: async (connection: ConnectionData) => {
-                                const connectionWithLastUpdatedInfo = {...connection, lastUpdated: new Date(), lastUpdatedBy: { id: currentUser.id, name: currentUser.name} };
-                                await compositionRoot.connection.save(connectionWithLastUpdatedInfo);
-                                reload();
-                            },
-                        });
-                    }
-
-                },
+                onClick: setSharingSettings,
             },
         ],
-        [loadingScreen, compositionRoot.connection, reload, rows]
+        [deleteConnections, editConnection, replicateConnection, setSharingSettings, testConnection, verifyUserCanEdit]
     );
     useEffect(() => {
         setLoading(true);
-        compositionRoot.connection.listAll({ search }).then(connections => {
-            setRows(connections);
-            setLoading(false);
-        });
+        compositionRoot.connection.listAll({ search }).run(
+            rows => setRows(rows),
+            error => snackbar.error(error)
+        );
+        setLoading(false);
     }, [compositionRoot, snackbar, search, reloadKey]);
+
     const createConnection = () => {
         history.push("/connections/new");
     };
@@ -211,4 +257,26 @@ export const ListConnectionsPage: React.FC = () => {
             />
         </React.Fragment>
     );
+};
+
+const hasPermissions = (connection: ConnectionData, permission: "read" | "write", currentUser: User) => {
+    if (isSuperAdmin(currentUser)) return true;
+
+    const { publicAccess = "--------", userAccesses = [], userGroupAccesses = [], owner } = connection;
+    const token = permission === "read" ? "r" : "w";
+
+    const isUserOwner = owner?.id === currentUser.id;
+    const isPublic = publicAccess.substring(0, 2).includes(token);
+
+    const hasUserAccess = !!_(userAccesses)
+        .filter(({ access }) => access.substring(0, 2).includes(token))
+        .find(({ id }) => id === currentUser.id);
+
+    const hasGroupAccess =
+        _(userGroupAccesses)
+            .filter(({ access }) => access.substring(0, 2).includes(token))
+            .intersectionBy(currentUser.userGroups, "id")
+            .value().length > 0;
+
+    return isUserOwner || isPublic || hasUserAccess || hasGroupAccess;
 };

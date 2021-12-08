@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { SyncAction } from "../../domain/entities/SyncAction";
+import { SyncAction } from "../../domain/entities/actions/SyncAction";
 import { InstanceRepository } from "../../domain/repositories/InstanceRepository";
 import { SyncActionRepository } from "../../domain/repositories/SyncActionRepository";
 import { XMartRepository } from "../../domain/repositories/XMartRepository";

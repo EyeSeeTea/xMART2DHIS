@@ -1,15 +1,11 @@
 import { ConfirmationDialog, ShareUpdate, Sharing, SharingRule } from "@eyeseetea/d2-ui-components";
 import { useCallback, useState } from "react";
-import { NamedRef } from "../../../domain/entities/Ref";
+import { NamedRef } from "../../../domain/entities/metadata/Ref";
 import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
-import { ConnectionData } from "../../../domain/entities/XMart";
+import { ConnectionData } from "../../../domain/entities/xmart/XMart";
 
-export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({
-    initialConnection,
-    onClose,
-    onSave,
-}) => {
+export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ initialConnection, onClose, onSave }) => {
     const { compositionRoot, currentUser } = useAppContext();
     const defaultConnectionData: ConnectionData = {
         id: "",
@@ -23,9 +19,9 @@ export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({
         lastUpdatedBy: { id: currentUser.id, name: currentUser.name },
         publicAccess: "--------",
         userAccesses: [],
-        userGroupAccesses: []
+        userGroupAccesses: [],
     };
-    
+
     const [connection, updateConnection] = useState<ConnectionData>(initialConnection ?? defaultConnectionData);
     const save = useCallback(async () => {
         await onSave(connection);

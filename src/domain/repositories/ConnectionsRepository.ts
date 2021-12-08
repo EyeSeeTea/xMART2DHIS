@@ -1,11 +1,11 @@
-import { ConnectionData } from "../entities/XMart";
+import { ConnectionData } from "../entities/xmart/XMart";
+import { FutureData } from "../entities/Future";
 
 export interface ConnectionsRepository {
-    listAll({ search }: ConnectionsFilter): Promise<ConnectionData[]>;
-    save(connection: ConnectionData): Promise<void>;
-    delete(connectionIds: string[]): Promise<void>;
-    getById(id: string): Promise<ConnectionData | undefined>;
-
+    listAll({ search }: ConnectionsFilter): FutureData<ConnectionData[]>;
+    save(connection: ConnectionData): FutureData<void>;
+    delete(connectionIds: string[]): FutureData<void>;
+    getById(id: string): FutureData<ConnectionData>;
 }
 
 export interface ConnectionsFilter {

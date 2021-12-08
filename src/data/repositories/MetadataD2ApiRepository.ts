@@ -1,15 +1,17 @@
 import _ from "lodash";
-import { FutureData } from "../../domain/entities/Future";
-import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
-import { Instance } from "../../domain/entities/Instance";
-import { MetadataPayload } from "../../domain/entities/Metadata";
+import { Future, FutureData } from "../../domain/entities/Future";
+import { ImportResult, ImportStats } from "../../domain/entities/data/ImportResult";
+import { Instance } from "../../domain/entities/instance/Instance";
+import { MetadataPackage, MetadataPayload } from "../../domain/entities/metadata/Metadata";
+import { OrganisationUnit } from "../../domain/entities/metadata/OrganisationUnit";
 import {
     ListMetadataResponse,
     ListMetadataOptions,
     MetadataRepository,
 } from "../../domain/repositories/MetadataRepository";
 import i18n from "../../locales";
-import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
+import { D2Api, D2ApiDefinition, D2Model, MetadataResponse, Stats } from "../../types/d2-api";
+import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
 
@@ -21,7 +23,17 @@ export class MetadataD2ApiRepository implements MetadataRepository {
     }
 
     public list(options: ListMetadataOptions): FutureData<ListMetadataResponse> {
-        const { model, page, pageSize, search, sorting = { field: "id", order: "asc" } } = options;
+        const {
+            model,
+            page,
+            pageSize,
+            search,
+            sorting = { field: "id", order: "asc" },
+            selectedIds,
+            fields = { $owner: true },
+        } = options;
+
+        const idsFilter = selectedIds && selectedIds?.length > 0 ? { id: { in: selectedIds } } : {};
 
         return apiToFuture(
             //@ts-ignore: d2-api incorrectly guessing model with string access
@@ -29,8 +41,8 @@ export class MetadataD2ApiRepository implements MetadataRepository {
                 page,
                 pageSize,
                 paging: true,
-                filter: { identifiable: search ? { token: search } : undefined },
-                fields: { $owner: true },
+                filter: { identifiable: search ? { token: search } : undefined, ...idsFilter },
+                fields,
                 order: `${sorting.field}:${sorting.order}`,
             })
         );
@@ -69,6 +81,58 @@ export class MetadataD2ApiRepository implements MetadataRepository {
     private isValidModel(model: string): model is keyof D2ApiDefinition["schemas"] {
         return _.keys(this.api.models).includes(model);
     }
+
+    @cache()
+    public getOrgUnitRoots(): FutureData<OrganisationUnit[]> {
+        return apiToFuture(
+            this.api.models.organisationUnits.get({
+                paging: false,
+                filter: { level: { eq: "1" } },
+                fields: { id: true, name: true, displayName: true, path: true },
+            })
+        ).map(response => response.objects);
+    }
+
+    public getMetadataByIds(
+        ids: string[],
+        fields?: object | string,
+        includeDefaults = false
+    ): FutureData<MetadataPackage> {
+        const requestFields = typeof fields === "object" ? getFieldsAsString(fields) : fields;
+        return Future.fromPromise(this.getMetadata<D2Model>(ids, requestFields, includeDefaults));
+    }
+
+    private async getMetadata<T>(
+        elements: string[],
+        fields = ":all",
+        includeDefaults: boolean
+    ): Promise<Record<string, T[]>> {
+        const promises = [];
+        const chunkSize = 50;
+
+        for (let i = 0; i < elements.length; i += chunkSize) {
+            const requestElements = elements.slice(i, i + chunkSize).toString();
+            promises.push(
+                this.api
+                    .get("/metadata", {
+                        fields,
+                        filter: "id:in:[" + requestElements + "]",
+                        defaults: includeDefaults ? undefined : "EXCLUDE",
+                    })
+                    .getData()
+            );
+        }
+        const response = await Promise.all(promises);
+        const results = deepMerge({}, ...response);
+        if (results.system) delete results.system;
+
+        return results;
+    }
+}
+
+function deepMerge(obj: any, ...src: any): any {
+    const mergeCustomizer = (obj: any, src: any): any => (_.isArray(obj) ? obj.concat(src) : src);
+    return _.mergeWith(obj, ...src, mergeCustomizer);
 }
 
 export function mergePayloads(payloads: MetadataPayload[]): MetadataPayload {
@@ -122,4 +186,37 @@ function formatStats(stats: Stats, type?: string): ImportStats {
 
 function getClassName(className: string): string | undefined {
     return _(className).split(".").last();
+}
+
+function applyFieldTransformers(key: string, value: any) {
+    // eslint-disable-next-line
+    if (value.hasOwnProperty("$fn")) {
+        switch (value["$fn"]["name"]) {
+            case "rename":
+                return {
+                    key: `${key}~rename(${value["$fn"]["to"]})`,
+                    value: _.omit(value, ["$fn"]),
+                };
+            default:
+                return { key, value };
+        }
+    } else {
+        return { key, value };
+    }
+}
+
+function getFieldsAsString(modelFields: object): string {
+    return _(modelFields)
+        .map((value0, key0: string) => {
+            const { key, value } = applyFieldTransformers(key0, value0);
+
+            if (typeof value === "boolean" || _.isEqual(value, {})) {
+                return value ? key.replace(/^\$/, ":") : null;
+            } else {
+                return key + "[" + getFieldsAsString(value) + "]";
+            }
+        })
+        .compact()
+        .sortBy()
+        .join(",");
 }

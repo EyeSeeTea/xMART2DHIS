@@ -1,4 +1,4 @@
-import { ConfidentialClientApplication, LogLevel } from "@azure/msal-node";
+import { ConfidentialClientApplication } from "@azure/msal-node";
 import "dotenv-flow/config";
 import "isomorphic-fetch";
 

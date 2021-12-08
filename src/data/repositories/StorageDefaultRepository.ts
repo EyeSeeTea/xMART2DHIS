@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { Ref } from "../../domain/entities/Ref";
+import { Ref } from "../../domain/entities/metadata/Ref";
 import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { Namespace, NamespaceProperties } from "../utils/Namespaces";
-import { SharingSetting } from "../../domain/entities/SharingSetting";
+import { SharingSetting } from "../../domain/entities/metadata/SharingSetting";
 
 export interface ObjectSharing {
     publicAccess: string;
@@ -21,8 +21,6 @@ export abstract class StorageDefaultRepository implements StorageRepository {
     public abstract getOrCreateObject<T extends object>(key: string, defaultValue: T): Promise<T>;
     public abstract saveObject<T extends object>(key: string, value: T): Promise<void>;
     public abstract removeObject(key: string): Promise<void>;
-    public abstract getObjectSharing(key: string): Promise<ObjectSharing | undefined>;
-    public abstract saveObjectSharing(key: string, object: ObjectSharing): Promise<void>;
 
     public async listObjectsInCollection<T extends Ref>(key: string): Promise<T[]> {
         return (await this.getObject<T[]>(key)) ?? [];

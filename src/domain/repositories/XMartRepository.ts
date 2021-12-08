@@ -1,5 +1,5 @@
 import { FutureData } from "../entities/Future";
-import { DataMart, MartTable, XMartContent, XMartResponse } from "../entities/XMart";
+import { DataMart, MartTable, XMartContent, XMartResponse } from "../entities/xmart/XMart";
 
 export interface XMartRepository {
     listMarts(): FutureData<DataMart[]>;
@@ -7,7 +7,11 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
-    runPipeline(mart: DataMart, pipeline: string, params: Record<string, string | number | boolean>): FutureData<void>;
+    runPipeline(
+        mart: DataMart,
+        pipeline: string,
+        params: Record<string, string | number | boolean>
+    ): FutureData<number>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

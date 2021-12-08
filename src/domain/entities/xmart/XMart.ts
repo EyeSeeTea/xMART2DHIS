@@ -1,4 +1,4 @@
-import { SharedRef } from "./Ref";
+import { SharedRef } from "../metadata/Ref";
 
 export type DataMartEndpoint = "PUBLIC" | "PROD" | "UAT";
 
@@ -13,7 +13,7 @@ export interface DataMart {
 }
 
 export interface ConnectionData extends SharedRef {
-    /*id: string; // Auto-generated ID
+    id: string; // Auto-generated ID
     name: string; // User defined name*/
     code: string; // xMART code
     type: DataMartEndpoint;

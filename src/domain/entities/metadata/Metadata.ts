@@ -1,3 +1,7 @@
+import { DataSet } from "./DataSet";
+import { OrganisationUnit } from "./OrganisationUnit";
+import { Program } from "./Program";
+import { ProgramEvent } from "../data/ProgramEvent";
 import { Ref } from "./Ref";
 
 export type MetadataModel = "categoryOptionCombos" | "categoryOptions" | "optionSets" | "organisationUnits";
@@ -29,3 +33,13 @@ export function isValidModel(model: string): model is MetadataModel {
 export function isValidMetadataItem(item: any): item is MetadataItem {
     return item.id;
 }
+
+export type MetadataEntity = OrganisationUnit | Program | DataSet;
+
+export type MetadataEntities = {
+    organisationUnits: OrganisationUnit[];
+    programs: Program[];
+    dataSets: DataSet[];
+};
+
+export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEntity[]>>;

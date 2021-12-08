@@ -1,11 +1,12 @@
 import { UseCase } from "../../../compositionRoot";
-import { DataMart, ConnectionData } from "../../entities/XMart";
+import { ConnectionData } from "../../entities/xmart/XMart";
 import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
+import { FutureData } from "../../entities/Future";
 
 export class SaveConnectionUseCase implements UseCase {
     constructor(private connectionsRepository: ConnectionsRepository) {}
 
-    public execute(connection: ConnectionData): Promise<void> {
+    public execute(connection: ConnectionData): FutureData<void> {
         return this.connectionsRepository.save(connection);
     }
 }

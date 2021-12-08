@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-03T15:41:28.492Z\n"
-"PO-Revision-Date: 2021-12-03T15:41:28.492Z\n"
+"POT-Creation-Date: 2021-12-07T06:51:18.325Z\n"
+"PO-Revision-Date: 2021-12-07T06:51:18.325Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -21,6 +21,117 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Field {{field}} cannot be blank"
+msgstr ""
+
+msgid "You need to select at least one {{field}}"
+msgstr ""
+
+msgid "Field {{field}} needs to be a valid url"
+msgstr ""
+
+msgid "Field {{field}} is not valid"
+msgstr ""
+
+msgid "All time"
+msgstr ""
+
+msgid "Fixed period"
+msgstr ""
+
+msgid "Since last execution"
+msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "Last 7 days"
+msgstr ""
+
+msgid "Last 14 days"
+msgstr ""
+
+msgid "Last 30 days"
+msgstr ""
+
+msgid "Last 90 days"
+msgstr ""
+
+msgid "This week"
+msgstr ""
+
+msgid "Last week"
+msgstr ""
+
+msgid "This month"
+msgstr ""
+
+msgid "Last month"
+msgstr ""
+
+msgid "This quarter"
+msgstr ""
+
+msgid "Last quarter"
+msgstr ""
+
+msgid "This year"
+msgstr ""
+
+msgid "Last year"
+msgstr ""
+
+msgid "Last 5 years"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Short name"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Last updated"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "API link"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Program Rule"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Option set"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Url"
 msgstr ""
 
 msgid "Sign in with Microsoft"
@@ -39,9 +150,6 @@ msgid "<No value>"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Created"
 msgstr ""
 
 msgid "Updated"
@@ -83,13 +191,72 @@ msgstr ""
 msgid "JSON Response"
 msgstr ""
 
+msgid "Metadata type"
+msgstr ""
+
+msgid "Only selected items"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Search by "
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
 msgid "Help"
 msgstr ""
 
-msgid "New action"
+msgid "Period"
+msgstr ""
+
+msgid "Start date"
+msgstr ""
+
+msgid "End date"
+msgstr ""
+
+msgid "General info"
+msgstr ""
+
+msgid "Organisation units"
+msgstr ""
+
+msgid "Name (*)"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Selected {{difference}} elements"
+msgstr ""
+
+msgid "Removed {{difference}} elements"
+msgstr ""
+
+msgid "You do not have assigned any organisation unit"
+msgstr ""
+
+msgid "Cancel action wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Action Creation Wizard. All your changes will be "
+"lost. Are you sure you want to proceed?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Save"
 msgstr ""
 
 msgid "Actions"
@@ -110,6 +277,44 @@ msgstr ""
 msgid "xMART2DHIS"
 msgstr ""
 
+msgid "An error has ocurred loading the action"
+msgstr ""
+
+msgid "Deleting Actions"
+msgstr ""
+
+msgid "Successfully deleted {{total}} actions"
+msgstr ""
+
+msgid "An error has ocurred deleting actionn"
+msgstr ""
+
+msgid "Executing the action"
+msgstr ""
+
+msgid ""
+"Successfully executed the action.\n"
+"{{result}}"
+msgstr ""
+
+msgid "An error has ocurred executing the action. {{error}}"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Execute"
+msgstr ""
+
+msgid "Delete Actions?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
 msgid "Actions are a way to trigger events in your application"
 msgstr ""
 
@@ -120,9 +325,16 @@ msgid "List connections of the MART"
 msgstr ""
 
 msgid "Name"
+msgid "Examples"
 msgstr ""
 
-msgid "Description"
+msgid "Load pipelines"
+msgstr ""
+
+msgid "Load data"
+msgstr ""
+
+msgid "Load model"
 msgstr ""
 
 msgid "Run"
@@ -171,4 +383,14 @@ msgid "Test connection"
 msgstr ""
 
 msgid "API URL"
+msgctxt "MODEL pipelines"
+msgid "Initial load of LOAD_DATA and LOAD"
+msgstr ""
+
+msgctxt "DATA example"
+msgid "LOAD"
+msgstr ""
+
+msgctxt "MODEL example"
+msgid "LOAD"
 msgstr ""

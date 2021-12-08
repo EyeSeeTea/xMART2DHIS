@@ -8,7 +8,7 @@ import {
 } from "@dhis2/ui";
 import React from "react";
 import { FormField } from "../../components/form/FormField";
-import { DataMartEndpoint } from "../../../domain/entities/XMart";
+import { DataMartEndpoint } from "../../../domain/entities/xmart/XMart";
 
 import { getConnectionFieldName, ConnectionFormField, connectionRequiredFields } from "./utils";
 

@@ -1,5 +1,5 @@
+import { NamedRef } from "./Ref";
 import _ from "lodash";
-import { NamedRef } from "../../domain/entities/Ref";
 
 export interface User {
     id: string;
