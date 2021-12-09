@@ -1,17 +1,13 @@
 import _ from "lodash";
-import {
-    SynchronizationResult,
-    SynchronizationStats,
-    SynchronizationStatus,
-} from "../../../domain/entities/SynchronizationResult";
+import { SyncResult, SyncStats, SyncStatus } from "../../../domain/entities/SyncResult";
 
-type Status = "OK" | "ERROR";
+type Status = "OK" | "ERROR" | "SUCCESS";
 
 export interface ImportPostResponse {
     status: Status;
     message?: string;
     response?: {
-        status: SynchronizationStatus;
+        status: SyncStatus;
         imported: number;
         updated: number;
         deleted: number;
@@ -20,15 +16,14 @@ export interface ImportPostResponse {
         importSummaries?: Array<{
             responseType: "ImportSummary";
             description?: string;
-            status: SynchronizationStatus;
-            href: string;
+            status: SyncStatus;
             importCount: {
                 imported: number;
                 updated: number;
                 deleted: number;
                 ignored: number;
             };
-            reference: string;
+            reference?: string;
             conflicts?: {
                 object: string;
                 value: string;
@@ -44,7 +39,7 @@ function processImportResponse(options: {
     model: string;
     importResult: ImportPostResponse;
     splitStatsList: boolean;
-}): SynchronizationResult {
+}): SyncResult {
     const { title, model, importResult, splitStatsList } = options;
     const { message, response } = importResult;
     const status = response ? response.status : "ERROR";
@@ -64,7 +59,7 @@ function processImportResponse(options: {
     const errors =
         _.flatMap(
             importSummaries,
-            ({ reference, description, conflicts }) =>
+            ({ reference = "-", description, conflicts }) =>
                 conflicts?.map(({ object, value }) => ({
                     id: reference,
                     message: _([description, object, value]).compact().join(" "),
@@ -72,9 +67,9 @@ function processImportResponse(options: {
         ) ?? [];
 
     const fields = ["imported", "updated", "ignored", "deleted", "total"] as const;
-    const totalStats: SynchronizationStats = { type: "TOTAL", ..._.pick(response, fields) };
+    const totalStats: SyncStats = { type: "TOTAL", ..._.pick(response, fields) };
 
-    const eventStatsList = (response.importSummaries || []).map((importSummary): SynchronizationStats => {
+    const eventStatsList = (response.importSummaries || []).map((importSummary): SyncStats => {
         return {
             type: `${model} ${importSummary.reference || "-"}`,
             ...importSummary.importCount,
@@ -91,7 +86,7 @@ function processImportResponse(options: {
 export function postImport(
     response: ImportPostResponse,
     options: { title: string; model: string; splitStatsList: boolean }
-): SynchronizationResult {
+): SyncResult {
     const { title, model, splitStatsList } = options;
     try {
         return processImportResponse({
@@ -100,7 +95,7 @@ export function postImport(
             importResult: response,
             splitStatsList,
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error?.response?.data) {
             return processImportResponse({
                 title,

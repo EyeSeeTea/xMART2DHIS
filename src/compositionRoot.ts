@@ -1,8 +1,8 @@
 import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
+import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
-import { Action1UseCase } from "./domain/usecases/actions/Action1UseCase";
-import { Action2UseCase } from "./domain/usecases/actions/Action2UseCase";
+import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
@@ -12,6 +12,7 @@ import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUse
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const martRepository = new XMartDefaultRepository();
+    const metadataRepository = new MetadataD2ApiRepository(instance);
 
     return {
         xmart: getExecute({
@@ -24,8 +25,7 @@ export function getCompositionRoot(instance: Instance) {
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            action1: new Action1UseCase(martRepository, instanceRepository),
-            action2: new Action2UseCase(martRepository, instanceRepository),
+            get: new GetActionsUseCase(martRepository, instanceRepository, metadataRepository),
         }),
     };
 }
@@ -49,3 +49,9 @@ function getExecute<UseCases extends Record<Key, UseCase>, Key extends keyof Use
 export interface UseCase {
     execute: Function;
 }
+
+export const XMartEndpoints = {
+    ENTO: "https://frontdoor-r5quteqglawbs.azurefd.net/VECTORS_IR",
+};
+
+export type XMartEndpoint = keyof typeof XMartEndpoints;

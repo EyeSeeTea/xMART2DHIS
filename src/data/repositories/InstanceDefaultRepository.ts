@@ -1,15 +1,21 @@
-import { FutureData } from "../../domain/entities/Future";
+import { DataValue } from "../../domain/entities/DataValue";
+import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/Instance";
 import { ProgramEvent } from "../../domain/entities/ProgramEvent";
-import { SynchronizationResult } from "../../domain/entities/SynchronizationResult";
+import { SyncResult } from "../../domain/entities/SyncResult";
 import { User } from "../../domain/entities/User";
-import { InstanceRepository } from "../../domain/repositories/InstanceRepository";
+import {
+    GetEventsFilters,
+    InstanceRepository,
+    PostDataValuesParams,
+    PostEventsParams,
+} from "../../domain/repositories/InstanceRepository";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
-import { ImportPostResponse, postImport } from "../clients/dhis-import/Dhis2Import";
+import { postImport } from "../clients/dhis-import/Dhis2Import";
 
 export class InstanceDefaultRepository implements InstanceRepository {
     private api: D2Api;
@@ -49,13 +55,47 @@ export class InstanceDefaultRepository implements InstanceRepository {
         return apiToFuture(this.api.system.info).map(({ version }) => version);
     }
 
-    public postEvents(events: ProgramEvent[]): FutureData<SynchronizationResult> {
-        return apiToFuture(this.api.post<ImportPostResponse>("/events", {}, { events })).map(response =>
-            postImport(response, {
-                title: i18n.t("Data values - Create/update"),
-                model: i18n.t("Event"),
-                splitStatsList: true,
+    public postEvents(events: ProgramEvent[], params: PostEventsParams = {}): FutureData<SyncResult> {
+        return apiToFuture(this.api.events.postAsync(params, { events })).flatMap(({ response }) =>
+            apiToFuture(this.api.system.waitFor(response.jobType, response.id)).flatMap(response => {
+                if (!response) return Future.error("Unknown error saving events");
+
+                return Future.success(
+                    postImport(
+                        { status: response.status, response },
+                        {
+                            title: i18n.t("Events - Create/update"),
+                            model: i18n.t("Event"),
+                            splitStatsList: true,
+                        }
+                    )
+                );
             })
         );
+    }
+
+    public postDataValueSet(dataValues: DataValue[], params: PostDataValuesParams): FutureData<SyncResult> {
+        return apiToFuture(this.api.dataValues.postSetAsync(params, { dataValues })).flatMap(({ response }) =>
+            apiToFuture(this.api.system.waitFor(response.jobType, response.id)).flatMap(importSummary => {
+                if (!importSummary) return Future.error("Unknown error saving data values");
+
+                const { status, description, conflicts, importCount } = importSummary;
+                const { imported, deleted, updated, ignored } = importCount;
+                const errors = conflicts?.map(({ object, value }) => ({ id: object, message: value })) ?? [];
+
+                return Future.success({
+                    title: i18n.t("Data values - Create/update"),
+                    status,
+                    message: description,
+                    stats: [{ imported, deleted, updated, ignored }],
+                    errors,
+                    rawResponse: importSummary,
+                });
+            })
+        );
+    }
+
+    public getEvents(_filters: GetEventsFilters): FutureData<ProgramEvent[]> {
+        throw new Error("Method not implemented.");
     }
 }

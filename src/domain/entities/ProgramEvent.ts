@@ -11,8 +11,10 @@ export interface ProgramEvent {
     attributeOptionCombo?: string;
     trackedEntityInstance?: string;
     programStage?: string;
-    dataValues: Array<{
-        dataElement: string;
-        value: string | number | boolean;
-    }>;
+    dataValues: ProgramEventDataValue[];
+}
+
+export interface ProgramEventDataValue {
+    dataElement: string;
+    value: string | number | boolean;
 }

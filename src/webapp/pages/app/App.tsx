@@ -1,6 +1,6 @@
 import { useConfig } from "@dhis2/app-runtime";
 import { HeaderBar } from "@dhis2/ui";
-import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
+import { LoadingProvider, SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import _ from "lodash";
 //@ts-ignore
@@ -47,15 +47,17 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
-                    <HeaderBar appName="Data Management" />
+                    <LoadingProvider>
+                        <HeaderBar appName="Data Management" />
 
-                    <div id="app" className="content">
-                        <AppContext.Provider value={appContext}>
-                            <Router />
-                        </AppContext.Provider>
-                    </div>
+                        <div id="app" className="content">
+                            <AppContext.Provider value={appContext}>
+                                <Router />
+                            </AppContext.Provider>
+                        </div>
 
-                    <Share visible={showShareButton} />
+                        <Share visible={showShareButton} />
+                    </LoadingProvider>
                 </SnackbarProvider>
             </OldMuiThemeProvider>
         </MuiThemeProvider>
