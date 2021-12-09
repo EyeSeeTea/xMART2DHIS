@@ -41,7 +41,7 @@ export const ActionDetailPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate(-1)}  />
+            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate(-1)} />
         </React.Fragment>
     );
 };

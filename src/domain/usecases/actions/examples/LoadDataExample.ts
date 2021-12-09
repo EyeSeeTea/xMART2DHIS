@@ -53,7 +53,8 @@ export class LoadDataExample implements UseCase {
                     }),
                     id: Future.success(id),
                 });
-            }).flatMap(({ batch, id }) => {
+            })
+            .flatMap(({ batch, id }) => {
                 // TODO: Clean-up document
                 return Future.success(batch);
             });

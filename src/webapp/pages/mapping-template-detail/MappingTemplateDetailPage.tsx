@@ -1,6 +1,6 @@
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import i18n from "../../../locales";
 import MappingTemplateWizard from "../../components/mapping-template-wizard/MappingTemplateWizard";
@@ -15,7 +15,7 @@ export const MappingTemplateDetailPage: React.FC = () => {
     //TODO: implement confirmation dialog to back or cancel in the RouterPage
     //because it's where the back button exists or to create a hook to access to back from here
     const loading = useLoading();
-    const history = useHistory();
+    const navigate = useNavigate();
     const snackbar = useSnackbar();
     const { id, action } = useParams() as SyncActionDetailParams;
     const { compositionRoot } = useAppContext();
@@ -44,7 +44,7 @@ export const MappingTemplateDetailPage: React.FC = () => {
             <MappingTemplateWizard
                 mappingTemplate={mappingTemplate}
                 onChange={setMappingTemplate}
-                onCancel={() => history.goBack()}
+                onCancel={() => navigate(-1)}
             />
         </React.Fragment>
     );

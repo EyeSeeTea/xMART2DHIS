@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-09T06:43:12.012Z\n"
+"POT-Creation-Date: 2021-12-09T15:41:45.248Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,6 +23,9 @@ msgstr ""
 msgid "Metadata"
 msgstr ""
 
+msgid "Unable to call xMART API for public data marts"
+msgstr ""
+
 msgid "Field {{field}} cannot be blank"
 msgstr ""
 
@@ -33,6 +36,9 @@ msgid "Field {{field}} needs to be a valid url"
 msgstr ""
 
 msgid "Field {{field}} is not valid"
+msgstr ""
+
+msgid "Only can exists a mapping model by dhis2 model"
 msgstr ""
 
 msgid "All time"
@@ -157,6 +163,89 @@ msgstr ""
 msgid "Url"
 msgstr ""
 
+msgid "General info"
+msgstr ""
+
+msgid "Organisation units"
+msgstr ""
+
+msgid "Period"
+msgstr ""
+
+msgid "Mapping"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Name (*)"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Dhis2 Model"
+msgstr ""
+
+msgid "xMART Table"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete Actions?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} model mappings?"
+msgstr ""
+
+msgid "Ok"
+msgstr ""
+
+msgid "Model Mapping"
+msgstr ""
+
+msgid "Import Template"
+msgstr ""
+
+msgid "Selected {{difference}} elements"
+msgstr ""
+
+msgid "Removed {{difference}} elements"
+msgstr ""
+
+msgid "You do not have assigned any organisation unit"
+msgstr ""
+
+msgid "Cancel action wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Action Creation Wizard. All your changes will be "
+"lost. Are you sure you want to proceed?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Start date"
+msgstr ""
+
+msgid "End date"
+msgstr ""
+
+msgid "Model mappings"
+msgstr ""
+
 msgid "Sign in with Microsoft"
 msgstr ""
 
@@ -196,16 +285,10 @@ msgstr ""
 msgid "Import Results"
 msgstr ""
 
-msgid "Ok"
-msgstr ""
-
 msgid "Import"
 msgstr ""
 
 msgid "Status"
-msgstr ""
-
-msgid "Summary"
 msgstr ""
 
 msgid "Messages"
@@ -214,13 +297,24 @@ msgstr ""
 msgid "JSON Response"
 msgstr ""
 
+msgid "Select mapping template"
+msgstr ""
+
+msgid "Mapping template"
+msgstr ""
+
+msgid "Cancel mapping template wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Mapping template Creation Wizard. All your changes "
+"will be lost. Are you sure you want to proceed?"
+msgstr ""
+
 msgid "Metadata type"
 msgstr ""
 
 msgid "Only selected items"
-msgstr ""
-
-msgid "Details"
 msgstr ""
 
 msgid "Select"
@@ -247,18 +341,6 @@ msgstr ""
 msgid "Enrollments"
 msgstr ""
 
-msgid "Model Mapping"
-msgstr ""
-
-msgid "Save"
-msgstr ""
-
-msgid "Dhis2 Model"
-msgstr ""
-
-msgid "xMART Table"
-msgstr ""
-
 msgid "Existed Table"
 msgstr ""
 
@@ -271,65 +353,6 @@ msgstr "Volver"
 msgid "Help"
 msgstr "Ayuda"
 
-msgid "Period"
-msgstr ""
-
-msgid "Start date"
-msgstr ""
-
-msgid "End date"
-msgstr ""
-
-msgid "General info"
-msgstr ""
-
-msgid "Organisation units"
-msgstr ""
-
-msgid "Mapping"
-msgstr ""
-
-msgid "Name (*)"
-msgstr ""
-
-msgid "Connection"
-msgstr ""
-
-msgid "Delete"
-msgstr ""
-
-msgid "Delete Actions?"
-msgstr ""
-
-msgid "Are you sure you want to delete {{total}} model mappings?"
-msgstr ""
-
-msgid "Selected {{difference}} elements"
-msgstr ""
-
-msgid "Removed {{difference}} elements"
-msgstr ""
-
-msgid "You do not have assigned any organisation unit"
-msgstr ""
-
-msgid "Cancel action wizard"
-msgstr ""
-
-msgid ""
-"You are about to exit the Action Creation Wizard. All your changes will be "
-"lost. Are you sure you want to proceed?"
-msgstr ""
-
-msgid "Yes"
-msgstr ""
-
-msgid "Cancel"
-msgstr ""
-
-msgid "Model mappings"
-msgstr ""
-
 msgid "Actions"
 msgstr ""
 
@@ -339,10 +362,19 @@ msgstr ""
 msgid "Connections"
 msgstr ""
 
+msgid "Mapping Template"
+msgstr ""
+
+msgid "Mapping Templates"
+msgstr ""
+
 msgid "Browse xMART"
 msgstr ""
 
 msgid "xMART2DHIS"
+msgstr ""
+
+msgid "Loading action"
 msgstr ""
 
 msgid "An error has ocurred loading the action"
@@ -381,6 +413,9 @@ msgid "List connections of the MART"
 msgstr ""
 
 msgid "Actions are a way to trigger events in your application"
+msgstr ""
+
+msgid "Define templates of mapping models to import in the actions"
 msgstr ""
 
 msgid "List table contents of the MART"
@@ -432,6 +467,33 @@ msgid "Running actions..."
 msgstr ""
 
 msgid "xMART API"
+msgstr ""
+
+msgid "Loading mapping template"
+msgstr ""
+
+msgid "An error has ocurred loading the mapping template"
+msgstr ""
+
+msgid "Deleting mapping templates"
+msgstr ""
+
+msgid "Successfully deleted {{total}} mapping templates"
+msgstr ""
+
+msgid "An error has ocurred deleting mapping templates"
+msgstr ""
+
+msgid "Delete mapping templates?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} mapping templates?"
+msgstr ""
+
+msgid "Production"
+msgstr ""
+
+msgid "UAT"
 msgstr ""
 
 msgid "Saving connection"

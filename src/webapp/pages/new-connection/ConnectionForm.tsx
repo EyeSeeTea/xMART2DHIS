@@ -4,7 +4,7 @@ import {
     createMinCharacterLength,
     hasValue,
     InputFieldFF,
-    SingleSelectFieldFF
+    SingleSelectFieldFF,
 } from "@dhis2/ui";
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import React from "react";

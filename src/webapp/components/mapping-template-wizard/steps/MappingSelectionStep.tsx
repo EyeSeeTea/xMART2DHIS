@@ -6,7 +6,7 @@ import {
     TableAction,
     TableColumn,
     TableSelection,
-    TableState
+    TableState,
 } from "@eyeseetea/d2-ui-components";
 import { Button, Icon } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
