@@ -8,6 +8,8 @@ import { LandingPage } from "./landing/LandingPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
 import { ActionsListPage } from "./actions-list/ActionsListPage";
 import { ActionDetailPage } from "./action-detail/ActionDetailPage";
+import { MappingTemplateListPage } from "./mapping-termplate-list/MappingTemplateListPage";
+import { MappingTemplateDetailPage } from "./mapping-template-detail/MappingTemplateDetailPage";
 
 export interface DetailPageParams {
     id: string;
@@ -32,6 +34,24 @@ export const Router = () => {
                     render={() => (
                         <RouterPage title={i18n.t("Actions")}>
                             <ActionsListPage />
+                        </RouterPage>
+                    )}
+                />
+
+                <Route
+                    path="/mapping-templates/:action(new|edit)/:id?"
+                    render={() => (
+                        <RouterPage title={i18n.t("Mapping Template")}>
+                            <MappingTemplateDetailPage />
+                        </RouterPage>
+                    )}
+                />
+
+                <Route
+                    path="/mapping-templates"
+                    render={() => (
+                        <RouterPage title={i18n.t("Mapping Templates")}>
+                            <MappingTemplateListPage />
                         </RouterPage>
                     )}
                 />

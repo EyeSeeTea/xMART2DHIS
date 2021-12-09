@@ -29,6 +29,12 @@ export const LandingPage: React.FC = () => {
                         addAction: () => history.push("/actions/new"),
                     },
                     {
+                        name: i18n.t("Mapping Templates"),
+                        description: i18n.t("Define templates of mapping models to import in the actions"),
+                        listAction: () => history.push("/mapping-templates"),
+                        addAction: () => history.push("/mapping-templates/new"),
+                    },
+                    {
                         name: i18n.t("Browse xMART"),
                         description: i18n.t("List table contents of the MART"),
                         listAction: () => history.push("/list"),

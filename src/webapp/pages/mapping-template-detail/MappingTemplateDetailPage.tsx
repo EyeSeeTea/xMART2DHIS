@@ -1,9 +1,9 @@
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { SyncAction } from "../../../domain/entities/actions/SyncAction";
+import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import i18n from "../../../locales";
-import ActionWizard from "../../components/action-wizard/ActionWizard";
+import MappingTemplateWizard from "../../components/mapping-template-wizard/MappingTemplateWizard";
 import { useAppContext } from "../../contexts/app-context";
 
 export interface SyncActionDetailParams {
@@ -11,7 +11,7 @@ export interface SyncActionDetailParams {
     action: "edit" | "new";
 }
 
-export const ActionDetailPage: React.FC = () => {
+export const MappingTemplateDetailPage: React.FC = () => {
     //TODO: implement confirmation dialog to back or cancel in the RouterPage
     //because it's where the back button exists or to create a hook to access to back from here
     const loading = useLoading();
@@ -20,20 +20,20 @@ export const ActionDetailPage: React.FC = () => {
     const { id, action } = useParams() as SyncActionDetailParams;
     const { compositionRoot } = useAppContext();
 
-    const [syncAction, updateSyncAction] = useState(SyncAction.build());
+    const [mappingTemplate, setMappingTemplate] = useState(MappingTemplate.build());
 
     useEffect(() => {
         if (action === "edit" && !!id) {
-            loading.show(true, i18n.t("Loading action"));
+            loading.show(true, i18n.t("Loading mapping template"));
 
-            compositionRoot.actions.get(id).run(
-                action => {
-                    updateSyncAction(action ?? SyncAction.build());
+            compositionRoot.mappingTemplates.get(id).run(
+                mappingTemplate => {
+                    setMappingTemplate(mappingTemplate ?? MappingTemplate.build());
                     loading.reset();
                 },
                 () => {
                     loading.reset();
-                    snackbar.error(i18n.t("An error has ocurred loading the action"));
+                    snackbar.error(i18n.t("An error has ocurred loading the mapping template"));
                 }
             );
         }
@@ -41,7 +41,11 @@ export const ActionDetailPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => history.goBack()} />
+            <MappingTemplateWizard
+                mappingTemplate={mappingTemplate}
+                onChange={setMappingTemplate}
+                onCancel={() => history.goBack()}
+            />
         </React.Fragment>
     );
 };
