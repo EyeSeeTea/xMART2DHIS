@@ -10,7 +10,7 @@ import { DataSetModel, ProgramModel } from "../../../../domain/entities/models/D
 
 const models = [ProgramModel, DataSetModel];
 
-export default function MetadataSelectionStep({ action, onChange }: SyncWizardStepProps) {
+export function MetadataSelectionStep({ action, onChange }: SyncWizardStepProps) {
     const snackbar = useSnackbar();
 
     const [metadataIds, updateMetadataIds] = useState<string[]>([]);

@@ -26,7 +26,7 @@ export interface ModelMappingRow extends ModelMapping {
     id: string;
 }
 
-export default function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) {
+export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) {
     const [currentModelMapping, setCurrentModelMapping] = useState<ModelMapping | undefined>(undefined);
     const [rows, setRows] = useState<ModelMappingRow[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);

@@ -1,6 +1,7 @@
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
-import { makeStyles, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
+import styled from "styled-components";
 import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { DataMart } from "../../../../domain/entities/xmart/XMart";
 import i18n from "../../../../locales";
@@ -10,8 +11,6 @@ import Dropdown from "../../dropdown/Dropdown";
 import { SyncWizardStepProps } from "../SyncWizard";
 
 export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
-    const classes = useStyles();
-
     const [connections, setConnections] = useState<DataMart[]>([]);
     const [errors, setErrors] = useState<Dictionary<string>>({});
     const { compositionRoot } = useAppContext();
@@ -45,17 +44,18 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
 
     return (
         <React.Fragment>
-            <TextField
-                className={classes.row}
-                fullWidth={true}
-                label={i18n.t("Name (*)")}
-                value={action.name ?? ""}
-                onChange={onChangeField("name")}
-                error={!!errors["name"]}
-                helperText={errors["name"]}
-            />
+            <Row>
+                <TextField
+                    fullWidth={true}
+                    label={i18n.t("Name (*)")}
+                    value={action.name ?? ""}
+                    onChange={onChangeField("name")}
+                    error={!!errors["name"]}
+                    helperText={errors["name"]}
+                />
+            </Row>
 
-            <div className={classes.row}>
+            <Row>
                 <Dropdown
                     items={connections}
                     value={action.connectionId ?? connections[0]?.id ?? ""}
@@ -64,27 +64,26 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
                     hideEmpty={true}
                     view={"full-width"}
                 />
-            </div>
+            </Row>
 
-            <TextField
-                className={classes.row}
-                fullWidth={true}
-                multiline={true}
-                rows={4}
-                label={i18n.t("Description")}
-                value={action.description ?? ""}
-                onChange={onChangeField("description")}
-                error={!!errors["description"]}
-                helperText={errors["description"]}
-            />
+            <Row>
+                <TextField
+                    fullWidth={true}
+                    multiline={true}
+                    rows={4}
+                    label={i18n.t("Description")}
+                    value={action.description ?? ""}
+                    onChange={onChangeField("description")}
+                    error={!!errors["description"]}
+                    helperText={errors["description"]}
+                />
+            </Row>
         </React.Fragment>
     );
 };
 
-const useStyles = makeStyles({
-    row: {
-        marginBottom: 25,
-    },
-});
+const Row = styled.div`
+    margin-bottom: 25px;
+`;
 
 export default GeneralInfoStep;

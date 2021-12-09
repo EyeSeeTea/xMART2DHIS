@@ -1,31 +1,20 @@
-import { makeStyles, Typography } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import { OrgUnitsSelector, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { Typography } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import i18n from "../../../../locales";
-import { D2Api } from "../../../../types/d2-api";
 import { useAppContext } from "../../../contexts/app-context";
 import { SyncWizardStepProps } from "../SyncWizard";
 
-const useStyles = makeStyles({
-    loading: {
-        display: "flex",
-        justifyContent: "center",
-    },
-});
-
-const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action, onChange }) => {
-    const { compositionRoot } = useAppContext();
-    const classes = useStyles();
+export const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action, onChange }) => {
+    const { compositionRoot, api } = useAppContext();
     const snackbar = useSnackbar();
 
     const [orgUnitRootIds, setOrgUnitRootIds] = useState<string[] | undefined>();
-    const [api, setApi] = useState<D2Api>();
 
     useEffect(() => {
-        setApi(compositionRoot.d2Api);
-
         compositionRoot.metadata.getOrgUnitRoots().run(
             roots => setOrgUnitRootIds(roots.map(({ id }) => id)),
             () => snackbar.error("An error has occurred loading organisation units")
@@ -36,11 +25,11 @@ const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action,
         onChange(action.update({ orgUnitPaths }));
     };
 
-    if (!orgUnitRootIds || !api) {
+    if (!orgUnitRootIds) {
         return (
-            <div className={classes.loading}>
+            <LoadingWrapper>
                 <CircularProgress />
-            </div>
+            </LoadingWrapper>
         );
     } else if (_.isEmpty(orgUnitRootIds)) {
         return <Typography>{i18n.t("You do not have assigned any organisation unit")}</Typography>;
@@ -64,4 +53,7 @@ const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action,
     }
 };
 
-export default OrganisationUnitsSelectionStep;
+const LoadingWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+`;

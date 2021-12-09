@@ -1,6 +1,7 @@
 import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRepository";
 import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
+import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsDataStoreRepository";
 import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
 import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
@@ -9,7 +10,6 @@ import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiReposi
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
-import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsDataStoreRepository";
 import { Instance } from "./domain/entities/instance/Instance";
 import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
 import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUseCase";
@@ -17,9 +17,14 @@ import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUse
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
+import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
+import { GetConnectionByIdUseCase } from "./domain/usecases/connection/GetConnectionByIdUseCase";
+import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
+import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
+import { TestConnectionUseCase } from "./domain/usecases/connection/TestConnectionUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
-import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
+import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
 import { GetMappingTemplatesUseCase } from "./domain/usecases/mappin-templates/GetMappingTemplatesUseCase";
 import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
@@ -28,12 +33,6 @@ import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartC
 import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
-import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
-import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
-import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
-import { GetConnectionByIdUseCase } from "./domain/usecases/connection/GetConnectionByIdUseCase";
-import { TestConnectionUseCase } from "./domain/usecases/connection/TestConnectionUseCase";
-import { getD2APiFromInstance } from "./utils/d2-api";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
@@ -94,7 +93,6 @@ export function getCompositionRoot(instance: Instance) {
             getById: new GetConnectionByIdUseCase(connectionRepository),
             testConnection: new TestConnectionUseCase(martRepository, instanceRepository),
         }),
-        d2Api: getD2APiFromInstance(instance),
     };
 }
 
