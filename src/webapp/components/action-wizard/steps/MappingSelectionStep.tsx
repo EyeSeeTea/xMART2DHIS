@@ -160,6 +160,7 @@ export function MappingSelectionStep({ action, onChange }: ActionWizardStepProps
 
             {openMappingTemplateDialog && (
                 <MappingTemplateDialog
+                    connectionId={action.connectionId}
                     onSave={handleMappingTemplateDialogSave}
                     onCancel={handleMappingTemplateDialogCancel}
                 ></MappingTemplateDialog>

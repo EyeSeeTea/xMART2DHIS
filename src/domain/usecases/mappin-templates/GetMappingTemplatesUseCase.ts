@@ -6,7 +6,9 @@ import { MappingTemplate } from "../../entities/mapping-template/MappingTemplate
 export class GetMappingTemplatesUseCase implements UseCase {
     constructor(private mappingRepository: MappingTemplateRepository) {}
 
-    public execute(): FutureData<MappingTemplate[]> {
-        return this.mappingRepository.list();
+    public execute(connectionId?: string): FutureData<MappingTemplate[]> {
+        return this.mappingRepository
+            .list()
+            .map(templates => templates.filter(template => !connectionId || template.connectionId === connectionId));
     }
 }

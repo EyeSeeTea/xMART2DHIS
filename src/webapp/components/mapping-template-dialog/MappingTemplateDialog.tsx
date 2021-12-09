@@ -7,11 +7,12 @@ import { MappingTemplate } from "../../../domain/entities/mapping-template/Mappi
 import { useAppContext } from "../../contexts/app-context";
 
 export interface ModelMappingDialogProps {
+    connectionId: string;
     onSave?: (mappingTemplate: MappingTemplate) => void;
     onCancel?: () => void;
 }
 
-const MappingTemplateDialog: React.FC<ModelMappingDialogProps> = ({ onSave, onCancel }) => {
+const MappingTemplateDialog: React.FC<ModelMappingDialogProps> = ({ connectionId, onSave, onCancel }) => {
     const [mappingTemplateId, setMappingTemplateId] = useState("");
     const [mappingTemplates, setMappingTemplates] = useState<MappingTemplate[]>([]);
 
@@ -19,13 +20,13 @@ const MappingTemplateDialog: React.FC<ModelMappingDialogProps> = ({ onSave, onCa
     const snackbar = useSnackbar();
 
     useEffect(() => {
-        compositionRoot.mappingTemplates.list().run(
+        compositionRoot.mappingTemplates.list(connectionId).run(
             mappingTemplates => {
                 setMappingTemplates(mappingTemplates);
             },
             error => snackbar.error(error)
         );
-    }, [compositionRoot, snackbar]);
+    }, [compositionRoot, snackbar, connectionId]);
 
     const handleMappingTemplateChange = useCallback((id: string) => {
         setMappingTemplateId(id);

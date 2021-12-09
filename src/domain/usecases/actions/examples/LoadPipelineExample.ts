@@ -4,7 +4,7 @@ import { apiToFuture } from "../../../../utils/futures";
 import { getUid } from "../../../../utils/uid";
 import { Future, FutureData } from "../../../entities/Future";
 import { DataMart } from "../../../entities/xmart/XMart";
-import { XMartPipelineDefinition } from "../../../entities/xmart/xMartSyncTables";
+import { XMartPipelineDefinition } from "../../../entities/xmart/xMartSyncTableTemplates";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
