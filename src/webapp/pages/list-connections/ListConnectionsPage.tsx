@@ -1,6 +1,12 @@
 import {
     ObjectsTable,
-    ObjectsTableDetailField, TableAction, TableColumn, TableSelection, TableState, useLoading, useSnackbar
+    ObjectsTableDetailField,
+    TableAction,
+    TableColumn,
+    TableSelection,
+    TableState,
+    useLoading,
+    useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import { Delete, Edit, FileCopy, SettingsInputAntenna, Share } from "@material-ui/icons";
 import _ from "lodash";
@@ -82,7 +88,7 @@ export const ListConnectionsPage: React.FC = () => {
             if (connection) {
                 compositionRoot.connection.getById(connection.id).run(
                     connection =>
-                        navigate( "/connections/new", {
+                        navigate("/connections/new", {
                             state: {
                                 connection: {
                                     ...connection,

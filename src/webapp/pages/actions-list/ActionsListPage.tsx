@@ -8,7 +8,7 @@ import {
     TableSelection,
     TableState,
     useLoading,
-    useSnackbar
+    useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import { Icon } from "@material-ui/core";
 import _ from "lodash";

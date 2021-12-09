@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-08T20:49:31.806Z\n"
-"PO-Revision-Date: 2021-12-08T20:49:31.807Z\n"
+"POT-Creation-Date: 2021-12-09T06:43:12.012Z\n"
+"PO-Revision-Date: 2021-12-09T06:43:12.012Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -87,6 +87,11 @@ msgid "Last year"
 msgstr ""
 
 msgid "Last 5 years"
+msgstr ""
+
+msgid ""
+"An error has occurred saving the action:\n"
+"{{error}}"
 msgstr ""
 
 msgid "You need to select one dataValues mapping"
@@ -254,6 +259,12 @@ msgstr ""
 msgid "xMART Table"
 msgstr ""
 
+msgid "Existed Table"
+msgstr ""
+
+msgid "New Table"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -322,10 +333,7 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-msgid "New Connection"
-msgstr ""
-
-msgid "Edit Connection"
+msgid "Connection creation"
 msgstr ""
 
 msgid "Connections"
@@ -369,25 +377,13 @@ msgstr ""
 msgid "Are you sure you want to delete {{total}} actions?"
 msgstr ""
 
+msgid "List connections of the MART"
+msgstr ""
+
 msgid "Actions are a way to trigger events in your application"
 msgstr ""
 
 msgid "List table contents of the MART"
-msgstr ""
-
-msgid "List connections of the MART"
-msgstr ""
-
-msgid "Examples"
-msgstr ""
-
-msgid "Load pipelines"
-msgstr ""
-
-msgid "Load data"
-msgstr ""
-
-msgid "Load model"
 msgstr ""
 
 msgid "Connection URL"
@@ -438,9 +434,6 @@ msgstr ""
 msgid "xMART API"
 msgstr ""
 
-msgid "xMART Table"
-msgstr ""
-
 msgid "Saving connection"
 msgstr ""
 
@@ -457,16 +450,4 @@ msgid "Cancel connection editing"
 msgstr ""
 
 msgid "Error saving connection"
-msgstr ""
-
-msgctxt "MODEL pipelines"
-msgid "Initial load of LOAD_DATA and LOAD"
-msgstr ""
-
-msgctxt "DATA example"
-msgid "LOAD"
-msgstr ""
-
-msgctxt "MODEL example"
-msgid "LOAD"
 msgstr ""
