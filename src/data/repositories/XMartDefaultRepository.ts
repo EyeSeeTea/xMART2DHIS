@@ -100,23 +100,57 @@ export class XMartDefaultRepository implements XMartRepository {
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart),
             token: this.getToken(mart),
-        })
-            .flatMap(({ endpoint, token }) =>
-                futureFetch<{ batchID: number; success?: boolean; errorMessage: string | null }>(
+        }).flatMap(({ endpoint, token }) =>
+            Future.joinObj({
+                response: futureFetch<{ BatchID: number; Success?: boolean; ErrorMessage: string | null }>(
                     "post",
                     joinUrl(endpoint, `/origin/start`),
                     { body, bearer: token }
-                )
-            )
-            .flatMap(({ errorMessage, batchID }) => {
-                if (errorMessage) {
-                    return Future.error(errorMessage);
-                } else if (batchID === null) {
+                ),
+                endpoint: Future.success(endpoint),
+                token: Future.success(token),
+            }).flatMap(({ response, endpoint, token }) => {
+                const { BatchID, ErrorMessage } = response;
+
+                if (ErrorMessage) {
+                    return Future.error(ErrorMessage);
+                } else if (BatchID === null) {
                     return Future.error("Unknown batch id");
-                } else {
-                    return Future.success(batchID);
                 }
-            });
+
+                return Future.success(BatchID);
+
+                /**
+                 * TODO: Implement polling
+                 {
+                    "BatchID": 194103,
+                    "ProcessStepCode": "COMPLETED", // NONE, INITIATING, STAGING, PREVIEWING, APPROVING, COMMIT_QUEUING, COMMITTING, FINALIZING, COMPLETED, STAGE_QUEUING
+                    "ProcessResultCode": "SUCCESS", // If COMPLETED: SYSTEM_ERROR, REJECTED, INVALID, SUCCESS, CANCELED, TIMEOUT_CANCELED
+                    "MartCode": "TRAINING_ARC",
+                    "OriginCode": "LOAD_PIPELINE",
+                    "PipelineCode": "LOAD_PIPELINE",
+                    "OriginTitle": "[xMART2DHIS] Load pipeline from URL",
+                    "ProcessStepTitle": "Completed",
+                    "ProcessResultTitle": "Success"
+                }
+                 */
+
+                return futureFetch<{
+                    BatchID: number;
+                    ProcessStepCode: string;
+                    ProcessResultCode: string;
+                    MartCode: string;
+                    OriginCode: string;
+                    PipelineCode: string;
+                    OriginTitle: string;
+                    ProcessStepTitle: string;
+                    ProcessResultTitle: string;
+                }>("post", joinUrl(endpoint, `/batch/${BatchID}/status`), { bearer: token }).map(response => {
+                    console.log(response);
+                    return response.BatchID;
+                });
+            })
+        );
     }
 
     private requestMart<Data>(
@@ -136,9 +170,9 @@ export class XMartDefaultRepository implements XMartRepository {
             case "PUBLIC":
                 return Future.error("Unable to call xMART API for public data marts");
             case "PROD":
-                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/api");
+                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/external-api");
             case "UAT":
-                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/api");
+                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/external-api");
             default:
                 return Future.error("Unknown data mart type");
         }
