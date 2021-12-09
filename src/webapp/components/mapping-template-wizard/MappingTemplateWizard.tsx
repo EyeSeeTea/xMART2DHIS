@@ -3,45 +3,24 @@ import _ from "lodash";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
+import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
-import { MappingSelectionStep } from "./steps/MappingSelectionStep";
-import { MetadataSelectionStep } from "./steps/MetadataSelectionStep";
-import { OrganisationUnitsSelectionStep } from "./steps/OrganisationUnitsSelectionStep";
-import { PeriodSelectionStep } from "./steps/PeriodSelectionStep";
+import MappingSelectionStep from "./steps/MappingSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";
 
-interface SyncWizardProps {
-    action: SyncAction;
-    isDialog?: boolean;
-    onChange?(action: SyncAction): void;
+interface MappingTemplateWizardProps {
+    mappingTemplate: MappingTemplate;
+    onChange?(mappingTemplate: MappingTemplate): void;
     onCancel?(): void;
 }
 
-export const stepsBaseInfo: SyncWizardStep[] = [
+export const stepsBaseInfo: MappingTemplateWizardStep[] = [
     {
         key: "general-info",
         label: i18n.t("General info"),
         component: GeneralInfoStep,
-        validationKeys: ["name"],
-    },
-    {
-        key: "organisations-units",
-        label: i18n.t("Organisation units"),
-        component: OrganisationUnitsSelectionStep,
-        validationKeys: ["orgUnitPaths"],
-    },
-    {
-        key: "metadata",
-        label: i18n.t("Metadata"),
-        component: MetadataSelectionStep,
-        validationKeys: ["metadataIds"],
-    },
-    {
-        key: "period",
-        label: i18n.t("Period"),
-        component: PeriodSelectionStep,
-        validationKeys: ["startDate", "endDate"],
+        validationKeys: ["name", "connectionId"],
     },
     {
         key: "mapping",
@@ -57,25 +36,25 @@ export const stepsBaseInfo: SyncWizardStep[] = [
     },
 ];
 
-export interface SyncWizardStep extends WizardStep {
+export interface MappingTemplateWizardStep extends WizardStep {
     validationKeys: string[];
     hidden?: (action: SyncAction) => boolean;
 }
 
-export interface SyncWizardStepProps {
-    action: SyncAction;
-    onChange: (action: SyncAction) => void;
+export interface MappingTemplateWizardStepProps {
+    mappingTemplate: MappingTemplate;
+    onChange: (mappingTemplate: MappingTemplate) => void;
     onCancel: () => void;
 }
 
-const SyncWizard: React.FC<SyncWizardProps> = ({ action, onCancel, onChange }) => {
+const MappingTemplateWizard: React.FC<MappingTemplateWizardProps> = ({ mappingTemplate, onCancel, onChange }) => {
     const location = useLocation();
-    const steps = stepsBaseInfo.map(step => ({ ...step, props: { action, onCancel, onChange } }));
+    const steps = stepsBaseInfo.map(step => ({ ...step, props: { mappingTemplate, onCancel, onChange } }));
 
     const onStepChangeRequest = async (_currentStep: WizardStep, newStep: WizardStep) => {
         const index = _(steps).findIndex(step => step.key === newStep.key);
         const validationMessages = _.take(steps, index).map(({ validationKeys }) =>
-            action.validate(validationKeys).map(({ description }) => description)
+            mappingTemplate.validate(validationKeys).map(({ description }) => description)
         );
 
         return _.flatten(validationMessages);
@@ -97,4 +76,4 @@ const SyncWizard: React.FC<SyncWizardProps> = ({ action, onCancel, onChange }) =
     );
 };
 
-export default SyncWizard;
+export default MappingTemplateWizard;

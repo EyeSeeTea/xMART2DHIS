@@ -16,10 +16,12 @@ export interface ModelValidation {
         | { type: "Custom"; validation: Validation };
 }
 
+type Check<T> = (value?: T) => boolean;
+
 export interface Validation {
     error: string;
     getDescription: (field: string) => string;
-    check: (value?: string) => boolean;
+    check: Check<string> | Check<unknown[]> | Check<Ref>;
 }
 
 // Diego Perini (License: MIT)

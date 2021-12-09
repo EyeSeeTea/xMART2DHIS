@@ -10,13 +10,14 @@ import {
 } from "@eyeseetea/d2-ui-components";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 import i18n from "../../../../locales";
-import { ModelMapping } from "../../../../domain/entities/mapping-template/MappingTemplate";
+import { MappingTemplate, ModelMapping } from "../../../../domain/entities/mapping-template/MappingTemplate";
 import React from "react";
 import { Button, Icon } from "@material-ui/core";
 import styled from "styled-components";
 import ModelMappingDialog from "../../model-mapping-dialog/ModelMappingDialog";
+import MappingTemplateDialog from "../../mapping-template-dialog/MappingTemplateDialog";
 
 const StyledButton = styled(Button)`
     margin-left: 8px;
@@ -26,11 +27,12 @@ export interface ModelMappingRow extends ModelMapping {
     id: string;
 }
 
-export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) {
+export default function MappingSelectionStep({ action, onChange }: ActionWizardStepProps) {
     const [currentModelMapping, setCurrentModelMapping] = useState<ModelMapping | undefined>(undefined);
     const [rows, setRows] = useState<ModelMappingRow[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);
     const [selection, updateSelection] = useState<TableSelection[]>([]);
+    const [openMappingTemplateDialog, setOpenMappingTemplateDialog] = useState(false);
 
     useEffect(() => {
         setRows(action.modelMappings.map(m => ({ ...m, id: m.dhis2Model })));
@@ -57,7 +59,11 @@ export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) 
         setCurrentModelMapping(modelMapping);
     }, []);
 
-    const handleSave = useCallback(
+    const handleImportTemplate = useCallback(() => {
+        setOpenMappingTemplateDialog(true);
+    }, []);
+
+    const handleModelMappingDialogSave = useCallback(
         (modelMapping: ModelMapping) => {
             const existedModelMapping = action.modelMappings.find(item => item.dhis2Model === modelMapping.dhis2Model);
 
@@ -72,8 +78,41 @@ export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) 
         [action, onChange]
     );
 
-    const handleCancel = useCallback(() => {
+    const handleModelMappingDialogCancel = useCallback(() => {
         setCurrentModelMapping(undefined);
+    }, []);
+
+    const handleMappingTemplateDialogSave = useCallback(
+        (mappingTemplate: MappingTemplate) => {
+            const modelMappingsToOverwrite = mappingTemplate.modelMappings.filter(templateMappings =>
+                action.modelMappings.some(actionMappings => actionMappings.dhis2Model === templateMappings.dhis2Model)
+            );
+            const newModelMappings = mappingTemplate.modelMappings.filter(
+                templateMappings =>
+                    !action.modelMappings.some(
+                        actionMappings => actionMappings.dhis2Model === templateMappings.dhis2Model
+                    )
+            );
+            const modelMappingsToMaintain = action.modelMappings.filter(
+                actionMappings =>
+                    !mappingTemplate.modelMappings.some(
+                        templateMappings => templateMappings.dhis2Model === actionMappings.dhis2Model
+                    )
+            );
+
+            onChange(
+                action.update({
+                    modelMappings: [...modelMappingsToOverwrite, ...newModelMappings, ...modelMappingsToMaintain],
+                })
+            );
+
+            setOpenMappingTemplateDialog(false);
+        },
+        [action, onChange]
+    );
+
+    const handleMappingTemplateDialogCancel = useCallback(() => {
+        setOpenMappingTemplateDialog(false);
     }, []);
 
     const confirmDelete = useCallback(async () => {
@@ -114,9 +153,16 @@ export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) 
                 <ModelMappingDialog
                     connectionId={action.connectionId}
                     modelMapping={currentModelMapping}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
+                    onSave={handleModelMappingDialogSave}
+                    onCancel={handleModelMappingDialogCancel}
                 ></ModelMappingDialog>
+            )}
+
+            {openMappingTemplateDialog && (
+                <MappingTemplateDialog
+                    onSave={handleMappingTemplateDialogSave}
+                    onCancel={handleMappingTemplateDialogCancel}
+                ></MappingTemplateDialog>
             )}
 
             {toDelete.length > 0 && (
@@ -143,6 +189,15 @@ export function MappingSelectionStep({ action, onChange }: SyncWizardStepProps) 
                 onClick={changeModelMapping}
             >
                 {i18n.t("Model Mapping")}
+            </StyledButton>
+
+            <StyledButton
+                color="primary"
+                variant="contained"
+                startIcon={<Icon>arrow_downward</Icon>}
+                onClick={handleImportTemplate}
+            >
+                {i18n.t("Import Template")}
             </StyledButton>
 
             <ObjectsTable<ModelMappingRow>

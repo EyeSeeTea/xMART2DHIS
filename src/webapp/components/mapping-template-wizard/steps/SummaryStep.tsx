@@ -1,17 +1,12 @@
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
-import _ from "lodash";
-import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
-import { availablePeriods } from "../../../../domain/entities/metadata/DataSyncPeriod";
-import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/metadata/Metadata";
+import { useHistory } from "react-router-dom";
 import { DataMart } from "../../../../domain/entities/xmart/XMart";
-import { cleanOrgUnitPaths } from "../../../../domain/utils";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
+import { MappingTemplate } from "../../../../domain/entities/mapping-template/MappingTemplate";
 
 const LiEntry: React.FC<{ label: string; value?: string }> = ({ label, value, children }) => {
     return (
@@ -36,12 +31,12 @@ const useStyles = makeStyles({
     },
 });
 
-export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
+export const SummaryStep = ({ mappingTemplate, onCancel }: MappingTemplateWizardStepProps) => {
     const { compositionRoot } = useAppContext();
 
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const navigate = useNavigate();
+    const history = useHistory();
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -53,13 +48,13 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
     const save = async () => {
         setIsSaving(true);
 
-        const errors = action.validate().map(e => e.description);
+        const errors = mappingTemplate.validate().map(e => e.description);
         if (errors.length > 0) {
             snackbar.error(errors.join("\n"));
         } else {
-            compositionRoot.actions.save(action).run(
+            compositionRoot.mappingTemplates.save(mappingTemplate).run(
                 () => {
-                    navigate(`/actions/edit/${action.id}`);
+                    history.push(`/mapping-templates/edit/${mappingTemplate.id}`);
                     onCancel();
                     setIsSaving(false);
                 },
@@ -77,14 +72,14 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
                 isOpen={cancelDialogOpen}
                 onSave={onCancel}
                 onCancel={closeCancelDialog}
-                title={i18n.t("Cancel action wizard")}
+                title={i18n.t("Cancel mapping template wizard")}
                 description={i18n.t(
-                    "You are about to exit the Action Creation Wizard. All your changes will be lost. Are you sure you want to proceed?"
+                    "You are about to exit the Mapping template Creation Wizard. All your changes will be lost. Are you sure you want to proceed?"
                 )}
                 saveText={i18n.t("Yes")}
             />
 
-            <SummaryStepContent action={action} />
+            <SummaryStepContent mappingTemplate={mappingTemplate} />
 
             <div className={classes.buttonContainer}>
                 <div>
@@ -104,82 +99,40 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
 };
 
 interface SummaryStepContentProps {
-    action: SyncAction;
+    mappingTemplate: MappingTemplate;
 }
 
 export const SummaryStepContent = (props: SummaryStepContentProps) => {
-    const { action } = props;
+    const { mappingTemplate } = props;
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
 
     const [connection, setConnection] = useState<DataMart>();
-    const [metadata, updateMetadata] = useState<MetadataPackage>({});
 
     useEffect(() => {
         compositionRoot.xmart.listDataMarts().run(
             dataMarts => {
-                const connection = dataMarts.find(d => d.id === action.connectionId);
+                const connection = dataMarts.find(d => d.id === mappingTemplate.connectionId);
                 setConnection(connection);
             },
             error => snackbar.error(error)
         );
-    }, [compositionRoot, snackbar, action]);
-
-    useEffect(() => {
-        const ids = [...action.metadataIds, ...cleanOrgUnitPaths(action.orgUnitPaths)];
-
-        compositionRoot.metadata
-            .getByIds(ids, "id,name,type")
-            .run(updateMetadata, () => snackbar.error("An error has ocurred loading metadata"));
-    }, [compositionRoot, action, snackbar]);
+    }, [compositionRoot, snackbar, mappingTemplate]);
 
     return (
         <ul>
-            <LiEntry label={i18n.t("Name")} value={action.name} />
+            <LiEntry label={i18n.t("Name")} value={mappingTemplate.name} />
 
             <LiEntry label={i18n.t("Connection")} value={connection?.name} />
 
-            <LiEntry label={i18n.t("Description")} value={action.description} />
-
-            {_.keys(metadata).map(metadataType => {
-                const itemsByType = metadata[metadataType as keyof MetadataEntities] || [];
-
-                return (
-                    itemsByType.length > 0 && (
-                        <LiEntry
-                            key={metadataType}
-                            //@ts-ignore
-                            label={`${api.models[metadataType].schema.displayName} [${itemsByType.length}]`}
-                        >
-                            <ul>
-                                {itemsByType.map(({ id, name }) => (
-                                    <LiEntry key={id} label={`${name} (${id})`} />
-                                ))}
-                            </ul>
-                        </LiEntry>
-                    )
-                );
-            })}
-
-            <LiEntry label={i18n.t("Period")} value={availablePeriods[action.period]?.name}>
-                {action.period === "FIXED" && (
-                    <ul>
-                        <LiEntry label={i18n.t("Start date")} value={moment(action.startDate).format("YYYY-MM-DD")} />
-                    </ul>
-                )}
-                {action.period === "FIXED" && (
-                    <ul>
-                        <LiEntry label={i18n.t("End date")} value={moment(action.endDate).format("YYYY-MM-DD")} />
-                    </ul>
-                )}
-            </LiEntry>
+            <LiEntry label={i18n.t("Description")} value={mappingTemplate.description} />
 
             <LiEntry
                 //@ts-ignore
                 label={i18n.t("Model mappings")}
             >
                 <ul>
-                    {action.modelMappings.map(modelMapping => (
+                    {mappingTemplate.modelMappings.map(modelMapping => (
                         <LiEntry
                             key={modelMapping.dhis2Model}
                             label={`${modelMapping.dhis2Model} -> ${modelMapping.xMARTTable}`}

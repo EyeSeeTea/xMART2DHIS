@@ -6,9 +6,9 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 
-export const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action, onChange }) => {
+export const OrganisationUnitsSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange }) => {
     const { compositionRoot, api } = useAppContext();
     const snackbar = useSnackbar();
 

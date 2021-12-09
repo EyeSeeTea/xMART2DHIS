@@ -6,7 +6,7 @@ import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsD
 import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
 import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
-import { MappingTemplateDataStoreRepository } from "./data/repositories/MappingDataStoreRepository";
+import { MappingTemplateDataStoreRepository } from "./data/repositories/MappingTemplateDataStoreRepository";
 import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
@@ -26,7 +26,9 @@ import { TestConnectionUseCase } from "./domain/usecases/connection/TestConnecti
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
+import { GetMappingTemplateByIdUseCase } from "./domain/usecases/mappin-templates/GetMappingTemplateByIdUseCase";
 import { GetMappingTemplatesUseCase } from "./domain/usecases/mappin-templates/GetMappingTemplatesUseCase";
+import { SaveMappingTemplateUseCase } from "./domain/usecases/mappin-templates/SaveMappingTemplateUseCase";
 import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
 import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
@@ -81,8 +83,10 @@ export function getCompositionRoot(instance: Instance) {
                 martRepository
             ),
         }),
-        mappings: getExecute({
+        mappingTemplates: getExecute({
             list: new GetMappingTemplatesUseCase(mappingRepository),
+            get: new GetMappingTemplateByIdUseCase(mappingRepository),
+            save: new SaveMappingTemplateUseCase(mappingRepository),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

@@ -4,9 +4,9 @@ import { ModelValidation, validateModel, ValidationError } from "../Validations"
 export interface MappingTemplateData {
     id: string;
     name: string;
+    description?: string;
     connectionId: string;
     modelMappings: ModelMapping[];
-    default?: boolean;
 }
 
 export interface ModelMapping {
@@ -19,16 +19,15 @@ export type Dhis2ModelKey = "dataValues" | "events" | "eventValues" | "teis" | "
 export class MappingTemplate implements MappingTemplateData {
     public readonly id: string;
     public readonly name: string;
+    public readonly description?: string;
     public readonly connectionId: string;
     public readonly modelMappings: ModelMapping[];
-    public readonly default?: boolean;
 
     constructor(data: MappingTemplateData) {
         this.id = data.id;
         this.name = data.name;
         this.connectionId = data.connectionId;
         this.modelMappings = data.modelMappings;
-        this.default = data.default;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -48,6 +47,7 @@ export class MappingTemplate implements MappingTemplateData {
     private moduleValidations(): ModelValidation[] {
         return [
             { property: "name", validation: { type: "Standard", validation: "hasText" } },
+            { property: "connectionId", validation: { type: "Standard", validation: "hasValue" } },
             { property: "modelMappings", validation: { type: "Standard", validation: "hasItems" } },
         ];
     }
@@ -65,9 +65,9 @@ export class MappingTemplate implements MappingTemplateData {
         return {
             id: this.id,
             name: this.name,
+            description: this.description,
             connectionId: this.connectionId,
             modelMappings: this.modelMappings,
-            default: this.default,
         };
     }
 }

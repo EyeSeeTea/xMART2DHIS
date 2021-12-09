@@ -6,11 +6,11 @@ export type Namespace = typeof Namespaces[keyof typeof Namespaces];
 export const Namespaces = {
     CONNECTIONS: "connections",
     ACTIONS: "actions",
-    MAPPINGS: "mappings",
+    MAPPINGTEMPLATES: "mapping-templates",
 };
 
 export const NamespaceProperties: Record<Namespace, string[]> = {
     [Namespaces.CONNECTIONS]: [],
     [Namespaces.ACTIONS]: [],
-    [Namespaces.MAPPINGS]: [],
+    [Namespaces.MAPPINGTEMPLATES]: [],
 };

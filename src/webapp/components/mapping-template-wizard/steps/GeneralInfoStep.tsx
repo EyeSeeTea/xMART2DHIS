@@ -1,16 +1,17 @@
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
-import { TextField } from "@material-ui/core";
+import { makeStyles, TextField } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
-import styled from "styled-components";
 import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { DataMart } from "../../../../domain/entities/xmart/XMart";
 import i18n from "../../../../locales";
 import { Dictionary } from "../../../../types/utils";
 import { useAppContext } from "../../../contexts/app-context";
 import Dropdown from "../../dropdown/Dropdown";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
 
-export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
+export const GeneralInfoStep = ({ mappingTemplate, onChange }: MappingTemplateWizardStepProps) => {
+    const classes = useStyles();
+
     const [connections, setConnections] = useState<DataMart[]>([]);
     const [errors, setErrors] = useState<Dictionary<string>>({});
     const { compositionRoot } = useAppContext();
@@ -19,13 +20,13 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
     const onChangeField = useCallback(
         (field: keyof SyncAction) => {
             return (event: React.ChangeEvent<{ value: unknown }>) => {
-                const newAction = action.update({ [field]: event.target.value });
+                const newAction = mappingTemplate.update({ [field]: event.target.value });
                 const messages = newAction.validate(["name"]).map(e => e.description);
                 setErrors(errors => ({ ...errors, [field]: messages.join("\n") }));
                 onChange(newAction);
             };
         },
-        [action, onChange]
+        [mappingTemplate, onChange]
     );
 
     useEffect(() => {
@@ -37,53 +38,53 @@ export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
 
     const onChangeConnection = useCallback(
         (connectionId?: string) => {
-            onChange(action.update({ connectionId }));
+            onChange(mappingTemplate.update({ connectionId }));
         },
-        [action, onChange]
+        [mappingTemplate, onChange]
     );
 
     return (
         <React.Fragment>
-            <Row>
-                <TextField
-                    fullWidth={true}
-                    label={i18n.t("Name (*)")}
-                    value={action.name ?? ""}
-                    onChange={onChangeField("name")}
-                    error={!!errors["name"]}
-                    helperText={errors["name"]}
-                />
-            </Row>
+            <TextField
+                className={classes.row}
+                fullWidth={true}
+                label={i18n.t("Name (*)")}
+                value={mappingTemplate.name ?? ""}
+                onChange={onChangeField("name")}
+                error={!!errors["name"]}
+                helperText={errors["name"]}
+            />
 
-            <Row>
+            <div className={classes.row}>
                 <Dropdown
                     items={connections}
-                    value={action.connectionId ?? connections[0]?.id ?? ""}
+                    value={mappingTemplate.connectionId ?? connections[0]?.id ?? ""}
                     onValueChange={onChangeConnection}
                     label={i18n.t("Connection")}
                     hideEmpty={true}
                     view={"full-width"}
                 />
-            </Row>
+            </div>
 
-            <Row>
-                <TextField
-                    fullWidth={true}
-                    multiline={true}
-                    rows={4}
-                    label={i18n.t("Description")}
-                    value={action.description ?? ""}
-                    onChange={onChangeField("description")}
-                    error={!!errors["description"]}
-                    helperText={errors["description"]}
-                />
-            </Row>
+            <TextField
+                className={classes.row}
+                fullWidth={true}
+                multiline={true}
+                rows={4}
+                label={i18n.t("Description")}
+                value={mappingTemplate.description ?? ""}
+                onChange={onChangeField("description")}
+                error={!!errors["description"]}
+                helperText={errors["description"]}
+            />
         </React.Fragment>
     );
 };
 
-const Row = styled.div`
-    margin-bottom: 25px;
-`;
+const useStyles = makeStyles({
+    row: {
+        marginBottom: 25,
+    },
+});
 
 export default GeneralInfoStep;

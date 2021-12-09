@@ -9,6 +9,8 @@ import { ActionsListPage } from "./actions-list/ActionsListPage";
 import { LandingPage } from "./landing/LandingPage";
 import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
+import { MappingTemplateDetailPage } from "./mapping-template-detail/MappingTemplateDetailPage";
+import { MappingTemplateListPage } from "./mapping-termplate-list/MappingTemplateListPage";
 import { NewConnectionPage } from "./new-connection/NewConnectionPage";
 
 export interface DetailPageParams {
@@ -52,6 +54,24 @@ export const Router = () => {
                     element={
                         <RouterPage title={i18n.t("Connections")}>
                             <ListConnectionsPage />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/mapping-templates/:action(new|edit)/:id?"
+                    element={
+                        <RouterPage title={i18n.t("Mapping Template")}>
+                            <MappingTemplateDetailPage />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/mapping-templates"
+                    element={
+                        <RouterPage title={i18n.t("Mapping Templates")}>
+                            <MappingTemplateListPage />
                         </RouterPage>
                     }
                 />
