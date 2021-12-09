@@ -1,4 +1,5 @@
 import { generateUid } from "../../../utils/uid";
+import { ModelMapping } from "../mapping-template/MappingTemplate";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
@@ -12,6 +13,7 @@ export interface SyncActionData {
     endDate?: Date;
     orgUnitPaths: string[];
     metadataIds: string[];
+    modelMappings: ModelMapping[];
 }
 
 export class SyncAction implements SyncActionData {
@@ -24,6 +26,7 @@ export class SyncAction implements SyncActionData {
     public readonly endDate?: Date;
     public readonly orgUnitPaths: string[];
     public readonly metadataIds: string[];
+    public readonly modelMappings: ModelMapping[];
 
     constructor(data: SyncActionData) {
         this.id = data.id;
@@ -35,6 +38,7 @@ export class SyncAction implements SyncActionData {
         this.endDate = data.endDate;
         this.orgUnitPaths = data.orgUnitPaths;
         this.metadataIds = data.metadataIds;
+        this.modelMappings = data.modelMappings;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -55,18 +59,30 @@ export class SyncAction implements SyncActionData {
         const dateValidations: ModelValidation[] =
             this.period === "FIXED"
                 ? [
-                      { property: "startDate", validation: "hasValue" },
-                      { property: "endDate", validation: "hasValue" },
+                      { property: "startDate", validation: { type: "Standard", validation: "hasValue" } },
+                      { property: "endDate", validation: { type: "Standard", validation: "hasValue" } },
                   ]
                 : [];
 
         return [
-            { property: "name", validation: "hasText" },
-            { property: "connectionId", validation: "hasValue" },
-            { property: "period", validation: "hasValue" },
-            { property: "orgUnitPaths", validation: "hasItems" },
-            { property: "metadataIds", validation: "hasItems" },
+            { property: "name", validation: { type: "Standard", validation: "hasText" } },
+            { property: "connectionId", validation: { type: "Standard", validation: "hasValue" } },
+            { property: "period", validation: { type: "Standard", validation: "hasValue" } },
+            { property: "orgUnitPaths", validation: { type: "Standard", validation: "hasItems" } },
+            { property: "metadataIds", validation: { type: "Standard", validation: "hasItems" } },
+            { property: "modelMappings", validation: { type: "Standard", validation: "hasItems" } },
             ...dateValidations,
+            // {
+            //     property: "mappingIds",
+            //     validation: {
+            //         type: "Custom",
+            //         validation: {
+            //             error: "cannot_be_blank",
+            //             getDescription: (field: string) => i18n.t("Field {{field}} cannot be blank", { field }),
+            //             check: (value?: string) => !value?.trim(),
+            //         },
+            //     },
+            // },
         ];
     }
 
@@ -79,6 +95,7 @@ export class SyncAction implements SyncActionData {
             period: "ALL",
             orgUnitPaths: [],
             metadataIds: [],
+            modelMappings: [],
         };
     };
 
@@ -93,6 +110,7 @@ export class SyncAction implements SyncActionData {
             endDate: this.endDate,
             orgUnitPaths: this.orgUnitPaths,
             metadataIds: this.metadataIds,
+            modelMappings: this.modelMappings,
         };
     }
 }

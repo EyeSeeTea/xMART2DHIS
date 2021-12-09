@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
+import MappingSelectionStep from "./steps/MappingSelectionStep";
 import MetadataSelectionStep from "./steps/MetadataSelectionStep";
 import OrganisationUnitsSelectionStep from "./steps/OrganisationUnitsSelectionStep";
 import PeriodSelectionStep from "./steps/PeriodSelectionStep";
@@ -41,6 +42,12 @@ export const stepsBaseInfo: SyncWizardStep[] = [
         label: i18n.t("Period"),
         component: PeriodSelectionStep,
         validationKeys: ["startDate", "endDate"],
+    },
+    {
+        key: "mapping",
+        label: i18n.t("Mapping"),
+        component: MappingSelectionStep,
+        validationKeys: ["modelMappings"],
     },
     {
         key: "summary",

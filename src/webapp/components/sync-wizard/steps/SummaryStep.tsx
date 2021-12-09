@@ -63,8 +63,8 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
                     onCancel();
                     setIsSaving(false);
                 },
-                () => {
-                    snackbar.error("An error has occurred saving the action");
+                error => {
+                    snackbar.error(error);
                     setIsSaving(false);
                 }
             );
@@ -172,6 +172,20 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
                         <LiEntry label={i18n.t("End date")} value={moment(action.endDate).format("YYYY-MM-DD")} />
                     </ul>
                 )}
+            </LiEntry>
+
+            <LiEntry
+                //@ts-ignore
+                label={i18n.t("Model mappings")}
+            >
+                <ul>
+                    {action.modelMappings.map(modelMapping => (
+                        <LiEntry
+                            key={modelMapping.dhis2Model}
+                            label={`${modelMapping.dhis2Model} -> ${modelMapping.xMARTTable}`}
+                        />
+                    ))}
+                </ul>
             </LiEntry>
         </ul>
     );

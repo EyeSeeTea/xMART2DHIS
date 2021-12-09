@@ -4,7 +4,7 @@ import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
 import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
-import { MappingDataStoreRepository } from "./data/repositories/MappingDataStoreRepository";
+import { MappingTemplateDataStoreRepository } from "./data/repositories/MappingDataStoreRepository";
 import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
@@ -16,11 +16,11 @@ import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUse
 import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
-import { StartAppUseCase } from "./domain/usecases/app/StartAppUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { SearchUsersUseCase } from "./domain/usecases/instance/SearchUsersUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
+import { GetMappingTemplatesUseCase } from "./domain/usecases/mappin-templates/GetMappingTemplatesUseCase";
 import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
 import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
@@ -47,12 +47,9 @@ export function getCompositionRoot(instance: Instance) {
     const teiRepository = new TEID2ApiRepository(instance);
     const aggregatedRespository = new AggregatedD2ApiRepository(instance);
     const fileRepository = new FileD2ApiRepository(instance);
-    const mappingRepository = new MappingDataStoreRepository(dataStoreClient);
+    const mappingRepository = new MappingTemplateDataStoreRepository(dataStoreClient);
 
     return {
-        app: getExecute({
-            initialize: new StartAppUseCase(mappingRepository),
-        }),
         xmart: getExecute({
             listTables: new ListMartTablesUseCase(martRepository),
             listTableContent: new ListMartContentsUseCase(martRepository),
@@ -73,7 +70,7 @@ export function getCompositionRoot(instance: Instance) {
             list: new GetActionsUseCase(actionRepository),
             get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
-            save: new SaveActionUseCase(actionRepository, fileRepository, martRepository),
+            save: new SaveActionUseCase(actionRepository, metadataRepository, fileRepository, martRepository),
             execute: new ExecuteActionUseCase(
                 actionRepository,
                 metadataRepository,
@@ -83,6 +80,9 @@ export function getCompositionRoot(instance: Instance) {
                 fileRepository,
                 martRepository
             ),
+        }),
+        mappings: getExecute({
+            list: new GetMappingTemplatesUseCase(mappingRepository),
         }),
         azure: getExecute({
             getInstance: new GetAzureInstanceUseCase(azureRepository),

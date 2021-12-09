@@ -12,7 +12,10 @@ import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 import { dataMarts } from "../xmart/ListDataMartsUseCase";
-import { xMartSyncTables } from "../../entities/xmart/xMartSyncTables";
+import { ProgramEvent } from "../../entities/data/ProgramEvent";
+import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
+import { DataValue } from "../../entities/data/DataValue";
+import { SyncAction } from "../../entities/actions/SyncAction";
 
 //TODO: Remove this when the repository return data marts
 const getDataMartById = (id: string) =>
@@ -57,6 +60,7 @@ export class ExecuteActionUseCase {
 
                 return Future.joinObj({
                     dataMart: Future.success(dataMart),
+                    action: Future.success(action),
                     events: this.eventsRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
                     teis: this.teiRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
                     dataValues: this.aggregatedRespository.get({
@@ -68,21 +72,8 @@ export class ExecuteActionUseCase {
                     }),
                 });
             })
-            .flatMap(({ dataMart, events, teis, dataValues }) => {
-                const eventValues = events.map(e => e.dataValues.map(v => ({ ...v, event: e.event }))).flat();
-                const teiAttributes = teis
-                    .map(t => t.attributes.map(att => ({ ...att, trackedEntityInstance: t.trackedEntityInstance })))
-                    .flat();
-                const enrollments = teis.map(t => t.enrollments).flat();
-
-                return Future.sequential([
-                    this.sendData(dataValues, dataMart, "Data values", xMartSyncTables.dataValues.table.CODE),
-                    this.sendData(events, dataMart, "Events", xMartSyncTables.events.table.CODE),
-                    this.sendData(eventValues, dataMart, "Event values", xMartSyncTables.eventValues.table.CODE),
-                    this.sendData(teis, dataMart, "Tracked entitiy instances", xMartSyncTables.teis.table.CODE),
-                    this.sendData(teiAttributes, dataMart, "TEI attributes", xMartSyncTables.teiAttributes.table.CODE),
-                    this.sendData(enrollments, dataMart, "Enrrollents", xMartSyncTables.enrollments.table.CODE),
-                ]).map((results: string[]) => results.join("\n"));
+            .flatMap(({ dataMart, events, teis, dataValues, action }) => {
+                return this.sendData(dataMart, events, teis, dataValues, action);
             });
     }
 
@@ -91,7 +82,65 @@ export class ExecuteActionUseCase {
         return this.metadataRepository.getMetadataByIds(ids, "id,name,type");
     }
 
-    private sendData<T>(data: T[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
+    private sendData(
+        dataMart: DataMart,
+        events: ProgramEvent[],
+        teis: TrackedEntityInstance[],
+        dataValues: DataValue[],
+        action: SyncAction
+    ): FutureData<string> {
+        const eventValues = events.map(e => e.dataValues.map(v => ({ ...v, event: e.event }))).flat();
+        const teiAttributes = teis
+            .map(t => t.attributes.map(att => ({ ...att, trackedEntityInstance: t.trackedEntityInstance })))
+            .flat();
+        const enrollments = teis.map(t => t.enrollments).flat();
+
+        const dataValuesModelMapping = action.modelMappings.find(
+            modelMapping => modelMapping.dhis2Model === "dataValues"
+        );
+        const eventsModelMapping = action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "events");
+        const eventValuesModelMapping = action.modelMappings.find(
+            modelMapping => modelMapping.dhis2Model === "eventValues"
+        );
+        const teisModelMapping = action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "teis");
+        const teiAttributesModelMapping = action.modelMappings.find(
+            modelMapping => modelMapping.dhis2Model === "teiAttributes"
+        );
+        const enrollmentsModelMapping = action.modelMappings.find(
+            modelMapping => modelMapping.dhis2Model === "enrollments"
+        );
+
+        return Future.sequential([
+            ...(dataValuesModelMapping
+                ? [this.sendDataByTable(dataValues, dataMart, "Data values", dataValuesModelMapping.xMARTTable)]
+                : []),
+            ...(eventsModelMapping
+                ? [this.sendDataByTable(events, dataMart, "Events", eventsModelMapping.xMARTTable)]
+                : []),
+            ...(eventValuesModelMapping
+                ? [this.sendDataByTable(eventValues, dataMart, "Event values", eventValuesModelMapping.xMARTTable)]
+                : []),
+            ...(teisModelMapping
+                ? [this.sendDataByTable(teis, dataMart, "Tracked entitiy instances", teisModelMapping.xMARTTable)]
+                : []),
+
+            ...(teiAttributesModelMapping
+                ? [
+                      this.sendDataByTable(
+                          teiAttributes,
+                          dataMart,
+                          "TEI attributes",
+                          teiAttributesModelMapping.xMARTTable
+                      ),
+                  ]
+                : []),
+            ...(enrollmentsModelMapping
+                ? [this.sendDataByTable(enrollments, dataMart, "Enrollents", enrollmentsModelMapping.xMARTTable)]
+                : []),
+        ]).map((results: string[]) => results.join("\n"));
+    }
+
+    private sendDataByTable<T>(data: T[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
         if (data.length === 0) return Future.success(i18n.t(`${key} does not found`));
 
         const fileInfo = this.generateFileInfo(data, key);

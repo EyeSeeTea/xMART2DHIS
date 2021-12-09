@@ -89,6 +89,24 @@ msgstr ""
 msgid "Last 5 years"
 msgstr ""
 
+msgid "You need to select one dataValues mapping"
+msgstr ""
+
+msgid "You need to select one events mapping"
+msgstr ""
+
+msgid "You need to select one eventValues mapping"
+msgstr ""
+
+msgid "You need to select one tracked entity instances mapping"
+msgstr ""
+
+msgid "You need to select one tracked entity instance attributes mapping"
+msgstr ""
+
+msgid "You need to select one enrollent mapping"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 
@@ -206,6 +224,36 @@ msgstr ""
 msgid "Search by "
 msgstr ""
 
+msgid "Data Values"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Event Values"
+msgstr ""
+
+msgid "Tracked Entity Instances"
+msgstr ""
+
+msgid "TEI Attributes"
+msgstr ""
+
+msgid "Enrollments"
+msgstr ""
+
+msgid "Model Mapping"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Dhis2 Model"
+msgstr ""
+
+msgid "xMART Table"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -227,10 +275,22 @@ msgstr ""
 msgid "Organisation units"
 msgstr ""
 
+msgid "Mapping"
+msgstr ""
+
 msgid "Name (*)"
 msgstr ""
 
 msgid "Connection"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete Actions?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} model mappings?"
 msgstr ""
 
 msgid "Selected {{difference}} elements"
@@ -256,7 +316,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-msgid "Save"
+msgid "Model mappings"
 msgstr ""
 
 msgid "Actions"
@@ -303,13 +363,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-msgid "Delete"
-msgstr ""
-
 msgid "Execute"
-msgstr ""
-
-msgid "Delete Actions?"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} actions?"
