@@ -5,8 +5,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-10-15T08:13:26.930Z\n"
-"PO-Revision-Date: 2021-10-15T08:13:26.931Z\n"
+"POT-Creation-Date: 2021-11-09T20:07:22.424Z\n"
+"PO-Revision-Date: 2021-11-09T20:07:22.424Z\n"
+
+msgid "Data values - Create/update"
+msgstr ""
 
 msgid "Events - Create/update"
 msgstr ""
@@ -14,13 +17,16 @@ msgstr ""
 msgid "Event"
 msgstr ""
 
-msgid "Data values - Create/update"
-msgstr ""
-
 msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Sign in with Microsoft"
+msgstr ""
+
+msgid "Unknown user"
 msgstr ""
 
 msgid "Add"
@@ -83,6 +89,24 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+msgid "New action"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Browse xMART"
+msgstr ""
+
+msgid "xMART2DHIS"
+msgstr ""
+
+msgid "Actions are a way to trigger events in your application"
+msgstr ""
+
+msgid "List table contents of the MART"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 
@@ -93,21 +117,6 @@ msgid "Run"
 msgstr ""
 
 msgid "Running actions..."
-msgstr ""
-
-msgid "Actions"
-msgstr ""
-
-msgid "Common tools"
-msgstr ""
-
-msgid "Actions are a way to trigger events in your application"
-msgstr ""
-
-msgid "Browse xMART"
-msgstr ""
-
-msgid "List table contents of the MART"
 msgstr ""
 
 msgid "xMART API"

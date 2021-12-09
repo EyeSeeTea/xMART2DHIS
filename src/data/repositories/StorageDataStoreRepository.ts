@@ -1,10 +1,10 @@
-import { D2Api, DataStore } from "../../../types/d2-api";
-import { getD2APiFromInstance } from "../../../utils/d2-api";
-import { Instance } from "../../../domain/entities/Instance";
-import { dataStoreNamespace } from "./Namespaces";
-import { StorageClient } from "./StorageClient";
+import { Instance } from "../../domain/entities/Instance";
+import { D2Api, DataStore } from "../../types/d2-api";
+import { getD2APiFromInstance } from "../../utils/d2-api";
+import { dataStoreNamespace } from "../utils/Namespaces";
+import { StorageDefaultRepository } from "./StorageDefaultRepository";
 
-export class DataStoreStorageClient extends StorageClient {
+export class StorageDataStoreRepository extends StorageDefaultRepository {
     private api: D2Api;
     private dataStore: DataStore;
 

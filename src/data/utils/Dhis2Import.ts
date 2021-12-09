@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { SyncResult, SyncStats, SyncStatus } from "../../../domain/entities/SyncResult";
+import { SyncResult, SyncStats, SyncStatus } from "../../domain/entities/SyncResult";
 
 type Status = "OK" | "ERROR" | "SUCCESS";
 

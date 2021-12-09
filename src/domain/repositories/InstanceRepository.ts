@@ -1,30 +1,20 @@
+import { StorageRepository } from "./StorageRepository";
 import { FutureData } from "../entities/Future";
-import { ProgramEvent } from "../entities/ProgramEvent";
-import { SyncResult } from "../entities/SyncResult";
 import { User } from "../entities/User";
+import { AggregatedRepository } from "./AggregatedRepository";
+import { EventsRepository } from "./EventsRepository";
+import { MetadataRepository } from "./MetadataRepository";
+import { Instance } from "../entities/Instance";
 
 export interface InstanceRepository {
+    metadata: MetadataRepository;
+    events: EventsRepository;
+    aggregated: AggregatedRepository;
+    dataStore: StorageRepository;
+
+    getInstance(): Instance;
     getBaseUrl(): string;
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
-    postEvents(events: ProgramEvent[], params?: PostEventsParams): FutureData<SyncResult>;
-    getEvents(filters: GetEventsFilters): FutureData<ProgramEvent[]>;
+    isAdmin(user: User): boolean;
 }
-
-export type PostEventsParams = {
-    idScheme?: "UID" | "CODE";
-    dataElementIdScheme?: "UID" | "CODE";
-    orgUnitIdScheme?: "UID" | "CODE";
-    eventIdScheme?: "UID" | "CODE";
-    dryRun?: boolean;
-};
-
-export type PostDataValuesParams = {
-    idScheme?: "UID" | "CODE";
-    dataElementIdScheme?: "UID" | "CODE";
-    orgUnitIdScheme?: "UID" | "CODE";
-    eventIdScheme?: "UID" | "CODE";
-    dryRun?: boolean;
-};
-
-export type GetEventsFilters = {};

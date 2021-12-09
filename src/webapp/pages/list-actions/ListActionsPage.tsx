@@ -1,20 +1,20 @@
 import { ObjectsTable, TableAction, TableColumn, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Sync } from "@material-ui/icons";
 import _ from "lodash";
-import { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Future } from "../../../domain/entities/Future";
 import { SyncAction } from "../../../domain/entities/SyncAction";
 import { SyncResult } from "../../../domain/entities/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
-import { PageHeader } from "../../components/page-header/PageHeader";
 import { useAppContext } from "../../contexts/app-context";
 
-export const ActionsPage: React.FC = () => {
+export const ListActionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
+    const history = useHistory();
 
     const [rows, setRows] = useState<SyncAction[]>([]);
     const [results, setResults] = useState<SyncResult[]>();
@@ -56,6 +56,10 @@ export const ActionsPage: React.FC = () => {
         [snackbar, loading, rows]
     );
 
+    const goToCreateAction = useCallback(() => {
+        history.push("/actions/new");
+    }, [history]);
+
     useEffect(() => {
         compositionRoot.actions.get().run(
             rows => setRows(rows),
@@ -64,16 +68,15 @@ export const ActionsPage: React.FC = () => {
     }, [compositionRoot, snackbar]);
 
     return (
-        <Container>
-            <PageHeader title={i18n.t("Actions")} onBackClick={() => window.history.back()} />
-
+        <React.Fragment>
             {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
 
-            <ObjectsTable<SyncAction> rows={rows} columns={columns} actions={actions} />
-        </Container>
+            <ObjectsTable<SyncAction>
+                rows={rows}
+                columns={columns}
+                actions={actions}
+                onActionButtonClick={goToCreateAction}
+            />
+        </React.Fragment>
     );
 };
-
-const Container = styled.div`
-    margin: 20px;
-`;

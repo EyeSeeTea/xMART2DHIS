@@ -1,8 +1,9 @@
 import _ from "lodash";
-import { Ref } from "../../../domain/entities/Ref";
-import { Namespace, NamespaceProperties } from "./Namespaces";
+import { Ref } from "../../domain/entities/Ref";
+import { StorageRepository } from "../../domain/repositories/StorageRepository";
+import { Namespace, NamespaceProperties } from "../utils/Namespaces";
 
-export abstract class StorageClient {
+export abstract class StorageDefaultRepository implements StorageRepository {
     // Object operations
     public abstract getObject<T extends object>(key: string): Promise<T | undefined>;
     public abstract getOrCreateObject<T extends object>(key: string, defaultValue: T): Promise<T>;

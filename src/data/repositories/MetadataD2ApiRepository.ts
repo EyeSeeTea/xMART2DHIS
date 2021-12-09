@@ -3,7 +3,11 @@ import { FutureData } from "../../domain/entities/Future";
 import { ImportResult, ImportStats } from "../../domain/entities/ImportResult";
 import { Instance } from "../../domain/entities/Instance";
 import { MetadataPayload } from "../../domain/entities/Metadata";
-import { ListMetadataResponse, ListOptions, MetadataRepository } from "../../domain/repositories/MetadataRepository";
+import {
+    ListMetadataResponse,
+    ListMetadataOptions,
+    MetadataRepository,
+} from "../../domain/repositories/MetadataRepository";
 import i18n from "../../locales";
 import { D2Api, D2ApiDefinition, MetadataResponse, Stats } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
@@ -16,7 +20,7 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         this.api = getD2APiFromInstance(instance);
     }
 
-    list(options: ListOptions): FutureData<ListMetadataResponse> {
+    public list(options: ListMetadataOptions): FutureData<ListMetadataResponse> {
         const { model, page, pageSize, search, sorting = { field: "id", order: "asc" } } = options;
 
         return apiToFuture(

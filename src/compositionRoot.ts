@@ -1,31 +1,39 @@
-import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
-import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
+import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
+import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
 import { Instance } from "./domain/entities/Instance";
+import { ExampleActionUseCase } from "./domain/usecases/actions/ExampleActionUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
+import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { GetCurrentUserUseCase } from "./domain/usecases/instance/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/instance/GetInstanceVersionUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
+import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 
 export function getCompositionRoot(instance: Instance) {
-    const instanceRepository = new InstanceDefaultRepository(instance);
-    const martRepository = new XMartDefaultRepository();
-    const metadataRepository = new MetadataD2ApiRepository(instance);
+    const instanceRepository = new InstanceD2ApiRepository(instance);
+    const azureRepository = new AzureMSALRepository();
+    const martRepository = new XMartDefaultRepository(azureRepository);
 
     return {
         xmart: getExecute({
             listTables: new ListMartTablesUseCase(martRepository),
-            list: new ListMartContentsUseCase(martRepository),
-            listAll: new ListAllMartContentsUseCase(martRepository),
+            listTableContent: new ListMartContentsUseCase(martRepository),
+            listAllTableContent: new ListAllMartContentsUseCase(martRepository),
+            listDataMarts: new ListDataMartsUseCase(martRepository),
         }),
         instance: getExecute({
             getCurrentUser: new GetCurrentUserUseCase(instanceRepository),
             getVersion: new GetInstanceVersionUseCase(instanceRepository),
         }),
         actions: getExecute({
-            get: new GetActionsUseCase(martRepository, instanceRepository, metadataRepository),
+            get: new GetActionsUseCase(martRepository, instanceRepository),
+            exampleAction: new ExampleActionUseCase(martRepository, instanceRepository),
+        }),
+        azure: getExecute({
+            getInstance: new GetAzureInstanceUseCase(azureRepository),
         }),
     };
 }
@@ -49,9 +57,3 @@ function getExecute<UseCases extends Record<Key, UseCase>, Key extends keyof Use
 export interface UseCase {
     execute: Function;
 }
-
-export const XMartEndpoints = {
-    ENTO: "https://frontdoor-r5quteqglawbs.azurefd.net/VECTORS_IR",
-};
-
-export type XMartEndpoint = keyof typeof XMartEndpoints;
