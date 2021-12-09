@@ -12,7 +12,7 @@ import {
     XMartLoadModelData,
     xMartSyncTableTemplates,
     XMartTableDefinition,
-} from "../../entities/xmart/xMartSyncTables";
+} from "../../entities/xmart/xMartSyncTableTemplates";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { Program } from "../../entities/metadata/Program";
 import i18n from "../../../locales";
