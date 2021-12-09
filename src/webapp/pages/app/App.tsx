@@ -52,7 +52,7 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
                 <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                     <SnackbarProvider>
                         <LoadingProvider>
-                            <HeaderBar appName="Data Management" />
+                            <HeaderBar appName="xMART2DHIS" />
 
                             <div id="app" className="content">
                                 <AppContext.Provider value={appContext}>

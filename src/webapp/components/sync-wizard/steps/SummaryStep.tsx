@@ -3,10 +3,10 @@ import { Button, LinearProgress, makeStyles } from "@material-ui/core";
 import _ from "lodash";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { availablePeriods } from "../../../../domain/entities/metadata/DataSyncPeriod";
 import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/metadata/Metadata";
-import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { DataMart } from "../../../../domain/entities/xmart/XMart";
 import { cleanOrgUnitPaths } from "../../../../domain/utils";
 import i18n from "../../../../locales";
@@ -41,7 +41,7 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
 
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -59,7 +59,7 @@ export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
         } else {
             compositionRoot.actions.save(action).run(
                 () => {
-                    history.push(`/actions/edit/${action.id}`);
+                    navigate(`/actions/edit/${action.id}`);
                     onCancel();
                     setIsSaving(false);
                 },

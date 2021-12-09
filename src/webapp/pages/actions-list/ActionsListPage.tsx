@@ -8,12 +8,12 @@ import {
     TableSelection,
     TableState,
     useLoading,
-    useSnackbar,
+    useSnackbar
 } from "@eyeseetea/d2-ui-components";
 import { Icon } from "@material-ui/core";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
@@ -24,7 +24,7 @@ export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const loading = useLoading();
     const snackbar = useSnackbar();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [rows, setRows] = useState<SyncAction[]>([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -53,17 +53,17 @@ export const ActionsListPage: React.FC = () => {
     ];
 
     const goToCreateAction = useCallback(() => {
-        history.push("/actions/new");
-    }, [history]);
+        navigate("/actions/new");
+    }, [navigate]);
 
     const goToEditAction = useCallback(
         (ids: string[]) => {
             const id = _.first(ids);
             if (!id) return;
 
-            history.push(`/actions/edit/${id}`);
+            navigate(`/actions/edit/${id}`);
         },
-        [history]
+        [navigate]
     );
 
     const confirmDelete = useCallback(async () => {

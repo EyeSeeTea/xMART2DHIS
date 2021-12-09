@@ -1,6 +1,6 @@
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import i18n from "../../../locales";
 import SyncWizard from "../../components/sync-wizard/SyncWizard";
@@ -15,7 +15,7 @@ export const ActionDetailPage: React.FC = () => {
     //TODO: implement confirmation dialog to back or cancel in the RouterPage
     //because it's where the back button exists or to create a hook to access to back from here
     const loading = useLoading();
-    const history = useHistory();
+    const navigate = useNavigate();
     const snackbar = useSnackbar();
     const { id, action } = useParams() as SyncActionDetailParams;
     const { compositionRoot } = useAppContext();
@@ -41,7 +41,7 @@ export const ActionDetailPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            <SyncWizard action={syncAction} onChange={updateSyncAction} onCancel={() => history.goBack()} />
+            <SyncWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate(-1)} />
         </React.Fragment>
     );
 };

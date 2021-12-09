@@ -1,31 +1,25 @@
-import _ from "lodash";
 import {
     ObjectsTable,
-    ObjectsTableDetailField,
-    TableColumn,
-    useSnackbar,
-    useLoading,
-    TableSelection,
-    TableAction,
-    TableState,
+    ObjectsTableDetailField, TableAction, TableColumn, TableSelection, TableState, useLoading, useSnackbar
 } from "@eyeseetea/d2-ui-components";
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { useHistory } from "react-router-dom";
-import i18n from "../../../locales";
-import { useReload } from "../../hooks/useReload";
-import { useAppContext } from "../../contexts/app-context";
+import { Delete, Edit, FileCopy, SettingsInputAntenna, Share } from "@material-ui/icons";
+import _ from "lodash";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
 import { ConnectionData } from "../../../domain/entities/xmart/XMart";
-import { User, isSuperAdmin } from "../../../domain/entities/metadata/User";
-import { Delete, Share, Edit, FileCopy, SettingsInputAntenna } from "@material-ui/icons";
-import { SharingSettingsDialog, SharingSettingsDialogProps } from "./SharingSettingsDialog";
+import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
+import { useAppContext } from "../../contexts/app-context";
+import { useReload } from "../../hooks/useReload";
+import { SharingSettingsDialog, SharingSettingsDialogProps } from "./SharingSettingsDialog";
 
 export const ListConnectionsPage: React.FC = () => {
     const { compositionRoot, currentUser } = useAppContext();
     const snackbar = useSnackbar();
     const loadingScreen = useLoading();
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [rows, setRows] = useState<ConnectionData[]>([]);
     const [loading, setLoading] = useState(false);
@@ -57,10 +51,10 @@ export const ListConnectionsPage: React.FC = () => {
         async (ids: string[]) => {
             const connection = rows.find(row => row.id === ids[0]);
             if (connection) {
-                history.push(`/connections/edit/${connection.id}`);
+                navigate(`/connections/edit/${connection.id}`);
             }
         },
-        [history, rows]
+        [navigate, rows]
     );
 
     const deleteConnections = useCallback(
@@ -88,8 +82,7 @@ export const ListConnectionsPage: React.FC = () => {
             if (connection) {
                 compositionRoot.connection.getById(connection.id).run(
                     connection =>
-                        history.push({
-                            pathname: "/connections/new",
+                        navigate( "/connections/new", {
                             state: {
                                 connection: {
                                     ...connection,
@@ -102,7 +95,7 @@ export const ListConnectionsPage: React.FC = () => {
                 );
             }
         },
-        [compositionRoot.connection, history, rows, snackbar]
+        [compositionRoot.connection, navigate, rows, snackbar]
     );
 
     const setSharingSettings = useCallback(
@@ -233,7 +226,7 @@ export const ListConnectionsPage: React.FC = () => {
     }, [compositionRoot, snackbar, search, reloadKey]);
 
     const createConnection = () => {
-        history.push("/connections/new");
+        navigate("/connections/new");
     };
 
     const onChange = useCallback((state: TableState<ConnectionData>) => {

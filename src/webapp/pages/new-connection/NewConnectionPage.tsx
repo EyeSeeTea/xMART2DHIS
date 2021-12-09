@@ -1,23 +1,23 @@
-import { NoticeBox, ButtonStrip, Button } from "@dhis2/ui";
+import { Button, ButtonStrip, NoticeBox } from "@dhis2/ui";
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
-import React, { useCallback, useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import i18n from "../../../locales";
-import { useAppContext } from "../../contexts/app-context";
-import { Form } from "react-final-form";
-import { FORM_ERROR } from "final-form";
-import { DataMart, ConnectionData } from "../../../domain/entities/xmart/XMart";
-import styled from "styled-components";
-import { useGoBack } from "../../hooks/useGoBack";
-import { getConnectionFieldName } from "./utils";
-import { RenderConnectionField } from "./ConnectionForm";
 import { Paper } from "@material-ui/core";
+import { FORM_ERROR } from "final-form";
+import React, { useCallback, useEffect, useState } from "react";
+import { Form } from "react-final-form";
+import { useLocation, useParams } from "react-router-dom";
+import styled from "styled-components";
+import { ConnectionData, DataMart } from "../../../domain/entities/xmart/XMart";
+import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
+import { useAppContext } from "../../contexts/app-context";
+import { useGoBack } from "../../hooks/useGoBack";
+import { RenderConnectionField } from "./ConnectionForm";
+import { getConnectionFieldName } from "./utils";
 
 export const NewConnectionPage: React.FC = () => {
     const { compositionRoot, currentUser } = useAppContext();
-    const { id, action } = useParams<{ id: string; action: "new" | "edit" }>();
-    const location = useLocation<{ connection?: ConnectionData }>();
+    const { id, action = "new" } = useParams();
+    const location = useLocation();
     const isEdit = action === "edit" && id ? true : false;
     const loading = useLoading();
     const snackbar = useSnackbar();
@@ -43,7 +43,7 @@ export const NewConnectionPage: React.FC = () => {
     useEffect(() => {
         if (location.state?.connection) {
             setInitialConnection(location.state?.connection);
-        } else if (isEdit) {
+        } else if (isEdit && id) {
             compositionRoot.connection.getById(id).run(
                 result => setInitialConnection(result),
                 () => setError(true)

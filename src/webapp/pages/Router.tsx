@@ -1,15 +1,15 @@
 import React from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import i18n from "../../locales";
 import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
+import { ActionDetailPage } from "./action-detail/ActionDetailPage";
+import { ActionsListPage } from "./actions-list/ActionsListPage";
 import { LandingPage } from "./landing/LandingPage";
 import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
-import { NewConnectionPage } from "./new-connection/NewConnectionPage";
 import { ListMartPage } from "./list-mart/ListMartPage";
-import { ActionsListPage } from "./actions-list/ActionsListPage";
-import { ActionDetailPage } from "./action-detail/ActionDetailPage";
+import { NewConnectionPage } from "./new-connection/NewConnectionPage";
 
 export interface DetailPageParams {
     id: string;
@@ -19,75 +19,72 @@ export interface DetailPageParams {
 export const Router = () => {
     return (
         <HashRouter>
-            <Switch>
+            <Routes>
                 <Route
                     path="/actions/:action(new|edit)/:id?"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Action")}>
                             <ActionDetailPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
                     path="/actions"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Actions")}>
                             <ActionsListPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
                     path={"/connections/:action(new|edit)/:id?"}
-                    render={props => (
-                        <RouterPage
-                            title={
-                                props.match.params.action === "new"
-                                    ? i18n.t("New Connection")
-                                    : i18n.t("Edit Connection")
-                            }
-                        >
+                    element={
+                        <RouterPage title={i18n.t("Connection creation")}>
                             <NewConnectionPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
                     path="/connections"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Connections")}>
                             <ListConnectionsPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
                     path="/list"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Browse xMART")}>
                             <ListMartPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
-                    render={() => (
+                    path="/"
+                    element={
                         <RouterPage title={i18n.t("xMART2DHIS")} isRoot={true}>
                             <LandingPage />
                         </RouterPage>
-                    )}
+                    }
                 />
-            </Switch>
+            </Routes>
         </HashRouter>
     );
 };
 
 const RouterPage: React.FC<{ title: string; isRoot?: boolean }> = ({ children, title, isRoot = false }) => {
+    const navigate = useNavigate();
+
     return (
         <Container>
             <AppHeader>
-                <PageHeader title={title} onBackClick={!isRoot ? () => window.history.back() : undefined} />
+                <PageHeader title={title} onBackClick={!isRoot ? () => navigate(-1) : undefined} />
                 <Spacer />
                 <AzureBadge />
             </AppHeader>
