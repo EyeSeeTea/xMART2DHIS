@@ -13,7 +13,7 @@ import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
-import { ConnectionData } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/XMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";
@@ -27,7 +27,7 @@ export const ListConnectionsPage: React.FC = () => {
 
     const navigate = useNavigate();
 
-    const [rows, setRows] = useState<ConnectionData[]>([]);
+    const [rows, setRows] = useState<DataMart[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, changeSearch] = useState<string>("");
     const [selection, setSelection] = useState<TableSelection[]>([]);
@@ -35,18 +35,18 @@ export const ListConnectionsPage: React.FC = () => {
 
     const [reloadKey, reload] = useReload();
 
-    const columns: TableColumn<ConnectionData>[] = useMemo(
+    const columns: TableColumn<DataMart>[] = useMemo(
         () => [
             { name: "name", text: i18n.t("Name") },
-            { name: "code", text: i18n.t("Code") },
-            { name: "type", text: i18n.t("Type") },
-            { name: "apiUrl", text: i18n.t("Connection URL") },
+            { name: "martCode", text: i18n.t("Code") },
+            { name: "environment", text: i18n.t("Type") },
+            { name: "dataEndpoint", text: i18n.t("Connection URL") },
         ],
         []
     );
 
     const verifyUserCanEdit = useCallback(
-        (connections: ConnectionData[]) => {
+        (connections: DataMart[]) => {
             if (!currentUser) return false;
             return connections.every(value => hasPermissions(value, "write", currentUser));
         },
@@ -112,7 +112,7 @@ export const ListConnectionsPage: React.FC = () => {
                 setCreateDialogProps({
                     initialConnection: connection,
                     onClose: () => setCreateDialogProps(undefined),
-                    onSave: async (connection: ConnectionData) => {
+                    onSave: async (connection: DataMart) => {
                         loadingScreen.show(true, i18n.t("Updating sharing settings"));
                         const connectionWithLastUpdatedInfo = {
                             ...connection,
@@ -147,10 +147,10 @@ export const ListConnectionsPage: React.FC = () => {
                     .testConnection({
                         id: connection.id,
                         name: connection.name,
-                        code: connection.code,
-                        type: connection.type,
-                        apiUrl: connection.apiUrl,
-                    })
+                        martCode: connection.martCode,
+                        environment: connection.environment,
+                        dataEndpoint: connection.dataEndpoint,
+                    } as DataMart)
                     .run(
                         batch => {
                             snackbar.success(`Connection tested successfully. Batch: ${batch}`);
@@ -166,14 +166,14 @@ export const ListConnectionsPage: React.FC = () => {
         [compositionRoot.connection, loadingScreen, rows, snackbar]
     );
 
-    const details: ObjectsTableDetailField<ConnectionData>[] = [
+    const details: ObjectsTableDetailField<DataMart>[] = [
         { name: "name" as const, text: i18n.t("Connection name") },
-        { name: "code" as const, text: i18n.t("Code") },
-        { name: "apiUrl" as const, text: i18n.t("API URL") },
-        { name: "type" as const, text: i18n.t("Type") },
+        { name: "martCode" as const, text: i18n.t("Code") },
+        { name: "dataEndpoint" as const, text: i18n.t("API URL") },
+        { name: "environment" as const, text: i18n.t("Type") },
     ];
 
-    const actions: TableAction<ConnectionData>[] = useMemo(
+    const actions: TableAction<DataMart>[] = useMemo(
         () => [
             {
                 name: "details",
@@ -235,7 +235,7 @@ export const ListConnectionsPage: React.FC = () => {
         navigate("/connections/new");
     };
 
-    const onChange = useCallback((state: TableState<ConnectionData>) => {
+    const onChange = useCallback((state: TableState<DataMart>) => {
         setSelection(state.selection);
     }, []);
 
@@ -243,7 +243,7 @@ export const ListConnectionsPage: React.FC = () => {
         <React.Fragment>
             {createDialogProps ? <SharingSettingsDialog {...createDialogProps} /> : null}
 
-            <ObjectsTable<ConnectionData>
+            <ObjectsTable<DataMart>
                 rows={rows}
                 columns={columns}
                 details={details}
@@ -258,7 +258,7 @@ export const ListConnectionsPage: React.FC = () => {
     );
 };
 
-const hasPermissions = (connection: ConnectionData, permission: "read" | "write", currentUser: User) => {
+const hasPermissions = (connection: DataMart, permission: "read" | "write", currentUser: User) => {
     if (isSuperAdmin(currentUser)) return true;
 
     const { publicAccess = "--------", userAccesses = [], userGroupAccesses = [], owner } = connection;

@@ -7,46 +7,46 @@ export const dataMarts: DataMart[] = [
     {
         id: "TRAINING",
         name: "[UAT] EST Playground",
-        code: "TRAINING_ARC",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
+        martCode: "TRAINING_ARC",
+        environment: "UAT",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
     },
     {
         id: "TRAINING_RJ",
         name: "[UAT] NTD Playground",
-        code: "TRAINING_RJ",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_RJ",
+        martCode: "TRAINING_RJ",
+        environment: "UAT",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_RJ",
     },
     {
         id: "REFMART-UAT",
         name: "[UAT] REFMART",
-        code: "REFMART",
-        type: "UAT",
-        apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/REFMART",
+        martCode: "REFMART",
+        environment: "UAT",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/REFMART",
     },
     {
         id: "REFMART-UAT-PUBLIC",
         name: "[UAT] REFMART (Public)",
-        code: "REFMART",
-        type: "PUBLIC",
-        apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-r5quteqglawbs.azurefd.net/REFMART",
+        martCode: "REFMART",
+        environment: "UAT",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/frontdoor-r5quteqglawbs.azurefd.net/REFMART",
     },
     {
         id: "REFMART-PROD",
         name: "[PROD] REFMART",
-        code: "REFMART",
-        type: "PROD",
-        apiUrl: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata/REFMART",
+        martCode: "REFMART",
+        environment: "PROD",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/extranet.who.int/xmart-api/odata/REFMART",
     },
     {
         id: "REFMART-PROD-PUBLIC",
         name: "[PROD] REFMART (Public)",
-        code: "REFMART",
-        type: "PUBLIC",
-        apiUrl: "https://dev.eyeseetea.com/cors/frontdoor-l4uikgap6gz3m.azurefd.net/REFMART",
+        martCode: "REFMART",
+        environment: "PROD",
+        dataEndpoint: "https://dev.eyeseetea.com/cors/frontdoor-l4uikgap6gz3m.azurefd.net/REFMART",
     },
-];
+] as DataMart[];
 
 export class ListDataMartsUseCase implements UseCase {
     constructor(private martRepository: XMartRepository) {}
@@ -54,7 +54,7 @@ export class ListDataMartsUseCase implements UseCase {
     public execute(): FutureData<DataMart[]> {
         console.debug(this.martRepository);
 
-        // TODO: Hardcoded for now
+        // TODO: HardmartCoded for now
         // return this.martRepository.listDataMarts(mart, table, options);
         return Future.success(dataMarts);
     }

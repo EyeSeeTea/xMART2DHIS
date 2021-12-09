@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { ConnectionData, DataMart } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/XMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";
@@ -23,12 +23,12 @@ export const NewConnectionPage: React.FC = () => {
     const snackbar = useSnackbar();
     const goBack = useGoBack();
     const goHome = useCallback(() => goBack(true), [goBack]);
-    const defaultConnectionData: ConnectionData = {
+    const defaultDataMart: DataMart = {
         id: generateUid(),
         name: "",
-        code: "",
-        type: "PUBLIC",
-        apiUrl: "",
+        martCode: "",
+        environment: "UAT",
+        dataEndpoint: "",
         owner: { id: currentUser.id, name: currentUser.name },
         created: new Date(),
         lastUpdated: new Date(),
@@ -37,7 +37,7 @@ export const NewConnectionPage: React.FC = () => {
         userAccesses: [],
         userGroupAccesses: [],
     };
-    const [initialConnection, setInitialConnection] = useState<ConnectionData>(defaultConnectionData);
+    const [initialConnection, setInitialConnection] = useState<DataMart>(defaultDataMart);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
@@ -72,7 +72,7 @@ export const NewConnectionPage: React.FC = () => {
             if (connections === undefined) return { FORM_ERROR };
 
             loading.show(true, i18n.t("Saving connection"));
-            let connectionToSave: ConnectionData;
+            let connectionToSave: DataMart;
 
             if (connections[0]) {
                 connectionToSave = {

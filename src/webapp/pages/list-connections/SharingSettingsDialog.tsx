@@ -3,16 +3,16 @@ import { useCallback, useState } from "react";
 import { NamedRef } from "../../../domain/entities/metadata/Ref";
 import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
-import { ConnectionData } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/XMart";
 
 export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ initialConnection, onClose, onSave }) => {
     const { compositionRoot, currentUser } = useAppContext();
-    const defaultConnectionData: ConnectionData = {
+    const defaultDataMart: DataMart = {
         id: "",
         name: "",
-        code: "",
-        type: "PUBLIC",
-        apiUrl: "",
+        martCode: "",
+        environment: "UAT",
+        dataEndpoint: "",
         owner: { id: currentUser.id, name: currentUser.name },
         created: new Date(),
         lastUpdated: new Date(),
@@ -22,7 +22,7 @@ export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ in
         userGroupAccesses: [],
     };
 
-    const [connection, updateConnection] = useState<ConnectionData>(initialConnection ?? defaultConnectionData);
+    const [connection, updateConnection] = useState<DataMart>(initialConnection ?? defaultDataMart);
     const save = useCallback(async () => {
         await onSave(connection);
         onClose();
@@ -75,9 +75,9 @@ export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ in
 };
 
 export interface SharingSettingsDialogProps {
-    initialConnection?: ConnectionData;
+    initialConnection?: DataMart;
     onClose: () => void;
-    onSave: (connection: ConnectionData) => Promise<void>;
+    onSave: (connection: DataMart) => Promise<void>;
 }
 
 function mapToSharingRule(array: NamedRef[]): SharingRule[] {

@@ -3,6 +3,7 @@ import { getD2APiFromInstance } from "../../../../utils/d2-api";
 import { apiToFuture } from "../../../../utils/futures";
 import { getUid } from "../../../../utils/uid";
 import { Future, FutureData } from "../../../entities/Future";
+import { DataMart } from "../../../entities/xmart/XMart";
 import { XMartPipelineDefinition } from "../../../entities/xmart/xMartSyncTables";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
@@ -58,10 +59,10 @@ export class LoadPipelineExample implements UseCase {
 const TRAINING_MART = {
     id: "TRAINING",
     name: "TRAINING",
-    code: "TRAINING_ARC",
-    type: "UAT",
-    apiUrl: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
-} as const;
+    martCode: "TRAINING_ARC",
+    environment: "UAT",
+    dataEndpoint: "https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart-api/odata/TRAINING_ARC",
+} as DataMart;
 
 const loadPipelineXml = `
 <XmartPipeline IsStructure="true">

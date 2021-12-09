@@ -1,3 +1,4 @@
+import { Constants } from "./data/Constants";
 import { ActionDataStoreRepository } from "./data/repositories/ActionDataStoreRepository";
 import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRepository";
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
@@ -36,7 +37,7 @@ import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUse
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
-    const azureRepository = new AzureMSALRepository();
+    const azureRepository = new AzureMSALRepository(Constants.TENANT_ID, Constants.CLIENT_ID);
     const martRepository = new XMartDefaultRepository(azureRepository);
     const dataStoreClient = new StorageDataStoreRepository("global", instance);
     const connectionRepository = new ConnectionsDataStoreRepository(dataStoreClient);

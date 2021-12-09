@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ConnectionsRepository, ConnectionsFilter } from "../../domain/repositories/ConnectionsRepository";
-import { ConnectionData } from "../../domain/entities/xmart/XMart";
+import { DataMart } from "../../domain/entities/xmart/XMart";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageDefaultRepository } from "./StorageDefaultRepository";
 import { Future, FutureData } from "../../domain/entities/Future";
@@ -8,8 +8,8 @@ import { Future, FutureData } from "../../domain/entities/Future";
 export class ConnectionsDataStoreRepository implements ConnectionsRepository {
     constructor(private dataStoreClient: StorageDefaultRepository) {}
 
-    listAll({ search }: ConnectionsFilter): FutureData<ConnectionData[]> {
-        return Future.fromPromise(this.dataStoreClient.listObjectsInCollection<ConnectionData>(Namespaces.CONNECTIONS))
+    listAll({ search }: ConnectionsFilter): FutureData<DataMart[]> {
+        return Future.fromPromise(this.dataStoreClient.listObjectsInCollection<DataMart>(Namespaces.CONNECTIONS))
             .flatMapError(error => Future.error(String(error)))
             .map(data =>
                 search
@@ -24,19 +24,17 @@ export class ConnectionsDataStoreRepository implements ConnectionsRepository {
             );
     }
 
-    getById(id: string): FutureData<ConnectionData> {
-        return Future.fromPromise(
-            this.dataStoreClient.getObjectInCollection<ConnectionData>(Namespaces.CONNECTIONS, id)
-        )
+    getById(id: string): FutureData<DataMart> {
+        return Future.fromPromise(this.dataStoreClient.getObjectInCollection<DataMart>(Namespaces.CONNECTIONS, id))
             .flatMapError(error => Future.error(String(error)))
             .flatMap(actionData =>
                 actionData ? Future.success(actionData) : Future.error(`The action ${id} doesnot exist`)
             );
     }
 
-    save(connection: ConnectionData): FutureData<void> {
+    save(connection: DataMart): FutureData<void> {
         return Future.fromPromise(
-            this.dataStoreClient.saveObjectInCollection<ConnectionData>(Namespaces.CONNECTIONS, connection)
+            this.dataStoreClient.saveObjectInCollection<DataMart>(Namespaces.CONNECTIONS, connection)
         ).flatMapError(error => Future.error(String(error)));
     }
 

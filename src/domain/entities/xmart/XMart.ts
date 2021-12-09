@@ -1,25 +1,13 @@
 import { SharedRef } from "../metadata/Ref";
 
-export type DataMartEndpoint = "PUBLIC" | "PROD" | "UAT";
+export type DataMartEnvironment = "PROD" | "UAT";
 
-export interface DataMart {
-    id: string; // Auto-generated ID
-    name: string; // User defined name
-    code: string; // xMART code
-    type: DataMartEndpoint;
+export interface DataMart extends SharedRef {
+    environment: DataMartEnvironment;
+    martCode: string;
     // If public, manually set by the user in the UI ie: https://frontdoor-r5quteqglawbs.azurefd.net/REFMART
     // If private, set with a dropdown in the UI https://portal-uat.who.int/xmart-api/odata/REFMART (UAT) or https://extranet.who.int/xmart-api/odata/REFMART (PROD)
-    apiUrl: string;
-}
-
-export interface ConnectionData extends SharedRef {
-    id: string; // Auto-generated ID
-    name: string; // User defined name*/
-    code: string; // xMART code
-    type: DataMartEndpoint;
-    // If public, manually set by the user in the UI ie: https://frontdoor-r5quteqglawbs.azurefd.net/REFMART
-    // If private, set with a dropdown in the UI https://portal-uat.who.int/xmart-api/odata/REFMART (UAT) or https://extranet.who.int/xmart-api/odata/REFMART (PROD)
-    apiUrl: string;
+    dataEndpoint: string;
 }
 
 export interface MartTable {
