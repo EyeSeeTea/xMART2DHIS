@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import i18n from "../../../../locales";
 import { D2Api } from "../../../../types/d2-api";
 import { useAppContext } from "../../../contexts/app-context";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 
 const useStyles = makeStyles({
     loading: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     },
 });
 
-const OrganisationUnitsSelectionStep: React.FC<SyncWizardStepProps> = ({ action, onChange }) => {
+const OrganisationUnitsSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange }) => {
     const { compositionRoot } = useAppContext();
     const classes = useStyles();
     const snackbar = useSnackbar();

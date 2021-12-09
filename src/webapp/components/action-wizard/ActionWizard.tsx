@@ -11,19 +11,19 @@ import OrganisationUnitsSelectionStep from "./steps/OrganisationUnitsSelectionSt
 import PeriodSelectionStep from "./steps/PeriodSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";
 
-interface SyncWizardProps {
+interface ActionWizardProps {
     action: SyncAction;
     isDialog?: boolean;
     onChange?(action: SyncAction): void;
     onCancel?(): void;
 }
 
-export const stepsBaseInfo: SyncWizardStep[] = [
+export const stepsBaseInfo: ActionWizardStep[] = [
     {
         key: "general-info",
         label: i18n.t("General info"),
         component: GeneralInfoStep,
-        validationKeys: ["name"],
+        validationKeys: ["name", "connectionId"],
     },
     {
         key: "organisations-units",
@@ -57,18 +57,18 @@ export const stepsBaseInfo: SyncWizardStep[] = [
     },
 ];
 
-export interface SyncWizardStep extends WizardStep {
+export interface ActionWizardStep extends WizardStep {
     validationKeys: string[];
     hidden?: (action: SyncAction) => boolean;
 }
 
-export interface SyncWizardStepProps {
+export interface ActionWizardStepProps {
     action: SyncAction;
     onChange: (action: SyncAction) => void;
     onCancel: () => void;
 }
 
-const SyncWizard: React.FC<SyncWizardProps> = ({ action, onCancel, onChange }) => {
+const ActionWizard: React.FC<ActionWizardProps> = ({ action, onCancel, onChange }) => {
     const location = useLocation();
     const steps = stepsBaseInfo.map(step => ({ ...step, props: { action, onCancel, onChange } }));
 
@@ -97,4 +97,4 @@ const SyncWizard: React.FC<SyncWizardProps> = ({ action, onCancel, onChange }) =
     );
 };
 
-export default SyncWizard;
+export default ActionWizard;

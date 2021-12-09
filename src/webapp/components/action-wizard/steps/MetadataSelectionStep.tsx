@@ -3,14 +3,14 @@ import _ from "lodash";
 import React, { useCallback, useState } from "react";
 
 import MetadataTable from "../../metadata-table/MetadataTable";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 import { MetadataType } from "../../../../utils/d2";
 import i18n from "../../../../locales";
 import { DataSetModel, ProgramModel } from "../../../../domain/entities/models/D2Models";
 
 const models = [ProgramModel, DataSetModel];
 
-export default function MetadataSelectionStep({ action, onChange }: SyncWizardStepProps) {
+export default function MetadataSelectionStep({ action, onChange }: ActionWizardStepProps) {
     const snackbar = useSnackbar();
 
     const [metadataIds, updateMetadataIds] = useState<string[]>([]);

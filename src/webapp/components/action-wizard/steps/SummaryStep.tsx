@@ -11,7 +11,7 @@ import { DataMart } from "../../../../domain/entities/xmart/XMart";
 import { cleanOrgUnitPaths } from "../../../../domain/utils";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 
 const LiEntry: React.FC<{ label: string; value?: string }> = ({ label, value, children }) => {
     return (
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const SummaryStep = ({ action, onCancel }: SyncWizardStepProps) => {
+export const SummaryStep = ({ action, onCancel }: ActionWizardStepProps) => {
     const { compositionRoot } = useAppContext();
 
     const snackbar = useSnackbar();

@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from "react";
 import { DataSyncPeriod } from "../../../../domain/entities/metadata/DataSyncPeriod";
 import PeriodSelection, { ObjectWithPeriod } from "../../period-selection/PeriodSelection";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 
-const PeriodSelectionStep: React.FC<SyncWizardStepProps> = ({ action, onChange }) => {
+const PeriodSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange }) => {
     const updatePeriod = useCallback(
         (period: DataSyncPeriod) => {
             onChange(action.update({ period, startDate: undefined, endDate: undefined }));

@@ -7,9 +7,9 @@ import i18n from "../../../../locales";
 import { Dictionary } from "../../../../types/utils";
 import { useAppContext } from "../../../contexts/app-context";
 import Dropdown from "../../dropdown/Dropdown";
-import { SyncWizardStepProps } from "../SyncWizard";
+import { ActionWizardStepProps } from "../ActionWizard";
 
-export const GeneralInfoStep = ({ action, onChange }: SyncWizardStepProps) => {
+export const GeneralInfoStep = ({ action, onChange }: ActionWizardStepProps) => {
     const classes = useStyles();
 
     const [connections, setConnections] = useState<DataMart[]>([]);
