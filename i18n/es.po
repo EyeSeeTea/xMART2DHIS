@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-10T06:59:11.402Z\n"
+"POT-Creation-Date: 2021-12-10T07:44:04.347Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -412,16 +412,19 @@ msgstr ""
 msgid "Are you sure you want to delete {{total}} actions?"
 msgstr ""
 
-msgid "List connections of the MART"
-msgstr ""
-
 msgid "Actions are a way to trigger events in your application"
 msgstr ""
 
 msgid "Define templates of mapping models to import in the actions"
 msgstr ""
 
-msgid "List table contents of the MART"
+msgid "List connections of the MART"
+msgstr ""
+
+msgid "Browse content"
+msgstr ""
+
+msgid "List table contents of the connections"
 msgstr ""
 
 msgid "Connection URL"

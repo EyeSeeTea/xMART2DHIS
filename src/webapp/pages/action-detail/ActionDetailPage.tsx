@@ -6,21 +6,17 @@ import i18n from "../../../locales";
 import ActionWizard from "../../components/action-wizard/ActionWizard";
 import { useAppContext } from "../../contexts/app-context";
 
-export interface SyncActionDetailParams {
-    id: string;
-    action: "edit" | "new";
-}
-
-export const ActionDetailPage: React.FC = () => {
-    //TODO: implement confirmation dialog to back or cancel in the RouterPage
-    //because it's where the back button exists or to create a hook to access to back from here
+//TODO: implement confirmation dialog to back or cancel in the RouterPage
+//because it's where the back button exists or to create a hook to access to back from here
+export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) => {
+    const { compositionRoot } = useAppContext();
     const loading = useLoading();
     const navigate = useNavigate();
     const snackbar = useSnackbar();
-    const { id, action } = useParams() as SyncActionDetailParams;
-    const { compositionRoot } = useAppContext();
 
-    const [syncAction, updateSyncAction] = useState(SyncAction.build());
+    const { id } = useParams();
+
+    const [syncAction, updateSyncAction] = useState(() => SyncAction.build());
 
     useEffect(() => {
         if (action === "edit" && !!id) {
@@ -45,3 +41,7 @@ export const ActionDetailPage: React.FC = () => {
         </React.Fragment>
     );
 };
+
+export interface ActionDetailPageProps {
+    action: "edit" | "new";
+}

@@ -23,10 +23,19 @@ export const Router = () => {
         <HashRouter>
             <Routes>
                 <Route
-                    path="/actions/:action(new|edit)/:id?"
+                    path="/actions/new"
                     element={
                         <RouterPage title={i18n.t("Action")}>
-                            <ActionDetailPage />
+                            <ActionDetailPage action="new" />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/actions/edit/:id"
+                    element={
+                        <RouterPage title={i18n.t("Action")}>
+                            <ActionDetailPage action="edit" />
                         </RouterPage>
                     }
                 />
