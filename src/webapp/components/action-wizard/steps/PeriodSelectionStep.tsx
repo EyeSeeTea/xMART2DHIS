@@ -3,7 +3,7 @@ import { DataSyncPeriod } from "../../../../domain/entities/metadata/DataSyncPer
 import PeriodSelection, { ObjectWithPeriod } from "../../period-selection/PeriodSelection";
 import { ActionWizardStepProps } from "../ActionWizard";
 
-const PeriodSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange }) => {
+export const PeriodSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange }) => {
     const updatePeriod = useCallback(
         (period: DataSyncPeriod) => {
             onChange(action.update({ period, startDate: undefined, endDate: undefined }));
@@ -49,5 +49,3 @@ const PeriodSelectionStep: React.FC<ActionWizardStepProps> = ({ action, onChange
 
     return <PeriodSelection objectWithPeriod={objectWithPeriod} onFieldChange={onFieldChange} />;
 };
-
-export default PeriodSelectionStep;

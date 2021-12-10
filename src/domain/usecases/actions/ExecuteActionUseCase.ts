@@ -1,34 +1,21 @@
 import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
+import { SyncAction } from "../../entities/actions/SyncAction";
+import { DataValue } from "../../entities/data/DataValue";
+import { ProgramEvent } from "../../entities/data/ProgramEvent";
+import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
 import { MetadataPackage } from "../../entities/metadata/Metadata";
-import { DataMart } from "../../entities/xmart/XMart";
+import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
+import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
 import { EventsRepository } from "../../repositories/EventsRepository";
 import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { dataMarts } from "../xmart/ListDataMartsUseCase";
-import { ProgramEvent } from "../../entities/data/ProgramEvent";
-import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
-import { DataValue } from "../../entities/data/DataValue";
-import { SyncAction } from "../../entities/actions/SyncAction";
-
-//TODO: Remove this when the repository return data marts
-const getDataMartById = (id: string) =>
-    Future.success<DataMart[]>(dataMarts).flatMap(dataMarts => {
-        const dataMart = dataMarts.find(dataMart => dataMart.id === id);
-
-        const dataMartResult: FutureData<DataMart> = dataMart
-            ? Future.success(dataMart)
-            : Future.error("Data mart not found");
-
-        return dataMartResult;
-    });
-
 export class ExecuteActionUseCase {
     constructor(
         private actionRepository: ActionRepository,
@@ -37,7 +24,8 @@ export class ExecuteActionUseCase {
         private teiRepository: TEIRepository,
         private aggregatedRespository: AggregatedRepository,
         private fileRepository: FileRepository,
-        private xMartRepository: XMartRepository
+        private xMartRepository: XMartRepository,
+        private connectionsRepository: ConnectionsRepository
     ) {}
 
     public execute(actionId: string): FutureData<string> {
@@ -47,7 +35,7 @@ export class ExecuteActionUseCase {
                 return Future.joinObj({
                     action: Future.success(action),
                     metadata: this.extractMetadata(action.metadataIds),
-                    dataMart: getDataMartById(action.connectionId),
+                    dataMart: this.connectionsRepository.getById(action.connectionId),
                 });
             })
             .flatMap(({ action, metadata, dataMart }) => {

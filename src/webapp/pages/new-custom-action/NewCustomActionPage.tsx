@@ -1,10 +1,11 @@
-import { Button } from "@material-ui/core";
+import { Button } from "@dhis2/ui";
 import Editor, { Monaco } from "@monaco-editor/react";
 import _ from "lodash";
 import React, { useCallback, useState } from "react";
 import ReactJson from "react-json-view";
 import styled from "styled-components";
 import * as ts from "typescript";
+import { Constants } from "../../../data/Constants";
 import { AzureMSALRepository } from "../../../data/repositories/AzureMSALRepository";
 import { InstanceD2ApiRepository } from "../../../data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "../../../data/repositories/XMartDefaultRepository";
@@ -23,7 +24,7 @@ export const NewActionPage: React.FC = () => {
         // eslint-disable-next-line no-eval
         const runtime = eval(jsCode);
 
-        const azureRepository = new AzureMSALRepository();
+        const azureRepository = new AzureMSALRepository(Constants.TENANT_ID, Constants.CLIENT_ID);
         const martRepository = new XMartDefaultRepository(azureRepository);
         const instanceRepository = new InstanceD2ApiRepository(instance);
         const result = await runtime.execute(martRepository, instanceRepository);
@@ -35,8 +36,8 @@ export const NewActionPage: React.FC = () => {
         <React.Fragment>
             <MonacoEditor value={value} onChange={setValue} />
 
-            <Center>
-                <Button variant="contained" onClick={execute} style={{ margin: "10px" }}>
+            <Center style={{ marginTop: 10 }}>
+                <Button type="button" onClick={execute}>
                     {i18n.t("Run")}
                 </Button>
             </Center>

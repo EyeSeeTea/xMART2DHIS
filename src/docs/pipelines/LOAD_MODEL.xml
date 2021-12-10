@@ -55,6 +55,8 @@
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
         <FindReplace Find=" " ReplaceWith="_" Column="FK_TABLE_CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="FK_TABLE_CODE" />
+        <FindReplace Find=" " ReplaceWith="_" Column="TABLE_CODE" />
+        <FindReplace Find="-" ReplaceWith="_" Column="TABLE_CODE" />
       </Transform>
       <LookupIDs>
         <StoreLookup LookupTable="TABLES" SourceResultColumn="TABLE_ID" SourceColumns="[TABLE_CODE], [MART_ID]" LookupResultColumn="Sys_ID" LookupColumns="CODE, MART_ID__Sys_ID" RegisterMissingAsIssues="false" />

@@ -8,15 +8,13 @@ import {
     TableSelection,
     TableState,
 } from "@eyeseetea/d2-ui-components";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
-import i18n from "../../../../locales";
-import { ModelMapping } from "../../../../domain/entities/mapping-template/MappingTemplate";
-import React from "react";
 import { Button, Icon } from "@material-ui/core";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
+import { ModelMapping } from "../../../../domain/entities/mapping-template/MappingTemplate";
+import i18n from "../../../../locales";
 import ModelMappingDialog from "../../model-mapping-dialog/ModelMappingDialog";
+import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
 
 const StyledButton = styled(Button)`
     margin-left: 8px;
@@ -26,7 +24,7 @@ export interface ModelMappingRow extends ModelMapping {
     id: string;
 }
 
-export default function MappingSelectionStep({ mappingTemplate, onChange }: MappingTemplateWizardStepProps) {
+export function MappingSelectionStep({ mappingTemplate, onChange }: MappingTemplateWizardStepProps) {
     const [currentModelMapping, setCurrentModelMapping] = useState<ModelMapping | undefined>(undefined);
     const [rows, setRows] = useState<ModelMappingRow[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);

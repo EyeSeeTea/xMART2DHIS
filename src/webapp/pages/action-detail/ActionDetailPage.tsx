@@ -1,26 +1,22 @@
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import i18n from "../../../locales";
 import ActionWizard from "../../components/action-wizard/ActionWizard";
 import { useAppContext } from "../../contexts/app-context";
 
-export interface SyncActionDetailParams {
-    id: string;
-    action: "edit" | "new";
-}
-
-export const ActionDetailPage: React.FC = () => {
-    //TODO: implement confirmation dialog to back or cancel in the RouterPage
-    //because it's where the back button exists or to create a hook to access to back from here
-    const loading = useLoading();
-    const history = useHistory();
-    const snackbar = useSnackbar();
-    const { id, action } = useParams() as SyncActionDetailParams;
+//TODO: implement confirmation dialog to back or cancel in the RouterPage
+//because it's where the back button exists or to create a hook to access to back from here
+export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) => {
     const { compositionRoot } = useAppContext();
+    const loading = useLoading();
+    const navigate = useNavigate();
+    const snackbar = useSnackbar();
 
-    const [syncAction, updateSyncAction] = useState(SyncAction.build());
+    const { id } = useParams();
+
+    const [syncAction, updateSyncAction] = useState(() => SyncAction.build());
 
     useEffect(() => {
         if (action === "edit" && !!id) {
@@ -41,7 +37,11 @@ export const ActionDetailPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => history.goBack()} />
+            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate(-1)} />
         </React.Fragment>
     );
 };
+
+export interface ActionDetailPageProps {
+    action: "edit" | "new";
+}

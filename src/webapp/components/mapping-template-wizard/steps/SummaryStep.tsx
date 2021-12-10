@@ -1,8 +1,8 @@
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { DataMart } from "../../../../domain/entities/xmart/XMart";
+import { useNavigate } from "react-router-dom";
+import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
 import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
@@ -36,7 +36,7 @@ export const SummaryStep = ({ mappingTemplate, onCancel }: MappingTemplateWizard
 
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -54,7 +54,7 @@ export const SummaryStep = ({ mappingTemplate, onCancel }: MappingTemplateWizard
         } else {
             compositionRoot.mappingTemplates.save(mappingTemplate).run(
                 () => {
-                    history.push(`/mapping-templates/edit/${mappingTemplate.id}`);
+                    navigate(`/mapping-templates/edit/${mappingTemplate.id}`);
                     onCancel();
                     setIsSaving(false);
                 },
@@ -110,7 +110,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const [connection, setConnection] = useState<DataMart>();
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => {
                 const connection = dataMarts.find(d => d.id === mappingTemplate.connectionId);
                 setConnection(connection);

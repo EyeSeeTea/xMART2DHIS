@@ -1,9 +1,6 @@
-import { ObjectsTable, TableColumn, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
-
+import { ObjectsTable, TableColumn, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
-// import { Sync } from "@material-ui/icons";
-// import { Future } from "../../../domain/entities/Future";
+import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
@@ -13,7 +10,7 @@ import { useAppContext } from "../../contexts/app-context";
 export const ListActionsPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [rows, setRows] = useState<SyncAction[]>([]);
     const [results, setResults] = useState<SyncResult[]>();
@@ -55,8 +52,8 @@ export const ListActionsPage: React.FC = () => {
     // );
 
     const goToCreateAction = useCallback(() => {
-        history.push("/custom-actions/new");
-    }, [history]);
+        navigate("/custom-actions/new");
+    }, [navigate]);
 
     useEffect(() => {
         compositionRoot.actions.list().run(

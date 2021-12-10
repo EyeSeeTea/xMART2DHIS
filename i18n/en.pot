@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-10T07:02:34.252Z\n"
-"PO-Revision-Date: 2021-12-10T07:02:34.252Z\n"
+"POT-Creation-Date: 2021-12-10T11:14:55.899Z\n"
+"PO-Revision-Date: 2021-12-10T11:14:55.899Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -21,6 +21,12 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Unable to call xMART API for public data marts"
+msgstr ""
+
+msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
 
 msgid "Field {{field}} cannot be blank"
@@ -90,6 +96,11 @@ msgid "Last year"
 msgstr ""
 
 msgid "Last 5 years"
+msgstr ""
+
+msgid ""
+"An error has occurred saving the action:\n"
+"{{error}}"
 msgstr ""
 
 msgid "You need to select one dataValues mapping"
@@ -348,6 +359,15 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
+msgid "New connection"
+msgstr ""
+
+msgid "Edit connection"
+msgstr ""
+
+msgid "Connections"
+msgstr ""
+
 msgid "Mapping Template"
 msgstr ""
 
@@ -403,19 +423,55 @@ msgstr ""
 msgid "Define templates of mapping models to import in the actions"
 msgstr ""
 
-msgid "List table contents of the MART"
+msgid "List connections of the MART"
 msgstr ""
 
-msgid "Examples"
+msgid "Browse content"
 msgstr ""
 
-msgid "Load pipelines"
+msgid "List table contents of the connections"
 msgstr ""
 
-msgid "Load data"
+msgid "Connection URL"
 msgstr ""
 
-msgid "Load model"
+msgid "Deleting connections"
+msgstr ""
+
+msgid "Successfully deleted {{total}} connections"
+msgstr ""
+
+msgid "An error has ocurred deleting connection(s)"
+msgstr ""
+
+msgid "Connection not found"
+msgstr ""
+
+msgid "Updating sharing settings"
+msgstr ""
+
+msgid "Successfully updated sharing settings"
+msgstr ""
+
+msgid "Testing connection"
+msgstr ""
+
+msgid "Connection name"
+msgstr ""
+
+msgid "Mart Code"
+msgstr ""
+
+msgid "OData API URL"
+msgstr ""
+
+msgid "Replicate"
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "Sharing settings"
 msgstr ""
 
 msgid "Run"
@@ -448,14 +504,20 @@ msgstr ""
 msgid "Are you sure you want to delete {{total}} mapping templates?"
 msgstr ""
 
-msgctxt "MODEL pipelines"
-msgid "Initial load of LOAD_DATA and LOAD"
+msgid "Production"
 msgstr ""
 
-msgctxt "DATA example"
-msgid "LOAD"
+msgid "UAT"
 msgstr ""
 
-msgctxt "MODEL example"
-msgid "LOAD"
+msgid "Saving connection"
+msgstr ""
+
+msgid "Connection successfully edited"
+msgstr ""
+
+msgid "Connection successfully created"
+msgstr ""
+
+msgid "Error saving connection"
 msgstr ""

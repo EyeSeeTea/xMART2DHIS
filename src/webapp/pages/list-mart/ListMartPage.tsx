@@ -3,7 +3,7 @@ import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { DataMart, MartTable, XMartContent } from "../../../domain/entities/xmart/XMart";
+import { DataMart, MartTable, XMartContent } from "../../../domain/entities/xmart/DataMart";
 import { ListXMartOptions } from "../../../domain/repositories/XMartRepository";
 import { Dropdown } from "../../components/dropdown/Dropdown";
 import { useAppContext } from "../../contexts/app-context";
@@ -83,7 +83,7 @@ export const ListMartPage: React.FC = () => {
     }, [compositionRoot, snackbar, selectedApi]);
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => {
                 setDataMarts(dataMarts);
                 setSelectedApi(dataMarts[0]);

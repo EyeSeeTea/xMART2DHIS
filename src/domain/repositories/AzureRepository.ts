@@ -3,8 +3,5 @@ import { FutureData } from "../entities/Future";
 
 export interface AzureRepository {
     getInstance(): PublicClientApplication;
-    getTokenPROD(): FutureData<string>;
-    getTokenUAT(): FutureData<string>;
-    getPrivateTokenPROD(): FutureData<string>;
-    getPrivateTokenUAT(): FutureData<string>;
+    getToken(scope: string): FutureData<string>;
 }
