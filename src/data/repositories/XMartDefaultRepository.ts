@@ -17,6 +17,7 @@ import {
 } from "../../domain/repositories/XMartRepository";
 import i18n from "../../locales";
 import { timeout } from "../../utils/futures";
+import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";
 
 export class XMartDefaultRepository implements XMartRepository {
@@ -224,10 +225,6 @@ export class XMartDefaultRepository implements XMartRepository {
                 );
             });
     }
-}
-
-function joinUrl(...urls: string[]): string {
-    return urls.join("/").replace(/\/+/g, "/");
 }
 
 function buildParams(params?: Record<string, string | number | boolean>): string | undefined {

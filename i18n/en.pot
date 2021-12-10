@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-09T15:41:45.248Z\n"
-"PO-Revision-Date: 2021-12-09T15:41:45.248Z\n"
+"POT-Creation-Date: 2021-12-10T06:59:11.402Z\n"
+"PO-Revision-Date: 2021-12-10T06:59:11.402Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -356,7 +356,10 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-msgid "Connection creation"
+msgid "New connection"
+msgstr ""
+
+msgid "Edit connection"
 msgstr ""
 
 msgid "Connections"
@@ -448,7 +451,10 @@ msgstr ""
 msgid "Connection name"
 msgstr ""
 
-msgid "API URL"
+msgid "Mart Code"
+msgstr ""
+
+msgid "OData API URL"
 msgstr ""
 
 msgid "Replicate"
@@ -503,12 +509,6 @@ msgid "Connection successfully edited"
 msgstr ""
 
 msgid "Connection successfully created"
-msgstr ""
-
-msgid "Cancel connection creation"
-msgstr ""
-
-msgid "Cancel connection editing"
 msgstr ""
 
 msgid "Error saving connection"

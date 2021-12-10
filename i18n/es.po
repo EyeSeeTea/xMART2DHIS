@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-09T15:41:45.248Z\n"
+"POT-Creation-Date: 2021-12-10T06:59:11.402Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -356,7 +356,10 @@ msgstr "Ayuda"
 msgid "Actions"
 msgstr ""
 
-msgid "Connection creation"
+msgid "New connection"
+msgstr ""
+
+msgid "Edit connection"
 msgstr ""
 
 msgid "Connections"
@@ -448,7 +451,10 @@ msgstr ""
 msgid "Connection name"
 msgstr ""
 
-msgid "API URL"
+msgid "Mart Code"
+msgstr ""
+
+msgid "OData API URL"
 msgstr ""
 
 msgid "Replicate"
@@ -503,12 +509,6 @@ msgid "Connection successfully edited"
 msgstr ""
 
 msgid "Connection successfully created"
-msgstr ""
-
-msgid "Cancel connection creation"
-msgstr ""
-
-msgid "Cancel connection editing"
 msgstr ""
 
 msgid "Error saving connection"

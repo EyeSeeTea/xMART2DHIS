@@ -1,4 +1,4 @@
-import { Button, ButtonStrip, NoticeBox } from "@dhis2/ui";
+import { Button, NoticeBox } from "@dhis2/ui";
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Paper } from "@material-ui/core";
 import { FORM_ERROR } from "final-form";
@@ -11,19 +11,22 @@ import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";
 import { useGoBack } from "../../hooks/useGoBack";
-import { RenderConnectionField } from "./ConnectionForm";
-import { getConnectionFieldName } from "./utils";
+import { fields, getConnectionFieldName, RenderConnectionField } from "./ConnectionForm";
 
-export const NewConnectionPage: React.FC = () => {
+export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) => {
     const { compositionRoot, currentUser } = useAppContext();
-    const { id, action = "new" } = useParams();
-    const location = useLocation();
-    const isEdit = action === "edit" && id ? true : false;
     const loading = useLoading();
     const snackbar = useSnackbar();
     const goBack = useGoBack();
+
+    const { id } = useParams();
+    const location = useLocation();
+    const isEdit = action === "edit" && id ? true : false;
+
     const goHome = useCallback(() => goBack(true), [goBack]);
-    const defaultDataMart: DataMart = {
+
+    const [error, setError] = useState<boolean>(false);
+    const [initialConnection, setInitialConnection] = useState<DataMart>({
         id: generateUid(),
         name: "",
         martCode: "",
@@ -36,9 +39,7 @@ export const NewConnectionPage: React.FC = () => {
         publicAccess: "--------",
         userAccesses: [],
         userGroupAccesses: [],
-    };
-    const [initialConnection, setInitialConnection] = useState<DataMart>(defaultDataMart);
-    const [error, setError] = useState<boolean>(false);
+    });
 
     useEffect(() => {
         if (location.state?.connection) {
@@ -100,54 +101,55 @@ export const NewConnectionPage: React.FC = () => {
         [compositionRoot, loading, snackbar, goHome, initialConnection, isEdit]
     );
 
-    const fields = ["name", "code", "type", "apiUrl"];
-    const cancel = !isEdit ? i18n.t("Cancel connection creation") : i18n.t("Cancel connection editing");
     if (error) return null;
 
     return (
-        <React.Fragment>
-            <Container>
-                <Form<{ connections: DataMart[] }>
-                    autocomplete="off"
-                    onSubmit={onSubmit}
-                    initialValues={{ connections: [initialConnection] }}
-                    render={({ handleSubmit, values, submitError }) => (
-                        <form onSubmit={handleSubmit}>
-                            {submitError && (
-                                <NoticeBox title={i18n.t("Error saving connection")} error={true}>
-                                    {submitError}
-                                </NoticeBox>
-                            )}
-                            {fields.map(field => (
-                                <Row key={`connection-row-${field}`}>
-                                    <Label>{getConnectionFieldName(field)}</Label>
-                                    <RenderConnectionField row={0} field={field} />
-                                </Row>
-                            ))}
+        <Container>
+            <Form<{ connections: DataMart[] }>
+                autocomplete="off"
+                keepDirtyOnReinitialize={true}
+                onSubmit={onSubmit}
+                initialValues={{ connections: [initialConnection] }}
+                render={({ handleSubmit, values, submitError }) => (
+                    <form onSubmit={handleSubmit}>
+                        {submitError && (
+                            <NoticeBox title={i18n.t("Error saving connection")} error={true}>
+                                {submitError}
+                            </NoticeBox>
+                        )}
 
-                            <ButtonsRow>
-                                <div>
-                                    <Button type="submit" primary>
-                                        {i18n.t("Save")}
-                                    </Button>
+                        {fields.map(field => (
+                            <Row key={`connection-row-${field}`}>
+                                <Label>{getConnectionFieldName(field)}</Label>
+                                <RenderConnectionField values={values.connections} row={0} field={field} />
+                            </Row>
+                        ))}
 
-                                    <Button type="reset" onClick={goHome}>
-                                        {cancel}
-                                    </Button>
-                                </div>
-                                <div style={{ marginRight: 7 }}>
-                                    <Button type="button" onClick={() => testConnection(values)}>
-                                        {i18n.t("Test connection")}
-                                    </Button>
-                                </div>
-                            </ButtonsRow>
-                        </form>
-                    )}
-                />
-            </Container>
-        </React.Fragment>
+                        <ButtonsRow>
+                            <Button type="submit" primary>
+                                {i18n.t("Save")}
+                            </Button>
+
+                            <Button type="reset" onClick={goHome}>
+                                {i18n.t("Cancel")}
+                            </Button>
+
+                            <Spacer />
+
+                            <Button type="button" onClick={() => testConnection(values)}>
+                                {i18n.t("Test connection")}
+                            </Button>
+                        </ButtonsRow>
+                    </form>
+                )}
+            />
+        </Container>
     );
 };
+
+export interface NewConnectionPageProps {
+    action: "new" | "edit";
+}
 
 const Row = styled.div`
     margin: 20px 0;
@@ -157,13 +159,19 @@ const Label = styled.b`
     display: block;
     margin-bottom: 15px;
 `;
+
 const Container = styled(Paper)`
     margin: 20px;
     padding: 40px;
 `;
-const ButtonsRow = styled(ButtonStrip)`
-    button:focus::after {
-        border-color: transparent !important;
-    }
-    justify-content: space-between;
+
+const ButtonsRow = styled.div`
+    display: flex;
+    gap: 20px;
+    padding-top: 10px;
+    margin-right: 9px;
+`;
+
+const Spacer = styled.span`
+    flex-grow: 1;
 `;

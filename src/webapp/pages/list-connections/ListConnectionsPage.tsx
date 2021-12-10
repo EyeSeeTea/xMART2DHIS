@@ -168,8 +168,8 @@ export const ListConnectionsPage: React.FC = () => {
 
     const details: ObjectsTableDetailField<DataMart>[] = [
         { name: "name" as const, text: i18n.t("Connection name") },
-        { name: "martCode" as const, text: i18n.t("Code") },
-        { name: "dataEndpoint" as const, text: i18n.t("API URL") },
+        { name: "martCode" as const, text: i18n.t("Mart Code") },
+        { name: "dataEndpoint" as const, text: i18n.t("OData API URL") },
         { name: "environment" as const, text: i18n.t("Type") },
     ];
 

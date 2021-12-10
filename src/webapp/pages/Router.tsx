@@ -41,10 +41,19 @@ export const Router = () => {
                 />
 
                 <Route
-                    path={"/connections/:action(new|edit)/:id?"}
+                    path={"/connections/new"}
                     element={
-                        <RouterPage title={i18n.t("Connection creation")}>
-                            <NewConnectionPage />
+                        <RouterPage title={i18n.t("New connection")}>
+                            <NewConnectionPage action="new" />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path={"/connections/edit/:id"}
+                    element={
+                        <RouterPage title={i18n.t("Edit connection")}>
+                            <NewConnectionPage action="edit" />
                         </RouterPage>
                     }
                 />
