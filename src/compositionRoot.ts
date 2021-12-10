@@ -33,7 +33,6 @@ import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataB
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
 import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
-import { ListDataMartsUseCase } from "./domain/usecases/xmart/ListDataMartsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
 
@@ -56,7 +55,6 @@ export function getCompositionRoot(instance: Instance) {
             listTables: new ListMartTablesUseCase(martRepository),
             listTableContent: new ListMartContentsUseCase(martRepository),
             listAllTableContent: new ListAllMartContentsUseCase(martRepository),
-            listDataMarts: new ListDataMartsUseCase(martRepository),
         }),
         instance: getExecute({
             getCurrentUser: new GetCurrentUserUseCase(instanceRepository),
@@ -72,7 +70,13 @@ export function getCompositionRoot(instance: Instance) {
             list: new GetActionsUseCase(actionRepository),
             get: new GetActionByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
-            save: new SaveActionUseCase(actionRepository, metadataRepository, fileRepository, martRepository),
+            save: new SaveActionUseCase(
+                actionRepository,
+                metadataRepository,
+                fileRepository,
+                martRepository,
+                connectionRepository
+            ),
             execute: new ExecuteActionUseCase(
                 actionRepository,
                 metadataRepository,
@@ -80,7 +84,8 @@ export function getCompositionRoot(instance: Instance) {
                 teiRepository,
                 aggregatedRespository,
                 fileRepository,
-                martRepository
+                martRepository,
+                connectionRepository
             ),
         }),
         mappingTemplates: getExecute({

@@ -67,14 +67,8 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     }, [compositionRoot, snackbar, xMARTConnection]);
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
-            dataMarts => {
-                //TODO: Replace by GetConnectionByIdUseCase
-
-                const dataMart = dataMarts.find(data => data.id === connectionId);
-
-                setXMartConnection(dataMart);
-            },
+        compositionRoot.connection.getById(connectionId).run(
+            dataMart => setXMartConnection(dataMart),
             error => snackbar.error(error)
         );
     }, [compositionRoot, snackbar, connectionId]);

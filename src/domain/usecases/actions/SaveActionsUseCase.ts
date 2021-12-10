@@ -1,30 +1,29 @@
 import { UseCase } from "../../../compositionRoot";
-import { Future, FutureData } from "../../entities/Future";
-import { SyncAction } from "../../entities/actions/SyncAction";
-import { ActionRepository } from "../../repositories/ActionRepository";
-import { DataMart } from "../../entities/xmart/DataMart";
-import { dataMarts } from "../xmart/ListDataMartsUseCase";
-import { FileRepository } from "../../repositories/FileRepository";
+import i18n from "../../../locales";
 import { getUid } from "../../../utils/uid";
-import { XMartRepository } from "../../repositories/XMartRepository";
+import { SyncAction } from "../../entities/actions/SyncAction";
+import { Future, FutureData } from "../../entities/Future";
+import { Program } from "../../entities/metadata/Program";
+import { DataMart } from "../../entities/xmart/DataMart";
 import {
     XMartFieldDefinition,
     XMartLoadModelData,
     xMartSyncTableTemplates,
-    XMartTableDefinition,
+    XMartTableDefinition
 } from "../../entities/xmart/xMartSyncTableTemplates";
+import { ActionRepository } from "../../repositories/ActionRepository";
+import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
+import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
-import { Program } from "../../entities/metadata/Program";
-import i18n from "../../../locales";
-//TODO: Remove this when the repository return data marts
-const listDataMarts = () => Future.success(dataMarts).flatMapError(error => Future.error(String(error)));
+import { XMartRepository } from "../../repositories/XMartRepository";
 
 export class SaveActionUseCase implements UseCase {
     constructor(
         private actionRepository: ActionRepository,
         private metadataRepository: MetadataRepository,
         private fileRepository: FileRepository,
-        private xMartRepository: XMartRepository
+        private xMartRepository: XMartRepository,
+        private connectionsRepository: ConnectionsRepository
     ) {}
 
     public execute(action: SyncAction): FutureData<void> {
@@ -32,7 +31,7 @@ export class SaveActionUseCase implements UseCase {
             .flatMap(action =>
                 Future.joinObj({
                     saveResult: this.actionRepository.save(action),
-                    dataMart: this.getDataMartByAction(action),
+                    dataMart: this.connectionsRepository.getById(action.connectionId),
                 })
             )
             .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action))
@@ -91,18 +90,6 @@ export class SaveActionUseCase implements UseCase {
             }
 
             return Future.success(action);
-        });
-    }
-
-    private getDataMartByAction(action: SyncAction): FutureData<DataMart> {
-        return listDataMarts().flatMap(dataMarts => {
-            const dataMart = dataMarts.find(dataMart => dataMart.id === action.connectionId);
-
-            const dataMartResult: FutureData<DataMart> = dataMart
-                ? Future.success(dataMart)
-                : Future.error("Data mart not found");
-
-            return dataMartResult;
         });
     }
 

@@ -8,7 +8,7 @@ import { Future, FutureData } from "../../domain/entities/Future";
 export class ConnectionsDataStoreRepository implements ConnectionsRepository {
     constructor(private dataStoreClient: StorageDefaultRepository) {}
 
-    listAll({ search }: ConnectionsFilter): FutureData<DataMart[]> {
+    listAll({ search }: ConnectionsFilter = {}): FutureData<DataMart[]> {
         return Future.fromPromise(this.dataStoreClient.listObjectsInCollection<DataMart>(Namespaces.CONNECTIONS))
             .flatMapError(error => Future.error(String(error)))
             .map(data =>

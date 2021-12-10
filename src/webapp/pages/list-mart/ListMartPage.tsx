@@ -83,7 +83,7 @@ export const ListMartPage: React.FC = () => {
     }, [compositionRoot, snackbar, selectedApi]);
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => {
                 setDataMarts(dataMarts);
                 setSelectedApi(dataMarts[0]);

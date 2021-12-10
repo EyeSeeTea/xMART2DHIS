@@ -110,7 +110,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const [connection, setConnection] = useState<DataMart>();
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => {
                 const connection = dataMarts.find(d => d.id === mappingTemplate.connectionId);
                 setConnection(connection);

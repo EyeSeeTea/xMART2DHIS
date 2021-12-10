@@ -30,7 +30,7 @@ export const GeneralInfoStep = ({ mappingTemplate, onChange }: MappingTemplateWi
     );
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => setConnections(dataMarts),
             error => snackbar.error(error)
         );

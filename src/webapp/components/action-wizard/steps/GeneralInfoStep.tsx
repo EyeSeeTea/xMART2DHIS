@@ -29,7 +29,7 @@ export const GeneralInfoStep = ({ action, onChange }: ActionWizardStepProps) => 
     );
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => setConnections(dataMarts),
             error => snackbar.error(error)
         );

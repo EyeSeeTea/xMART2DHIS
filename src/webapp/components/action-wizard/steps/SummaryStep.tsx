@@ -116,7 +116,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
     const [metadata, updateMetadata] = useState<MetadataPackage>({});
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
+        compositionRoot.connection.listAll().run(
             dataMarts => {
                 const connection = dataMarts.find(d => d.id === action.connectionId);
                 setConnection(connection);
