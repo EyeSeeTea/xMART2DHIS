@@ -249,7 +249,7 @@ function futureFetch<Data>(
     const { body, textResponse = false, params, bearer } = options;
     const controller = new AbortController();
     const qs = buildParams(params);
-    const url = `${path}${qs ? `?${qs}` : ""}`;
+    const url = addCORSProxy(`${path}${qs ? `?${qs}` : ""}`);
 
     return Future.fromComputation((resolve, reject) => {
         fetch(url, {
@@ -311,3 +311,7 @@ type XMartAPIBatchStatusResponseStatus =
           ProcessStepCode: "COMPLETED";
           ProcessResultCode: "SYSTEM_ERROR" | "REJECTED" | "INVALID" | "SUCCESS" | "CANCELED" | "TIMEOUT_CANCELED";
       };
+
+function addCORSProxy(url: string): string {
+    return url.replace(/^(.*?:\/\/)(.*)/, "$1dev.eyeseetea.com/cors/$2");
+}

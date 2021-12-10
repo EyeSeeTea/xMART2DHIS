@@ -77,10 +77,19 @@ export const Router = () => {
                 />
 
                 <Route
-                    path="/mapping-templates/:action(new|edit)/:id?"
+                    path="/mapping-templates/new"
                     element={
                         <RouterPage title={i18n.t("Mapping Template")}>
-                            <MappingTemplateDetailPage />
+                            <MappingTemplateDetailPage action="new" />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/mapping-templates/edit/:id"
+                    element={
+                        <RouterPage title={i18n.t("Mapping Template")}>
+                            <MappingTemplateDetailPage action="edit" />
                         </RouterPage>
                     }
                 />
