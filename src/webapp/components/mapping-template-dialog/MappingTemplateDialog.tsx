@@ -26,7 +26,7 @@ const MappingTemplateDialog: React.FC<ModelMappingDialogProps> = ({ connectionId
             },
             error => snackbar.error(error)
         );
-    }, [compositionRoot, snackbar]);
+    }, [compositionRoot, snackbar, connectionId]);
 
     const handleMappingTemplateChange = useCallback((id: string) => {
         setMappingTemplateId(id);
