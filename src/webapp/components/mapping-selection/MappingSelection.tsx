@@ -20,6 +20,7 @@ import {
 } from "../../../domain/entities/mapping-template/MappingTemplate";
 import ModelMappingDialog from "../model-mapping-dialog/ModelMappingDialog";
 import MappingTemplateDialog from "../mapping-template-dialog/MappingTemplateDialog";
+import _ from "lodash";
 
 const StyledButton = styled(Button)`
     margin-left: 8px;
@@ -143,6 +144,16 @@ export default function MappingSelection({
         setToDelete([]);
     }, [onChange, modelMappings, toDelete]);
 
+    const handleEdit = useCallback(
+        async (ids: []) => {
+            const id = _.first(ids);
+            if (!id) return;
+
+            setEditModelMapping(modelMappings.find(item => modelMappingComplexId(item) === id));
+        },
+        [modelMappings]
+    );
+
     const actions: TableAction<ModelMappingRow>[] = useMemo(
         () => [
             {
@@ -158,8 +169,15 @@ export default function MappingSelection({
                 onClick: setToDelete,
                 icon: <Icon>delete</Icon>,
             },
+            {
+                name: "edit",
+                text: i18n.t("Edit"),
+                multiple: true,
+                onClick: handleEdit,
+                icon: <Icon>edit</Icon>,
+            },
         ],
-        []
+        [handleEdit]
     );
 
     const handleTableChange = useCallback((tableState: TableState<ReferenceObject>) => {

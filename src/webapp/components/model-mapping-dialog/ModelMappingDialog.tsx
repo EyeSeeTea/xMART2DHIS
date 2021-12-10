@@ -50,7 +50,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     const [modelMappingState, setModelMappingState] = useState(modelMapping);
     const [xMARTTables, setXMARTTables] = useState<MartTable[]>();
     const [xMARTConnection, setXMartConnection] = useState<DataMart>();
-    const [xMartTableMode, setXMartTableMode] = useState<"existed" | "new">("existed");
+    const [xMartTableMode, setXMartTableMode] = useState<"existed" | "new">("new");
 
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
@@ -67,10 +67,29 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     }, [compositionRoot, snackbar, xMARTConnection]);
 
     useEffect(() => {
+        if (!xMARTTables) return;
+
+        if (modelMapping.xMARTTable) {
+            const existedTable = xMARTTables.find(table => table.name === modelMapping.xMARTTable);
+
+            setXMartTableMode(existedTable ? "existed" : "new");
+        }
+    }, [xMARTTables, modelMapping]);
+
+    useEffect(() => {
+        if (!xMARTConnection) return;
+
+        compositionRoot.xmart.listTables(xMARTConnection).run(
+            tables => {
+                setXMARTTables(tables);
+            },
+            error => snackbar.error(error)
+        );
+    }, [compositionRoot, snackbar, xMARTConnection]);
+
+    useEffect(() => {
         compositionRoot.xmart.listDataMarts().run(
             dataMarts => {
-                //TODO: Replace by GetConnectionByIdUseCase
-
                 const dataMart = dataMarts.find(data => data.id === connectionId);
 
                 setXMartConnection(dataMart);
@@ -99,9 +118,16 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
         }
     }, [onSave, modelMappingState]);
 
-    const handleXmartTableModeChange = useCallback((_event, value) => {
-        setXMartTableMode(value === "existed" ? "existed" : "new");
-    }, []);
+    const handleXmartTableModeChange = useCallback(
+        (_event, value) => {
+            setXMartTableMode(value === "existed" ? "existed" : "new");
+
+            if (value === "new") {
+                setModelMappingState({ ...modelMappingState, xMARTTable: "" });
+            }
+        },
+        [modelMappingState]
+    );
 
     const onChangeNewTable = useCallback(
         (event: React.ChangeEvent<{ value: string }>) => {
