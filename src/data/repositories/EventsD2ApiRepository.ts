@@ -72,6 +72,10 @@ export class EventsD2ApiRepository implements EventsRepository {
         const fetchApi = (orgUnit: string, page: number) => {
             return apiToFuture(
                 this.api.events.get({
+                    dataElementIdScheme: "CODE",
+                    categoryOptionComboIdScheme: "CODE",
+                    orgUnitIdScheme: "CODE",
+                    programIdScheme: "CODE",
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -96,7 +100,7 @@ export class EventsD2ApiRepository implements EventsRepository {
                 });
             })
         )
-            .flatMapError(() => Future.error("An error has occurred rerieving events"))
+            .flatMapError(error => Future.error(`An error has occurred retrieving events\n${String(error)}`))
             .map(result =>
                 _(result)
                     .flatten()
@@ -118,6 +122,10 @@ export class EventsD2ApiRepository implements EventsRepository {
         const fetchApi = (program: string, orgUnit: string, page: number) => {
             return apiToFuture(
                 this.api.events.get({
+                    dataElementIdScheme: "CODE",
+                    categoryOptionComboIdScheme: "CODE",
+                    orgUnitIdScheme: "CODE",
+                    programIdScheme: "CODE",
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -147,11 +155,10 @@ export class EventsD2ApiRepository implements EventsRepository {
                 ).map(events => _.flatten(events));
             })
         )
-            .flatMapError(() => Future.error("An error has occurred rerieving events"))
+            .flatMapError(error => Future.error(`An error has occurred retrieving events\n${String(error)}`))
             .map(result =>
                 _(result)
                     .flatten()
-                    .filter(({ program }) => programIds.includes(program))
                     .map(object => ({ ...object, id: object.event }))
                     .value()
             );
