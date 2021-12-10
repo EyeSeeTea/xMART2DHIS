@@ -39,7 +39,7 @@ export class SaveActionUseCase implements UseCase {
             .flatMap(() => Future.success(undefined))
             .flatMapError(error => {
                 return Future.error(
-                    i18n.t(`An error has occurred saving the action:\n{{error}}`, { error: String(error) })
+                    i18n.t(`An error has occurred saving the action.\n{{error}}`, { error: String(error) })
                 );
             });
     }

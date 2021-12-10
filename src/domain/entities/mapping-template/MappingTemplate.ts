@@ -1,3 +1,5 @@
+import _ from "lodash";
+import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
@@ -11,10 +13,36 @@ export interface MappingTemplateData {
 
 export interface ModelMapping {
     dhis2Model: Dhis2ModelKey;
+    metadataType?: string;
+    metadataId?: string;
     xMARTTable: string;
 }
 
 export type Dhis2ModelKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments";
+
+export const modelMappingComplexId = (modelMapping: ModelMapping) =>
+    `${modelMapping.dhis2Model}-${modelMapping.metadataId ?? ""}`;
+
+export const modelMappingsValidation: ModelValidation = {
+    property: "modelMappings",
+    validation: {
+        type: "Custom",
+        validation: {
+            error: "custom_error",
+            getDescription: (field: string) =>
+                i18n.t("Only can exists a mapping model by metadata and dhis2 model", { field }),
+            check: (value?: unknown[]) => {
+                const modelMappings = value as ModelMapping[];
+
+                const groups = _(modelMappings)
+                    .groupBy(modelMapping => modelMappingComplexId(modelMapping))
+                    .value();
+
+                return Object.values(groups).some(valuesByGroup => valuesByGroup.length > 1);
+            },
+        },
+    },
+};
 
 export class MappingTemplate implements MappingTemplateData {
     public readonly id: string;
@@ -49,6 +77,7 @@ export class MappingTemplate implements MappingTemplateData {
             { property: "name", validation: { type: "Standard", validation: "hasText" } },
             { property: "connectionId", validation: { type: "Standard", validation: "hasValue" } },
             { property: "modelMappings", validation: { type: "Standard", validation: "hasItems" } },
+            modelMappingsValidation,
         ];
     }
 
