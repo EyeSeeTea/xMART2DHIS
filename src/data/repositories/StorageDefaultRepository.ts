@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Ref } from "../../domain/entities/Ref";
+import { Ref } from "../../domain/entities/metadata/Ref";
 import { StorageRepository } from "../../domain/repositories/StorageRepository";
 import { Namespace, NamespaceProperties } from "../utils/Namespaces";
 

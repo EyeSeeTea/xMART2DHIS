@@ -17,7 +17,7 @@ import _ from "lodash";
 import { useCallback } from "react";
 import ReactJson from "react-json-view";
 import i18n from "../../../locales";
-import { SyncResult, SyncStats } from "../../../domain/entities/SyncResult";
+import { SyncResult, SyncStats } from "../../../domain/entities/data/SyncResult";
 
 const useStyles = makeStyles(theme => ({
     accordionHeading1: {

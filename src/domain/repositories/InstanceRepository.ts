@@ -1,10 +1,10 @@
 import { StorageRepository } from "./StorageRepository";
 import { FutureData } from "../entities/Future";
-import { User } from "../entities/User";
+import { User } from "../entities/metadata/User";
 import { AggregatedRepository } from "./AggregatedRepository";
 import { EventsRepository } from "./EventsRepository";
 import { MetadataRepository } from "./MetadataRepository";
-import { Instance } from "../entities/Instance";
+import { Instance } from "../entities/instance/Instance";
 
 export interface InstanceRepository {
     metadata: MetadataRepository;

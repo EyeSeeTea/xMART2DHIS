@@ -2,10 +2,16 @@ import { ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseet
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { DataMart, MartTable, XMartContent } from "../../../domain/entities/XMart";
+import styled from "styled-components";
+import { DataMart, MartTable, XMartContent } from "../../../domain/entities/xmart/XMart";
 import { ListXMartOptions } from "../../../domain/repositories/XMartRepository";
 import { Dropdown } from "../../components/dropdown/Dropdown";
 import { useAppContext } from "../../contexts/app-context";
+
+const StyledDropdown = styled(Dropdown)`
+    margin-top: -8px;
+    margin-left: 10px;
+`;
 
 export const ListMartPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -97,7 +103,7 @@ export const ListMartPage: React.FC = () => {
             forceSelectionColumn={true}
             filterComponents={
                 <React.Fragment>
-                    <Dropdown
+                    <StyledDropdown
                         label={i18n.t("xMART API")}
                         value={selectedApi?.id ?? ""}
                         items={dataMarts.map(({ id, name }) => ({ id, name }))}
@@ -107,7 +113,7 @@ export const ListMartPage: React.FC = () => {
                             setSelectedApi(_.find(dataMarts, ({ id }) => id === endpoint));
                         }}
                     />
-                    <Dropdown
+                    <StyledDropdown
                         label={i18n.t("xMART Table")}
                         value={selectedTable ?? ""}
                         items={tables?.map(item => ({ id: item.name, name: item.name })) ?? []}

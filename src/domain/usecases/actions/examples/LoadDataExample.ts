@@ -1,16 +1,16 @@
-import { UseCase } from "../../../compositionRoot";
-import { getD2APiFromInstance } from "../../../utils/d2-api";
-import { apiToFuture } from "../../../utils/futures";
-import { getUid } from "../../../utils/uid";
-import { Future, FutureData } from "../../entities/Future";
-import { InstanceRepository } from "../../repositories/InstanceRepository";
-import { XMartRepository } from "../../repositories/XMartRepository";
+import { UseCase } from "../../../../compositionRoot";
+import { getD2APiFromInstance } from "../../../../utils/d2-api";
+import { apiToFuture } from "../../../../utils/futures";
+import { getUid } from "../../../../utils/uid";
+import { Future, FutureData } from "../../../entities/Future";
+import { InstanceRepository } from "../../../repositories/InstanceRepository";
+import { XMartRepository } from "../../../repositories/XMartRepository";
 
 // TODO: This is an example use case, should be more generic and use table metadata, validations and mapping
-export class ExampleActionUseCase implements UseCase {
+export class LoadDataExample implements UseCase {
     constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
 
-    public execute(): FutureData<void> {
+    public execute(): FutureData<number> {
         const instance = this.instanceRepository.getInstance();
         const api = getD2APiFromInstance(instance);
 
@@ -48,8 +48,7 @@ export class ExampleActionUseCase implements UseCase {
                     url,
                     table: "AGGREGATED",
                 });
-            })
-            .flatMap(() => Future.success(undefined));
+            });
     }
 }
 

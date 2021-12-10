@@ -1,13 +1,12 @@
 import { UseCase } from "../../../compositionRoot";
-import { Future, FutureData } from "../../entities/Future";
-import { SyncAction } from "../../entities/SyncAction";
-import { InstanceRepository } from "../../repositories/InstanceRepository";
-import { XMartRepository } from "../../repositories/XMartRepository";
+import { FutureData } from "../../entities/Future";
+import { SyncAction } from "../../entities/actions/SyncAction";
+import { ActionRepository } from "../../repositories/ActionRepository";
 
 export class GetActionsUseCase implements UseCase {
-    constructor(private martRepository: XMartRepository, private instanceRepository: InstanceRepository) {}
+    constructor(private actionRepository: ActionRepository) {}
 
     public execute(): FutureData<SyncAction[]> {
-        return Future.success([]);
+        return this.actionRepository.list();
     }
 }

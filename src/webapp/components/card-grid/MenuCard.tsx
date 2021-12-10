@@ -51,7 +51,7 @@ const Card = styled(MUICard)`
     padding: 0;
     margin: 0.5rem;
     float: left;
-    width: 230px;
+    width: 250px;
 `;
 
 const Content = styled(MUICardContent)`

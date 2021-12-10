@@ -1,7 +1,7 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/XMart";
+import { DataMart, MartTable, XMartContent, XMartResponse } from "../../domain/entities/xmart/XMart";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import { ListAllOptions, ListXMartOptions, XMartRepository } from "../../domain/repositories/XMartRepository";
 import { generateUid } from "../../utils/uid";
@@ -85,7 +85,7 @@ export class XMartDefaultRepository implements XMartRepository {
         mart: DataMart,
         pipeline: string,
         params: Record<string, string | number | boolean>
-    ): FutureData<void> {
+    ): FutureData<number> {
         const body = JSON.stringify(
             {
                 martCode: mart.code,
@@ -100,9 +100,23 @@ export class XMartDefaultRepository implements XMartRepository {
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart),
             token: this.getToken(mart),
-        }).flatMap(({ endpoint, token }) =>
-            futureFetch("post", joinUrl(endpoint, `/origin/start`), { body, bearer: token })
-        );
+        })
+            .flatMap(({ endpoint, token }) =>
+                futureFetch<{ batchID: number; success?: boolean; errorMessage: string | null }>(
+                    "post",
+                    joinUrl(endpoint, `/origin/start`),
+                    { body, bearer: token }
+                )
+            )
+            .flatMap(({ errorMessage, batchID }) => {
+                if (errorMessage) {
+                    return Future.error(errorMessage);
+                } else if (batchID === null) {
+                    return Future.error("Unknown batch id");
+                } else {
+                    return Future.success(batchID);
+                }
+            });
     }
 
     private requestMart<Data>(

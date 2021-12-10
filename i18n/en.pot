@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-11-09T20:07:22.424Z\n"
-"PO-Revision-Date: 2021-11-09T20:07:22.424Z\n"
+"POT-Creation-Date: 2021-12-10T07:02:34.252Z\n"
+"PO-Revision-Date: 2021-12-10T07:02:34.252Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -21,6 +21,221 @@ msgid "Unknown model"
 msgstr ""
 
 msgid "Metadata"
+msgstr ""
+
+msgid "Field {{field}} cannot be blank"
+msgstr ""
+
+msgid "You need to select at least one {{field}}"
+msgstr ""
+
+msgid "Field {{field}} needs to be a valid url"
+msgstr ""
+
+msgid "Field {{field}} is not valid"
+msgstr ""
+
+msgid "Only can exists a mapping model by dhis2 model"
+msgstr ""
+
+msgid "All time"
+msgstr ""
+
+msgid "Fixed period"
+msgstr ""
+
+msgid "Since last execution"
+msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "Last 7 days"
+msgstr ""
+
+msgid "Last 14 days"
+msgstr ""
+
+msgid "Last 30 days"
+msgstr ""
+
+msgid "Last 90 days"
+msgstr ""
+
+msgid "This week"
+msgstr ""
+
+msgid "Last week"
+msgstr ""
+
+msgid "This month"
+msgstr ""
+
+msgid "Last month"
+msgstr ""
+
+msgid "This quarter"
+msgstr ""
+
+msgid "Last quarter"
+msgstr ""
+
+msgid "This year"
+msgstr ""
+
+msgid "Last year"
+msgstr ""
+
+msgid "Last 5 years"
+msgstr ""
+
+msgid "You need to select one dataValues mapping"
+msgstr ""
+
+msgid "You need to select one events mapping"
+msgstr ""
+
+msgid "You need to select one eventValues mapping"
+msgstr ""
+
+msgid "You need to select one tracked entity instances mapping"
+msgstr ""
+
+msgid "You need to select one tracked entity instance attributes mapping"
+msgstr ""
+
+msgid "You need to select one enrollent mapping"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Short name"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Last updated"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "API link"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Program Rule"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Option set"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Url"
+msgstr ""
+
+msgid "General info"
+msgstr ""
+
+msgid "Organisation units"
+msgstr ""
+
+msgid "Period"
+msgstr ""
+
+msgid "Mapping"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Name (*)"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Dhis2 Model"
+msgstr ""
+
+msgid "xMART Table"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete Actions?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} model mappings?"
+msgstr ""
+
+msgid "Ok"
+msgstr ""
+
+msgid "Model Mapping"
+msgstr ""
+
+msgid "Import Template"
+msgstr ""
+
+msgid "Selected {{difference}} elements"
+msgstr ""
+
+msgid "Removed {{difference}} elements"
+msgstr ""
+
+msgid "You do not have assigned any organisation unit"
+msgstr ""
+
+msgid "Cancel action wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Action Creation Wizard. All your changes will be "
+"lost. Are you sure you want to proceed?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Start date"
+msgstr ""
+
+msgid "End date"
+msgstr ""
+
+msgid "Model mappings"
 msgstr ""
 
 msgid "Sign in with Microsoft"
@@ -39,9 +254,6 @@ msgid "<No value>"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Created"
 msgstr ""
 
 msgid "Updated"
@@ -65,16 +277,10 @@ msgstr ""
 msgid "Import Results"
 msgstr ""
 
-msgid "Ok"
-msgstr ""
-
 msgid "Import"
 msgstr ""
 
 msgid "Status"
-msgstr ""
-
-msgid "Summary"
 msgstr ""
 
 msgid "Messages"
@@ -83,16 +289,69 @@ msgstr ""
 msgid "JSON Response"
 msgstr ""
 
+msgid "Select mapping template"
+msgstr ""
+
+msgid "Mapping template"
+msgstr ""
+
+msgid "Cancel mapping template wizard"
+msgstr ""
+
+msgid ""
+"You are about to exit the Mapping template Creation Wizard. All your "
+"changes will be lost. Are you sure you want to proceed?"
+msgstr ""
+
+msgid "Metadata type"
+msgstr ""
+
+msgid "Only selected items"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Search by "
+msgstr ""
+
+msgid "Data Values"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Event Values"
+msgstr ""
+
+msgid "Tracked Entity Instances"
+msgstr ""
+
+msgid "TEI Attributes"
+msgstr ""
+
+msgid "Enrollments"
+msgstr ""
+
+msgid "Existed Table"
+msgstr ""
+
+msgid "New Table"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
 msgid "Help"
 msgstr ""
 
-msgid "New action"
+msgid "Actions"
 msgstr ""
 
-msgid "Actions"
+msgid "Mapping Template"
+msgstr ""
+
+msgid "Mapping Templates"
 msgstr ""
 
 msgid "Browse xMART"
@@ -101,16 +360,62 @@ msgstr ""
 msgid "xMART2DHIS"
 msgstr ""
 
+msgid "Loading action"
+msgstr ""
+
+msgid "An error has ocurred loading the action"
+msgstr ""
+
+msgid "Deleting Actions"
+msgstr ""
+
+msgid "Successfully deleted {{total}} actions"
+msgstr ""
+
+msgid "An error has ocurred deleting actionn"
+msgstr ""
+
+msgid "Executing the action"
+msgstr ""
+
+msgid ""
+"Successfully executed the action.\n"
+"{{result}}"
+msgstr ""
+
+msgid ""
+"An error has ocurred executing the action.\n"
+"{{error}}"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Execute"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
 msgid "Actions are a way to trigger events in your application"
+msgstr ""
+
+msgid "Define templates of mapping models to import in the actions"
 msgstr ""
 
 msgid "List table contents of the MART"
 msgstr ""
 
-msgid "Name"
+msgid "Examples"
 msgstr ""
 
-msgid "Description"
+msgid "Load pipelines"
+msgstr ""
+
+msgid "Load data"
+msgstr ""
+
+msgid "Load model"
 msgstr ""
 
 msgid "Run"
@@ -122,5 +427,35 @@ msgstr ""
 msgid "xMART API"
 msgstr ""
 
-msgid "xMART Table"
+msgid "Loading mapping template"
+msgstr ""
+
+msgid "An error has ocurred loading the mapping template"
+msgstr ""
+
+msgid "Deleting mapping templates"
+msgstr ""
+
+msgid "Successfully deleted {{total}} mapping templates"
+msgstr ""
+
+msgid "An error has ocurred deleting mapping templates"
+msgstr ""
+
+msgid "Delete mapping templates?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} mapping templates?"
+msgstr ""
+
+msgctxt "MODEL pipelines"
+msgid "Initial load of LOAD_DATA and LOAD"
+msgstr ""
+
+msgctxt "DATA example"
+msgid "LOAD"
+msgstr ""
+
+msgctxt "MODEL example"
+msgid "LOAD"
 msgstr ""
