@@ -244,15 +244,17 @@ function futureFetch<Data>(
         textResponse?: boolean;
         params?: Record<string, string | number | boolean>;
         bearer?: string;
+        corsProxy?: boolean;
     } = {}
 ): FutureData<Data> {
-    const { body, textResponse = false, params, bearer } = options;
+    const { body, textResponse = false, params, bearer, corsProxy = process.env.NODE_ENV === "development" } = options;
     const controller = new AbortController();
     const qs = buildParams(params);
-    const url = addCORSProxy(`${path}${qs ? `?${qs}` : ""}`);
+    const url = `${path}${qs ? `?${qs}` : ""}`;
+    const fetchUrl = corsProxy ? addCORSProxy(url) : url;
 
-    return Future.fromComputation((resolve, reject) => {
-        fetch(url, {
+    return Future.fromComputation<string, Data>((resolve, reject) => {
+        fetch(fetchUrl, {
             signal: controller.signal,
             method,
             headers: {
@@ -264,7 +266,13 @@ function futureFetch<Data>(
         })
             .then(async response => {
                 if (!response.ok) {
-                    reject("Fetch request failed");
+                    reject(
+                        i18n.t(`API error code: {{statusText}} ({{status}})`, {
+                            nsSeparator: false,
+                            statusText: response.statusText,
+                            status: response.status,
+                        })
+                    );
                 } else if (textResponse) {
                     const text = await response.text();
                     resolve(text as unknown as Data);
@@ -276,6 +284,9 @@ function futureFetch<Data>(
             .catch(err => reject(err ? err.message : "Unknown error"));
 
         return controller.abort;
+    }).flatMapError(err => {
+        if (corsProxy) return Future.error(err);
+        return futureFetch<Data>(method, path, { ...options, corsProxy: true });
     });
 }
 

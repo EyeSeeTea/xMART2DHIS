@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-10T07:44:04.347Z\n"
-"PO-Revision-Date: 2021-12-10T07:44:04.347Z\n"
+"POT-Creation-Date: 2021-12-10T11:14:55.899Z\n"
+"PO-Revision-Date: 2021-12-10T11:14:55.899Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -24,6 +24,9 @@ msgid "Metadata"
 msgstr ""
 
 msgid "Unable to call xMART API for public data marts"
+msgstr ""
+
+msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
 
 msgid "Field {{field}} cannot be blank"
