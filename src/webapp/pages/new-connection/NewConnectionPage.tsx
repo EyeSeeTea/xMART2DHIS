@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { DataMart } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";

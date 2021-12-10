@@ -1,5 +1,5 @@
 import { FutureData } from "../entities/Future";
-import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/XMart";
+import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
 
 export interface XMartRepository {
     listMartSuggestions(): FutureData<MartSuggestions>;

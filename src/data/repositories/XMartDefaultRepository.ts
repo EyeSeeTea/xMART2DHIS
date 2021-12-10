@@ -7,7 +7,7 @@ import {
     MartTable,
     XMartContent,
     XMartResponse,
-} from "../../domain/entities/xmart/XMart";
+} from "../../domain/entities/xmart/DataMart";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,

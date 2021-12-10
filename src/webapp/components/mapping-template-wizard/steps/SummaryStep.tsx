@@ -2,7 +2,7 @@ import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Button, LinearProgress, makeStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DataMart } from "../../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
 import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";

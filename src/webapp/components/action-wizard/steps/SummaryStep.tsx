@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { availablePeriods } from "../../../../domain/entities/metadata/DataSyncPeriod";
 import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/metadata/Metadata";
-import { DataMart } from "../../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import { cleanOrgUnitPaths } from "../../../../domain/utils";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";

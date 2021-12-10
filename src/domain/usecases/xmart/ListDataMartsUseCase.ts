@@ -1,6 +1,6 @@
 import { UseCase } from "../../../compositionRoot";
 import { Future, FutureData } from "../../entities/Future";
-import { DataMart } from "../../entities/xmart/XMart";
+import { DataMart } from "../../entities/xmart/DataMart";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
 export const dataMarts: DataMart[] = [

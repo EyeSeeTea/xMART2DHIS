@@ -1,7 +1,7 @@
-import { DataMart } from "../../domain/entities/xmart/XMart";
+import { DataMart } from "../../domain/entities/xmart/DataMart";
 import { SharingSetting } from "../../domain/entities/metadata/SharingSetting";
 import { Codec, Schema } from "../../utils/codec";
-import { NamedRefModel } from "./DHIS2Model";
+import { NamedRefModel } from "./RefModel";
 
 export const SharingSettingModel: Codec<SharingSetting> = Schema.object({
     access: Schema.string,

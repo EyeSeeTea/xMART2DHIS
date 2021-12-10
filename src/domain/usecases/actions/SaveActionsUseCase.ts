@@ -2,7 +2,7 @@ import { UseCase } from "../../../compositionRoot";
 import { Future, FutureData } from "../../entities/Future";
 import { SyncAction } from "../../entities/actions/SyncAction";
 import { ActionRepository } from "../../repositories/ActionRepository";
-import { DataMart } from "../../entities/xmart/XMart";
+import { DataMart } from "../../entities/xmart/DataMart";
 import { dataMarts } from "../xmart/ListDataMartsUseCase";
 import { FileRepository } from "../../repositories/FileRepository";
 import { getUid } from "../../../utils/uid";

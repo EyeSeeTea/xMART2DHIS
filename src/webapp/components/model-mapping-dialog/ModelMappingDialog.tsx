@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import i18n from "../../../locales";
 import { Dropdown, DropdownOption } from "../dropdown/Dropdown";
 import { Dhis2ModelKey, ModelMapping } from "../../../domain/entities/mapping-template/MappingTemplate";
-import { DataMart, MartTable } from "../../../domain/entities/xmart/XMart";
+import { DataMart, MartTable } from "../../../domain/entities/xmart/DataMart";
 import { useAppContext } from "../../contexts/app-context";
 import styled from "styled-components";
 

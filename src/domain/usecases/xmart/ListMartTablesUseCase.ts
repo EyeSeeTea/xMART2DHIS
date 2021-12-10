@@ -1,6 +1,6 @@
 import { UseCase } from "../../../compositionRoot";
 import { FutureData } from "../../entities/Future";
-import { DataMart, MartTable } from "../../entities/xmart/XMart";
+import { DataMart, MartTable } from "../../entities/xmart/DataMart";
 import { XMartRepository } from "../../repositories/XMartRepository";
 
 export class ListMartTablesUseCase implements UseCase {

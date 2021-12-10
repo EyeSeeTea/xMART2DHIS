@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { NamedRef } from "../../../domain/entities/metadata/Ref";
 import i18n from "../../../locales";
 import { useAppContext } from "../../contexts/app-context";
-import { DataMart } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/DataMart";
 
 export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ initialConnection, onClose, onSave }) => {
     const { compositionRoot, currentUser } = useAppContext();

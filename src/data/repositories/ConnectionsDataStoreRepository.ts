@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ConnectionsRepository, ConnectionsFilter } from "../../domain/repositories/ConnectionsRepository";
-import { DataMart } from "../../domain/entities/xmart/XMart";
+import { DataMart } from "../../domain/entities/xmart/DataMart";
 import { Namespaces } from "../utils/Namespaces";
 import { StorageDefaultRepository } from "./StorageDefaultRepository";
 import { Future, FutureData } from "../../domain/entities/Future";

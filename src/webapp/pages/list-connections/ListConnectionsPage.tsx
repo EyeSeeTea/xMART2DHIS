@@ -13,7 +13,7 @@ import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
-import { DataMart } from "../../../domain/entities/xmart/XMart";
+import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";

@@ -3,7 +3,7 @@ import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
 import { Future, FutureData } from "../../entities/Future";
 import { MetadataPackage } from "../../entities/metadata/Metadata";
-import { DataMart } from "../../entities/xmart/XMart";
+import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
 import { EventsRepository } from "../../repositories/EventsRepository";

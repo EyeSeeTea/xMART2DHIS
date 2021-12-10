@@ -1,5 +1,5 @@
 import { UseCase } from "../../../compositionRoot";
-import { DataMart } from "../../entities/xmart/XMart";
+import { DataMart } from "../../entities/xmart/DataMart";
 import { ConnectionsRepository, ConnectionsFilter } from "../../repositories/ConnectionsRepository";
 import { FutureData } from "../../entities/Future";
 

@@ -1,4 +1,4 @@
-import { DataMart } from "../entities/xmart/XMart";
+import { DataMart } from "../entities/xmart/DataMart";
 import { FutureData } from "../entities/Future";
 
 export interface ConnectionsRepository {

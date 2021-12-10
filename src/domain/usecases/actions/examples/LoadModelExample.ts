@@ -3,7 +3,7 @@ import { getD2APiFromInstance } from "../../../../utils/d2-api";
 import { apiToFuture } from "../../../../utils/futures";
 import { getUid } from "../../../../utils/uid";
 import { Future, FutureData } from "../../../entities/Future";
-import { DataMart } from "../../../entities/xmart/XMart";
+import { DataMart } from "../../../entities/xmart/DataMart";
 import { InstanceRepository } from "../../../repositories/InstanceRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 
