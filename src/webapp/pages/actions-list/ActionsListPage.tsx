@@ -110,7 +110,7 @@ export const ActionsListPage: React.FC = () => {
                 },
                 error => {
                     loading.reset();
-                    snackbar.error(i18n.t("An error has ocurred executing the action. {{error}}", { error }));
+                    snackbar.error(i18n.t("An error has ocurred executing the action.\n{{error}}", { error }));
                 }
             );
         },
