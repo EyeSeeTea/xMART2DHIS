@@ -116,7 +116,7 @@ export class XMartDefaultRepository implements XMartRepository {
 
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(environment),
-            token: this.getODataToken(environment),
+            token: this.getAPIToken(environment),
         })
             .flatMap(({ endpoint, token }) =>
                 futureFetch<XMartAPIBatchStartResponse>("post", joinUrl(endpoint, `/origin/start`), {
@@ -163,9 +163,9 @@ export class XMartDefaultRepository implements XMartRepository {
     private getAPIEndpoint(environment: DataMartEnvironment): FutureData<string> {
         switch (environment) {
             case "PROD":
-                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/external-api");
+                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/external");
             case "UAT":
-                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/external-api");
+                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/external");
             default:
                 return Future.error("Unknown data mart type");
         }
@@ -202,10 +202,10 @@ export class XMartDefaultRepository implements XMartRepository {
 
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart.environment),
-            token: this.getODataToken(mart.environment),
+            token: this.getAPIToken(mart.environment),
         })
             .flatMap(({ endpoint, token }) =>
-                futureFetch<XMartAPIBatchStatusResponse>("post", joinUrl(endpoint, `/batch/${batch}/status`), {
+                futureFetch<XMartAPIBatchStatusResponse>("get", joinUrl(endpoint, `/batch/${batch}/status`), {
                     bearer: token,
                 })
             )
