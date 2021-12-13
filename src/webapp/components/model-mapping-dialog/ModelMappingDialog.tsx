@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import i18n from "../../../locales";
 import { Dropdown, DropdownOption } from "../dropdown/Dropdown";
 import { Dhis2ModelKey, ModelMapping } from "../../../domain/entities/mapping-template/MappingTemplate";
-import { DataMart, MartTable } from "../../../domain/entities/xmart/XMart";
+import { DataMart, MartTable } from "../../../domain/entities/xmart/DataMart";
 import { useAppContext } from "../../contexts/app-context";
 import styled from "styled-components";
 import { MetadataEntity } from "../../../domain/entities/metadata/Metadata";
@@ -95,14 +95,8 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     }, [xMARTTables, modelMapping]);
 
     useEffect(() => {
-        compositionRoot.xmart.listDataMarts().run(
-            dataMarts => {
-                //TODO: Replace by GetConnectionByIdUseCase
-
-                const dataMart = dataMarts.find(data => data.id === connectionId);
-
-                setXMartConnection(dataMart);
-            },
+        compositionRoot.connection.getById(connectionId).run(
+            dataMart => setXMartConnection(dataMart),
             error => snackbar.error(error)
         );
     }, [compositionRoot, snackbar, connectionId]);

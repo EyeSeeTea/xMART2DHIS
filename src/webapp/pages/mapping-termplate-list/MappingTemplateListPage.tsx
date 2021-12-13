@@ -13,7 +13,7 @@ import {
 import { Icon } from "@material-ui/core";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import i18n from "../../../locales";
@@ -24,7 +24,7 @@ export const MappingTemplateListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
     const loading = useLoading();
     const snackbar = useSnackbar();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [rows, setRows] = useState<MappingTemplate[]>([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -53,17 +53,17 @@ export const MappingTemplateListPage: React.FC = () => {
     ];
 
     const goToCreateAction = useCallback(() => {
-        history.push("/mapping-templates/new");
-    }, [history]);
+        navigate("/mapping-templates/new");
+    }, [navigate]);
 
     const goToEditAction = useCallback(
         (ids: string[]) => {
             const id = _.first(ids);
             if (!id) return;
 
-            history.push(`/mapping-templates/edit/${id}`);
+            navigate(`/mapping-templates/edit/${id}`);
         },
-        [history]
+        [navigate]
     );
 
     const confirmDelete = useCallback(async () => {

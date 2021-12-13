@@ -1,5 +1,6 @@
 import { StorageRepository } from "./StorageRepository";
 import { FutureData } from "../entities/Future";
+import { UserSearch } from "../entities/SearchUser";
 import { User } from "../entities/metadata/User";
 import { AggregatedRepository } from "./AggregatedRepository";
 import { EventsRepository } from "./EventsRepository";
@@ -17,4 +18,5 @@ export interface InstanceRepository {
     getCurrentUser(): FutureData<User>;
     getInstanceVersion(): FutureData<string>;
     isAdmin(user: User): boolean;
+    searchUsers(query: string): Promise<UserSearch>;
 }

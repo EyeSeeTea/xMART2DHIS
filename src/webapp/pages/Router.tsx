@@ -1,15 +1,17 @@
 import React from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import i18n from "../../locales";
 import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
-import { LandingPage } from "./landing/LandingPage";
-import { ListMartPage } from "./list-mart/ListMartPage";
-import { ActionsListPage } from "./actions-list/ActionsListPage";
 import { ActionDetailPage } from "./action-detail/ActionDetailPage";
-import { MappingTemplateListPage } from "./mapping-termplate-list/MappingTemplateListPage";
+import { ActionsListPage } from "./actions-list/ActionsListPage";
+import { LandingPage } from "./landing/LandingPage";
+import { ListConnectionsPage } from "./list-connections/ListConnectionsPage";
+import { ListMartPage } from "./list-mart/ListMartPage";
 import { MappingTemplateDetailPage } from "./mapping-template-detail/MappingTemplateDetailPage";
+import { MappingTemplateListPage } from "./mapping-termplate-list/MappingTemplateListPage";
+import { NewConnectionPage } from "./new-connection/NewConnectionPage";
 
 export interface DetailPageParams {
     id: string;
@@ -19,69 +21,117 @@ export interface DetailPageParams {
 export const Router = () => {
     return (
         <HashRouter>
-            <Switch>
+            <Routes>
                 <Route
-                    path="/actions/:action(new|edit)/:id?"
-                    render={() => (
+                    path="/actions/new"
+                    element={
                         <RouterPage title={i18n.t("Action")}>
-                            <ActionDetailPage />
+                            <ActionDetailPage action="new" />
                         </RouterPage>
-                    )}
+                    }
+                />
+
+                <Route
+                    path="/actions/edit/:id"
+                    element={
+                        <RouterPage title={i18n.t("Action")}>
+                            <ActionDetailPage action="edit" />
+                        </RouterPage>
+                    }
                 />
 
                 <Route
                     path="/actions"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Actions")}>
                             <ActionsListPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
-                    path="/mapping-templates/:action(new|edit)/:id?"
-                    render={() => (
-                        <RouterPage title={i18n.t("Mapping Template")}>
-                            <MappingTemplateDetailPage />
+                    path={"/connections/new"}
+                    element={
+                        <RouterPage title={i18n.t("New connection")}>
+                            <NewConnectionPage action="new" />
                         </RouterPage>
-                    )}
+                    }
+                />
+
+                <Route
+                    path={"/connections/edit/:id"}
+                    element={
+                        <RouterPage title={i18n.t("Edit connection")}>
+                            <NewConnectionPage action="edit" />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/connections"
+                    element={
+                        <RouterPage title={i18n.t("Connections")}>
+                            <ListConnectionsPage />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/mapping-templates/new"
+                    element={
+                        <RouterPage title={i18n.t("Mapping Template")}>
+                            <MappingTemplateDetailPage action="new" />
+                        </RouterPage>
+                    }
+                />
+
+                <Route
+                    path="/mapping-templates/edit/:id"
+                    element={
+                        <RouterPage title={i18n.t("Mapping Template")}>
+                            <MappingTemplateDetailPage action="edit" />
+                        </RouterPage>
+                    }
                 />
 
                 <Route
                     path="/mapping-templates"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Mapping Templates")}>
                             <MappingTemplateListPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
                     path="/list"
-                    render={() => (
+                    element={
                         <RouterPage title={i18n.t("Browse xMART")}>
                             <ListMartPage />
                         </RouterPage>
-                    )}
+                    }
                 />
 
                 <Route
-                    render={() => (
+                    path="/"
+                    element={
                         <RouterPage title={i18n.t("xMART2DHIS")} isRoot={true}>
                             <LandingPage />
                         </RouterPage>
-                    )}
+                    }
                 />
-            </Switch>
+            </Routes>
         </HashRouter>
     );
 };
 
 const RouterPage: React.FC<{ title: string; isRoot?: boolean }> = ({ children, title, isRoot = false }) => {
+    const navigate = useNavigate();
+
     return (
         <Container>
             <AppHeader>
-                <PageHeader title={title} onBackClick={!isRoot ? () => window.history.back() : undefined} />
+                <PageHeader title={title} onBackClick={!isRoot ? () => navigate(-1) : undefined} />
                 <Spacer />
                 <AzureBadge />
             </AppHeader>

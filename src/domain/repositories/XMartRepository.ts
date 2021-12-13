@@ -1,8 +1,8 @@
 import { FutureData } from "../entities/Future";
-import { DataMart, MartTable, XMartContent, XMartResponse } from "../entities/xmart/XMart";
+import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
 
 export interface XMartRepository {
-    listMarts(): FutureData<DataMart[]>;
+    listMartSuggestions(): FutureData<MartSuggestions>;
     listTables(mart: DataMart): FutureData<MartTable[]>;
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
@@ -26,3 +26,5 @@ export type ListAllOptions = {
     filter?: string; // Filter results to be included in the response (ie: "contains(TEST_TYPE_FK, 'value')")
     orderBy?: string; // Order the results by properties
 };
+
+export type MartSuggestions = Record<DataMartEnvironment, { label: string; value: string }[]>;

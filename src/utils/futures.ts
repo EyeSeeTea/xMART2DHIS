@@ -11,3 +11,10 @@ export function apiToFuture<Data>(res: CancelableResponse<Data>): FutureData<Dat
         return res.cancel;
     });
 }
+
+export const timeout = (ms: number): FutureData<void> => {
+    return Future.fromComputation(resolve => {
+        const id = setTimeout(resolve, ms);
+        return () => clearTimeout(id);
+    });
+};

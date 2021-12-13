@@ -1,96 +1,49 @@
-import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useMemo } from "react";
-import { useHistory } from "react-router-dom";
-import { AzureMSALRepository } from "../../../data/repositories/AzureMSALRepository";
-import { InstanceD2ApiRepository } from "../../../data/repositories/InstanceD2ApiRepository";
-import { XMartDefaultRepository } from "../../../data/repositories/XMartDefaultRepository";
-import { LoadDataExample } from "../../../domain/usecases/actions/examples/LoadDataExample";
-import { LoadModelExample } from "../../../domain/usecases/actions/examples/LoadModelExample";
-import { LoadPipelineExample } from "../../../domain/usecases/actions/examples/LoadPipelineExample";
+import { useNavigate } from "react-router-dom";
 import i18n from "../../../locales";
 import { Card, CardGrid } from "../../components/card-grid/CardGrid";
-import { useAppContext } from "../../contexts/app-context";
 
 export const LandingPage: React.FC = () => {
-    const { instance } = useAppContext();
-
-    const history = useHistory();
-    const snackbar = useSnackbar();
+    const navigate = useNavigate();
 
     const cards: Card[] = useMemo(
         () => [
             {
-                key: "tools",
+                title: i18n.t("Actions"),
+                key: "actions",
                 children: [
                     {
                         name: i18n.t("Actions"),
                         description: i18n.t("Actions are a way to trigger events in your application"),
-                        listAction: () => history.push("/actions"),
-                        addAction: () => history.push("/actions/new"),
+                        listAction: () => navigate("/actions"),
+                        addAction: () => navigate("/actions/new"),
                     },
                     {
                         name: i18n.t("Mapping Templates"),
                         description: i18n.t("Define templates of mapping models to import in the actions"),
-                        listAction: () => history.push("/mapping-templates"),
-                        addAction: () => history.push("/mapping-templates/new"),
-                    },
-                    {
-                        name: i18n.t("Browse xMART"),
-                        description: i18n.t("List table contents of the MART"),
-                        listAction: () => history.push("/list"),
+                        listAction: () => navigate("/mapping-templates"),
+                        addAction: () => navigate("/mapping-templates/new"),
                     },
                 ],
             },
             {
-                key: "examples",
-                title: i18n.t("Examples"),
+                title: i18n.t("Connections"),
+                key: "tools",
                 children: [
                     {
-                        name: i18n.t("Load pipelines"),
-                        description: i18n.t("Initial load of LOAD_DATA and LOAD_MODEL pipelines"),
-                        listAction: () =>
-                            new LoadPipelineExample(
-                                new XMartDefaultRepository(new AzureMSALRepository()),
-                                new InstanceD2ApiRepository(instance)
-                            )
-                                .execute()
-                                .run(
-                                    batch => snackbar.success(`Executed batch ${batch}`),
-                                    error => snackbar.error(error)
-                                ),
+                        name: i18n.t("Connections"),
+                        description: i18n.t("List connections of the MART"),
+                        listAction: () => navigate("/connections"),
                     },
                     {
-                        name: i18n.t("Load data"),
-                        description: i18n.t("LOAD_DATA example"),
-                        listAction: () =>
-                            new LoadDataExample(
-                                new XMartDefaultRepository(new AzureMSALRepository()),
-                                new InstanceD2ApiRepository(instance)
-                            )
-                                .execute()
-                                .run(
-                                    batch => snackbar.success(`Executed batch ${batch}`),
-                                    error => snackbar.error(error)
-                                ),
-                    },
-                    {
-                        name: i18n.t("Load model"),
-                        description: i18n.t("LOAD_MODEL example"),
-                        listAction: () =>
-                            new LoadModelExample(
-                                new XMartDefaultRepository(new AzureMSALRepository()),
-                                new InstanceD2ApiRepository(instance)
-                            )
-                                .execute()
-                                .run(
-                                    batch => snackbar.success(`Executed batch ${batch}`),
-                                    error => snackbar.error(error)
-                                ),
+                        name: i18n.t("Browse content"),
+                        description: i18n.t("List table contents of the connections"),
+                        listAction: () => navigate("/list"),
                     },
                 ],
             },
         ],
-        [history, instance, snackbar]
+        [navigate]
     );
 
     return <CardGrid cards={cards} />;
