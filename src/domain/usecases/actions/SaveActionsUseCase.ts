@@ -44,56 +44,6 @@ export class SaveActionUseCase implements UseCase {
             });
     }
 
-    validateModelMappings(action: SyncAction): FutureData<SyncAction> {
-        return this.metadataRepository.getMetadataByIds(action.metadataIds, "id,programType").flatMap(metadata => {
-            const existsNormalPrograms = metadata.programs?.some(
-                program => (program as Program).programType === "WITHOUT_REGISTRATION"
-            );
-            const existsTrackerPrograms = metadata.programs?.some(
-                program => (program as Program).programType === "WITH_REGISTRATION"
-            );
-            const existsDataSets = metadata.dataSets && metadata.dataSets?.length > 0;
-
-            const validationErrors = Object.values({
-                dataValues:
-                    existsDataSets && !action.modelMappings.some(mapping => mapping.dhis2Model === "dataValues")
-                        ? i18n.t("You need to select one dataValues mapping")
-                        : null,
-                events:
-                    (existsNormalPrograms || existsTrackerPrograms) &&
-                    !action.modelMappings.some(mapping => mapping.dhis2Model === "events")
-                        ? i18n.t("You need to select one events mapping")
-                        : null,
-                eventValues:
-                    (existsNormalPrograms || existsTrackerPrograms) &&
-                    !action.modelMappings.some(mapping => mapping.dhis2Model === "eventValues")
-                        ? i18n.t("You need to select one eventValues mapping")
-                        : null,
-                teis:
-                    existsTrackerPrograms && !action.modelMappings.some(mapping => mapping.dhis2Model === "teis")
-                        ? i18n.t("You need to select one tracked entity instances mapping")
-                        : null,
-                teiAttributes:
-                    existsTrackerPrograms &&
-                    !action.modelMappings.some(mapping => mapping.dhis2Model === "teiAttributes")
-                        ? i18n.t("You need to select one tracked entity instance attributes mapping")
-                        : null,
-                enrollments:
-                    existsTrackerPrograms && !action.modelMappings.some(mapping => mapping.dhis2Model === "enrollments")
-                        ? i18n.t("You need to select one enrollent mapping")
-                        : null,
-            })
-                .flat()
-                .filter(error => error !== null);
-
-            if (validationErrors.length > 0) {
-                return Future.error(validationErrors.join("\n"));
-            }
-
-            return Future.success(action);
-        });
-    }
-
     private getDataMartByAction(action: SyncAction): FutureData<DataMart> {
         return listDataMarts().flatMap(dataMarts => {
             const dataMart = dataMarts.find(dataMart => dataMart.id === action.connectionId);
@@ -144,5 +94,120 @@ export class SaveActionUseCase implements UseCase {
         const fileInfo = { id: getUid(`xMART2DHIS_${key}`), name: `xMART2DHIS_${key} file`, data: blob };
 
         return fileInfo;
+    }
+
+    validateModelMappings(action: SyncAction): FutureData<SyncAction> {
+        return this.metadataRepository
+            .getMetadataByIds(action.metadataIds, "id,programType, displayName")
+            .flatMap(metadata => {
+                const trackerPrograms = metadata.programs?.filter(
+                    program => (program as Program).programType === "WITH_REGISTRATION"
+                );
+
+                const dataValuesErrors = !metadata.dataSets
+                    ? []
+                    : metadata.dataSets
+                          ?.map(dataSet => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "dataValues" &&
+                                      (mapping.metadataId === dataSet.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(`The dataSet ${dataSet.displayName} has not associated a dataValues mapping`)
+                                  : null;
+                          })
+                          .flat();
+
+                const eventsErrors = !metadata.programs
+                    ? []
+                    : metadata.programs
+                          ?.map(program => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "events" &&
+                                      (mapping.metadataId === program.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(`The program ${program.displayName} has not associated a events mapping`)
+                                  : null;
+                          })
+                          .flat();
+
+                const eventValuesErrors = !metadata.programs
+                    ? []
+                    : metadata.programs
+                          ?.map(program => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "eventValues" &&
+                                      (mapping.metadataId === program.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(
+                                        `The program ${program.displayName} has not associated a eventValues mapping`
+                                    )
+                                  : null;
+                          })
+                          .flat();
+
+                const teisErrors = !trackerPrograms
+                    ? []
+                    : trackerPrograms
+                          ?.map(program => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "teis" &&
+                                      (mapping.metadataId === program.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(`The program ${program.displayName} has not associated a TEIs mapping`)
+                                  : null;
+                          })
+                          .flat();
+
+                const teiAttributesErrors = !trackerPrograms
+                    ? []
+                    : trackerPrograms
+                          ?.map(program => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "teiAttributes" &&
+                                      (mapping.metadataId === program.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(
+                                        `The program ${program.displayName} has not associated a TEI Attributes mapping`
+                                    )
+                                  : null;
+                          })
+                          .flat();
+
+                const enrollmentErrors = !trackerPrograms
+                    ? []
+                    : trackerPrograms
+                          ?.map(program => {
+                              return !action.modelMappings.some(
+                                  mapping =>
+                                      mapping.dhis2Model === "enrollments" &&
+                                      (mapping.metadataId === program.id || !mapping.metadataId)
+                              )
+                                  ? i18n.t(
+                                        `The program ${program.displayName} has not associated a enrollments mapping`
+                                    )
+                                  : null;
+                          })
+                          .flat();
+
+                const validationErrors = [
+                    ...dataValuesErrors,
+                    ...eventsErrors,
+                    ...eventValuesErrors,
+                    ...teisErrors,
+                    ...teiAttributesErrors,
+                    ...enrollmentErrors,
+                ].filter(error => error !== null);
+
+                if (validationErrors.length > 0) {
+                    return Future.error(validationErrors.join("\n"));
+                }
+
+                return Future.success(action);
+            });
     }
 }

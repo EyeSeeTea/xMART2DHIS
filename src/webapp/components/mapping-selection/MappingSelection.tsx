@@ -85,19 +85,17 @@ export default function MappingSelection({
 
     const handleModelMappingDialogSave = useCallback(
         (modelMapping: ModelMapping) => {
-            const editedModelMappings = newModelMapping
-                ? [...modelMappings, modelMapping]
-                : modelMappings.map(item =>
-                      modelMappingComplexId(item) === modelMappingComplexId(modelMapping) ? modelMapping : item
-                  );
+            const editedModelMappings = editModelMapping
+                ? modelMappings.map(item =>
+                      modelMappingComplexId(item) === modelMappingComplexId(editModelMapping) ? modelMapping : item
+                  )
+                : [...modelMappings, modelMapping];
 
             onChange(editedModelMappings);
-
             setNewModelMapping(undefined);
-
             setEditModelMapping(undefined);
         },
-        [modelMappings, onChange, newModelMapping]
+        [modelMappings, onChange, editModelMapping]
     );
 
     const handleModelMappingDialogCancel = useCallback(() => {
@@ -172,7 +170,8 @@ export default function MappingSelection({
             {
                 name: "edit",
                 text: i18n.t("Edit"),
-                multiple: true,
+                multiple: false,
+                primary: true,
                 onClick: handleEdit,
                 icon: <Icon>edit</Icon>,
             },

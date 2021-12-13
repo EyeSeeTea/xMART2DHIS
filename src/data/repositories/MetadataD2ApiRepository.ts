@@ -22,14 +22,17 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         this.api = getD2APiFromInstance(instance);
     }
 
+    @cache()
     public list(options: ListMetadataOptions): FutureData<ListMetadataResponse> {
         const {
             model,
+            paging = true,
             page,
             pageSize,
             search,
             sorting = { field: "id", order: "asc" },
             selectedIds,
+            aditionalFilters,
             fields = { $owner: true },
         } = options;
 
@@ -38,10 +41,10 @@ export class MetadataD2ApiRepository implements MetadataRepository {
         return apiToFuture(
             //@ts-ignore: d2-api incorrectly guessing model with string access
             this.api.models[model].get({
-                page,
-                pageSize,
-                paging: true,
-                filter: { identifiable: search ? { token: search } : undefined, ...idsFilter },
+                page: paging ? page : undefined,
+                pageSize: paging ? pageSize : undefined,
+                paging,
+                filter: { identifiable: search ? { token: search } : undefined, ...idsFilter, ...aditionalFilters },
                 fields,
                 order: `${sorting.field}:${sorting.order}`,
             })

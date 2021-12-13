@@ -24,7 +24,7 @@ export abstract class D2Model {
     protected static searchFilter: SearchFilter = { field: "name", operator: "token" };
     protected static initialSorting = ["name", "asc"];
     protected static modelTransform: Function = (objects: object[]) => objects;
-    protected static modelFilters: any = {};
+    protected static modelFilters: Record<string, any> = {};
     protected static childrenKeys: string[] | undefined = undefined;
     protected static mappingType: string | undefined;
     protected static parentMappingType: string | undefined;
@@ -56,7 +56,7 @@ export abstract class D2Model {
     }
 
     // TODO: This should be typed (not priority)
-    public static getApiModelFilters(): any {
+    public static getApiModelFilters(): Record<string, any> {
         return this.modelFilters;
     }
 

@@ -6,9 +6,9 @@ import MetadataTable from "../../metadata-table/MetadataTable";
 import { ActionWizardStepProps } from "../ActionWizard";
 import { MetadataType } from "../../../../utils/d2";
 import i18n from "../../../../locales";
-import { DataSetModel, ProgramModel } from "../../../../domain/entities/models/D2Models";
+import { DataSetModel, AllProgramsModel } from "../../../../domain/entities/models/D2Models";
 
-const models = [ProgramModel, DataSetModel];
+const models = [AllProgramsModel, DataSetModel];
 
 export default function MetadataSelectionStep({ action, onChange }: ActionWizardStepProps) {
     const snackbar = useSnackbar();

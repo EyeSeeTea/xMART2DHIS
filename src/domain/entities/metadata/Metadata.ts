@@ -3,7 +3,13 @@ import { OrganisationUnit } from "./OrganisationUnit";
 import { Program } from "./Program";
 import { Ref } from "./Ref";
 
-export type MetadataModel = "categoryOptionCombos" | "categoryOptions" | "optionSets" | "organisationUnits";
+export type MetadataModel =
+    | "categoryOptionCombos"
+    | "categoryOptions"
+    | "optionSets"
+    | "organisationUnits"
+    | "programs"
+    | "dataSets";
 
 export const displayName: Record<string, string> = {
     categoryOptionCombos: "Category option combo",

@@ -182,7 +182,9 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
                     {action.modelMappings.map(modelMapping => (
                         <LiEntry
                             key={modelMapping.dhis2Model}
-                            label={`${modelMapping.dhis2Model} -> ${modelMapping.xMARTTable}`}
+                            label={`${modelMapping.dhis2Model} - ${modelMapping.metadataId ?? ""} -> ${
+                                modelMapping.xMARTTable
+                            }`}
                         />
                     ))}
                 </ul>

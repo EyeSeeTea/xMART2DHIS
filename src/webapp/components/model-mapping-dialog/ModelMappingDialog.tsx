@@ -1,12 +1,15 @@
 import { DialogContent, FormLabel, RadioGroup, FormControlLabel, Radio, TextField } from "@material-ui/core";
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import i18n from "../../../locales";
 import { Dropdown, DropdownOption } from "../dropdown/Dropdown";
 import { Dhis2ModelKey, ModelMapping } from "../../../domain/entities/mapping-template/MappingTemplate";
 import { DataMart, MartTable } from "../../../domain/entities/xmart/XMart";
 import { useAppContext } from "../../contexts/app-context";
 import styled from "styled-components";
+import { MetadataEntity } from "../../../domain/entities/metadata/Metadata";
+import { DataSetModel, AllProgramsModel, TrackerProgramsModel } from "../../../domain/entities/models/D2Models";
+import { D2Model } from "../../../domain/entities/models/D2Model";
 
 const Container = styled.div`
     margin-bottom: 16px;
@@ -39,6 +42,15 @@ const dhis2Models: DropdownOption<Dhis2ModelKey>[] = [
     },
 ];
 
+const metadataModelByData: Record<Dhis2ModelKey, typeof D2Model> = {
+    dataValues: DataSetModel,
+    events: AllProgramsModel,
+    eventValues: AllProgramsModel,
+    teis: TrackerProgramsModel,
+    teiAttributes: TrackerProgramsModel,
+    enrollments: TrackerProgramsModel,
+};
+
 export interface ModelMappingDialogProps {
     connectionId: string;
     modelMapping: ModelMapping;
@@ -51,6 +63,12 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     const [xMARTTables, setXMARTTables] = useState<MartTable[]>();
     const [xMARTConnection, setXMartConnection] = useState<DataMart>();
     const [xMartTableMode, setXMartTableMode] = useState<"existed" | "new">("new");
+    const [metadataItems, setMetadataItems] = useState<MetadataEntity[]>([]);
+
+    const metadataModel = useMemo(
+        () => metadataModelByData[modelMappingState.dhis2Model],
+        [modelMappingState.dhis2Model]
+    );
 
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
@@ -77,19 +95,10 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     }, [xMARTTables, modelMapping]);
 
     useEffect(() => {
-        if (!xMARTConnection) return;
-
-        compositionRoot.xmart.listTables(xMARTConnection).run(
-            tables => {
-                setXMARTTables(tables);
-            },
-            error => snackbar.error(error)
-        );
-    }, [compositionRoot, snackbar, xMARTConnection]);
-
-    useEffect(() => {
         compositionRoot.xmart.listDataMarts().run(
             dataMarts => {
+                //TODO: Replace by GetConnectionByIdUseCase
+
                 const dataMart = dataMarts.find(data => data.id === connectionId);
 
                 setXMartConnection(dataMart);
@@ -97,6 +106,23 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
             error => snackbar.error(error)
         );
     }, [compositionRoot, snackbar, connectionId]);
+
+    useEffect(() => {
+        setMetadataItems([]);
+        compositionRoot.metadata
+            .list({
+                paging: false,
+                model: metadataModel.getCollectionName(),
+                aditionalFilters: metadataModel.getApiModelFilters(),
+                sorting: { field: "displayName", order: "asc" },
+            })
+            .run(
+                items => {
+                    setMetadataItems(items.objects);
+                },
+                error => snackbar.error(error)
+            );
+    }, [compositionRoot, snackbar, xMARTConnection, metadataModel]);
 
     const handleDhis2ModelChange = useCallback(
         (dhis2Model: Dhis2ModelKey) => {
@@ -110,6 +136,18 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
             setModelMappingState({ ...modelMappingState, xMARTTable: xMARTTable });
         },
         [modelMappingState]
+    );
+
+    const handleMetadataItemChange = useCallback(
+        (metadataId: string) => {
+            const metadataType = metadataModel.getMetadataType();
+            setModelMappingState({
+                ...modelMappingState,
+                metadataType,
+                metadataId,
+            });
+        },
+        [modelMappingState, metadataModel]
     );
 
     const handleSave = useCallback(() => {
@@ -156,6 +194,16 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                         items={dhis2Models}
                         value={modelMappingState.dhis2Model}
                         onValueChange={handleDhis2ModelChange}
+                        hideEmpty={true}
+                    />
+                </Container>
+
+                <Container>
+                    <Dropdown
+                        label={i18n.t("Metadata")}
+                        items={metadataItems}
+                        value={modelMappingState.metadataId ?? ""}
+                        onValueChange={handleMetadataItemChange}
                         hideEmpty={true}
                     />
                 </Container>
