@@ -12,12 +12,13 @@ import { generateUid } from "../../../utils/uid";
 import { useAppContext } from "../../contexts/app-context";
 import { useGoBack } from "../../hooks/useGoBack";
 import { fields, getConnectionFieldName, RenderConnectionField } from "./ConnectionForm";
+import HelpDialog, { HelpDialogProps } from "../../components/help-dialog/HelpDialog";
 
 export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) => {
     const { compositionRoot, currentUser } = useAppContext();
     const loading = useLoading();
     const snackbar = useSnackbar();
-    const goBack = useGoBack();
+    const goBack = useGoBack("/connections");
 
     const { id } = useParams();
     const location = useLocation();
@@ -25,6 +26,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
 
     const goHome = useCallback(() => goBack(true), [goBack]);
 
+    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<HelpDialogProps>();
     const [error, setError] = useState<boolean>(false);
     const [initialConnection, setInitialConnection] = useState<DataMart>({
         id: generateUid(),
@@ -32,6 +34,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
         martCode: "",
         environment: "UAT",
         dataEndpoint: "",
+        connectionWorks: false,
         owner: { id: currentUser.id, name: currentUser.name },
         created: new Date(),
         lastUpdated: new Date(),
@@ -58,10 +61,20 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
             compositionRoot.connection.testConnection(connections[0]).run(
                 batch => {
                     snackbar.success(`Connection tested successfully. Batch: ${batch}`);
+                    setInitialConnection(connection => ({ ...connection, connectionWorks: true }));
                     loading.reset();
                 },
                 error => {
                     snackbar.error(error);
+                    setInitialConnection(connection => ({ ...connection, connectionWorks: false }));
+                    if (error === "Origin code 'LOAD_PIPELINE' does not exists") {
+                        setOpenHelpDialogProps({
+                            onCancel: () => setOpenHelpDialogProps(undefined),
+                            code: connections && connections[0] ? connections[0].martCode : "",
+                            name: connections && connections[0] ? connections[0].name : "",
+                        });
+                    }
+
                     loading.reset();
                 }
             );
@@ -105,6 +118,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
 
     return (
         <Container>
+            {openHelpDialogProps ? <HelpDialog {...openHelpDialogProps} /> : null}
             <Form<{ connections: DataMart[] }>
                 autocomplete="off"
                 keepDirtyOnReinitialize={true}

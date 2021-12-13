@@ -8,6 +8,7 @@ export interface DataMart extends SharedRef {
     // If public, manually set by the user in the UI ie: https://frontdoor-r5quteqglawbs.azurefd.net/REFMART
     // If private, set with a dropdown in the UI https://portal-uat.who.int/xmart-api/odata/REFMART (UAT) or https://extranet.who.int/xmart-api/odata/REFMART (PROD)
     dataEndpoint: string;
+    connectionWorks: boolean;
 }
 
 export interface MartTable {

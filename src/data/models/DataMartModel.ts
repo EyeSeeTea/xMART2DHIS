@@ -16,6 +16,7 @@ export const DataMartModel: Codec<DataMart> = Schema.object({
     martCode: Schema.string,
     environment: Schema.oneOf([Schema.exact("PROD"), Schema.exact("UAT")]),
     dataEndpoint: Schema.nonEmptyString,
+    connectionWorks: Schema.boolean,
     owner: NamedRefModel,
     created: Schema.date,
     lastUpdated: Schema.date,
