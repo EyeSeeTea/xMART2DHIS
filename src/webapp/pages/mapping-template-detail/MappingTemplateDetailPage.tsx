@@ -40,7 +40,7 @@ export const MappingTemplateDetailPage: React.FC<MappingTemplateDetailPageProps>
             <MappingTemplateWizard
                 mappingTemplate={mappingTemplate}
                 onChange={setMappingTemplate}
-                onCancel={() => navigate(-1)}
+                onCancel={() => navigate("/mapping-templates")}
             />
         </React.Fragment>
     );

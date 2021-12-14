@@ -1,12 +1,11 @@
-import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
-import { Button, LinearProgress, makeStyles } from "@material-ui/core";
+import { ConfirmationDialog, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { Button, makeStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { MappingTemplate } from "../../../../domain/entities/mapping-template/MappingTemplate";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../locales";
 import { useAppContext } from "../../../contexts/app-context";
 import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
-import { MappingTemplate } from "../../../../domain/entities/mapping-template/MappingTemplate";
 
 const LiEntry: React.FC<{ label: string; value?: string }> = ({ label, value, children }) => {
     return (
@@ -33,34 +32,30 @@ const useStyles = makeStyles({
 
 export const SummaryStep = ({ mappingTemplate, onCancel }: MappingTemplateWizardStepProps) => {
     const { compositionRoot } = useAppContext();
-
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const navigate = useNavigate();
+    const loading = useLoading();
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
 
     const openCancelDialog = () => setCancelDialogOpen(true);
 
     const closeCancelDialog = () => setCancelDialogOpen(false);
 
     const save = async () => {
-        setIsSaving(true);
-
         const errors = mappingTemplate.validate().map(e => e.description);
         if (errors.length > 0) {
             snackbar.error(errors.join("\n"));
         } else {
+            loading.show(true, i18n.t("Saving mapping template..."));
             compositionRoot.mappingTemplates.save(mappingTemplate).run(
                 () => {
-                    navigate(`/mapping-templates/edit/${mappingTemplate.id}`);
                     onCancel();
-                    setIsSaving(false);
+                    loading.reset();
                 },
                 error => {
                     snackbar.error(error);
-                    setIsSaving(false);
+                    loading.reset();
                 }
             );
         }
@@ -92,8 +87,6 @@ export const SummaryStep = ({ mappingTemplate, onCancel }: MappingTemplateWizard
                     </Button>
                 </div>
             </div>
-
-            {isSaving && <LinearProgress />}
         </React.Fragment>
     );
 };

@@ -1,9 +1,8 @@
-import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
-import { Button, LinearProgress, makeStyles } from "@material-ui/core";
+import { ConfirmationDialog, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { Button, makeStyles } from "@material-ui/core";
 import _ from "lodash";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { availablePeriods } from "../../../../domain/entities/metadata/DataSyncPeriod";
 import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/metadata/Metadata";
@@ -38,34 +37,30 @@ const useStyles = makeStyles({
 
 export const SummaryStep = ({ action, onCancel }: ActionWizardStepProps) => {
     const { compositionRoot } = useAppContext();
-
     const snackbar = useSnackbar();
     const classes = useStyles();
-    const navigate = useNavigate();
+    const loading = useLoading();
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
 
     const openCancelDialog = () => setCancelDialogOpen(true);
 
     const closeCancelDialog = () => setCancelDialogOpen(false);
 
     const save = async () => {
-        setIsSaving(true);
-
         const errors = action.validate().map(e => e.description);
         if (errors.length > 0) {
             snackbar.error(errors.join("\n"));
         } else {
+            loading.show(true, i18n.t("Saving action..."));
             compositionRoot.actions.save(action).run(
                 () => {
-                    navigate(`/actions/edit/${action.id}`);
                     onCancel();
-                    setIsSaving(false);
+                    loading.reset();
                 },
                 error => {
                     snackbar.error(error);
-                    setIsSaving(false);
+                    loading.reset();
                 }
             );
         }
@@ -97,8 +92,6 @@ export const SummaryStep = ({ action, onCancel }: ActionWizardStepProps) => {
                     </Button>
                 </div>
             </div>
-
-            {isSaving && <LinearProgress />}
         </React.Fragment>
     );
 };
