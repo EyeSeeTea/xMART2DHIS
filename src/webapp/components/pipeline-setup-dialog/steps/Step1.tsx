@@ -8,7 +8,7 @@ export const Step1: React.FC<PipelineSetupDialogProps> = ({ mart }) => {
     return (
         <React.Fragment>
             <h2>
-                {i18n.t("Step 1: Go to the pipeline creation ")}
+                {i18n.t("Step 1: Go to the pipeline creation ", { nsSeparator: false })}
                 <a href={getUrl(mart)} target="_blank" rel="noreferrer">
                     {i18n.t("page")}
                 </a>

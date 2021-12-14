@@ -8,6 +8,7 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
+import { Tooltip } from "@material-ui/core";
 import { Check, Clear, Delete, Edit, FileCopy, Help, SettingsInputAntenna, Share } from "@material-ui/icons";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -50,7 +51,24 @@ export const ListConnectionsPage: React.FC = () => {
                 name: "connectionWorks",
                 text: i18n.t("Test connection"),
                 getValue: row =>
-                    row.connectionWorks ? <Check style={{ fill: "#008000" }} /> : <Clear style={{ fill: "#ff0000" }} />,
+                    row.connectionWorks ? (
+                        <Check style={{ fill: "green" }} />
+                    ) : (
+                        <Tooltip title={i18n.t("Connection to the data mart was not possible")}>
+                            <div
+                                onClick={event => {
+                                    event.stopPropagation();
+
+                                    setOpenHelpDialogProps({
+                                        onCancel: () => setOpenHelpDialogProps(undefined),
+                                        mart: row,
+                                    });
+                                }}
+                            >
+                                <Clear style={{ fill: "red" }} />
+                            </div>
+                        </Tooltip>
+                    ),
             },
         ],
         []
@@ -188,7 +206,10 @@ export const ListConnectionsPage: React.FC = () => {
                         error => {
                             snackbar.error(error);
                             compositionRoot.connection.save({ ...connection, connectionWorks: false }).runAsync();
-                            if (error === "Origin code 'LOAD_PIPELINE' does not exists" || error === "Sequence contains no elements") {
+                            if (
+                                error === "Origin code 'LOAD_PIPELINE' does not exists" ||
+                                error === "Sequence contains no elements"
+                            ) {
                                 setOpenHelpDialogProps({
                                     onCancel: () => setOpenHelpDialogProps(undefined),
                                     mart: connection,

@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { Future } from "../../../domain/entities/Future";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
@@ -67,17 +68,19 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
         compositionRoot.connection.testConnection(connection).run(
             batch => {
                 snackbar.success(`Connection tested successfully. Batch: ${batch}`);
-                setInitialConnection(connection => ({ ...connection, connectionWorks: true }));
                 loading.reset();
             },
             error => {
-                snackbar.error(error);
-                setInitialConnection(connection => ({ ...connection, connectionWorks: false }));
-                if (error === "Origin code 'LOAD_PIPELINE' does not exists" || error === "Sequence contains no elements") {
+                if (
+                    error === "Origin code 'LOAD_PIPELINE' does not exists" ||
+                    error === "Sequence contains no elements"
+                ) {
                     setOpenHelpDialogProps({
                         onCancel: () => setOpenHelpDialogProps(undefined),
                         mart: connection,
                     });
+                } else {
+                    snackbar.error(error);
                 }
 
                 loading.reset();
@@ -86,27 +89,34 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     };
 
     const onSubmit = useCallback(
-        async ({ connections }: { connections: DataMart[] }) => {
+        async ({ connections }: NewConnectionViewModel) => {
             const [connection] = connections;
             if (!connection) return { FORM_ERROR };
 
             loading.show(true, i18n.t("Saving connection"));
-            compositionRoot.connection.save({ ...initialConnection, ...connection }).run(
-                () => {
-                    snackbar.success(
-                        isEdit ? i18n.t("Connection successfully edited") : i18n.t("Connection successfully created")
-                    );
-                    loading.reset();
-                    goHome();
-                },
-                () => {
-                    snackbar.error("An error has occurred saving the connection");
-                    loading.reset();
-                    goHome();
-                }
-            );
+            compositionRoot.connection
+                .testConnection(connection)
+                .map(() => true)
+                .flatMapError(() => Future.success(false))
+                .flatMap(connectionWorks => compositionRoot.connection.save({ ...connection, connectionWorks }))
+                .run(
+                    () => {
+                        snackbar.success(
+                            isEdit
+                                ? i18n.t("Connection successfully edited")
+                                : i18n.t("Connection successfully created")
+                        );
+                        loading.reset();
+                        goHome();
+                    },
+                    () => {
+                        snackbar.error("An error has occurred saving the connection");
+                        loading.reset();
+                        goHome();
+                    }
+                );
         },
-        [compositionRoot, loading, snackbar, goHome, initialConnection, isEdit]
+        [compositionRoot, loading, snackbar, goHome, isEdit]
     );
 
     if (error) return null;
@@ -115,7 +125,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
         <Container>
             {openHelpDialogProps ? <PipelineSetupDialog {...openHelpDialogProps} /> : null}
 
-            <Form<{ connections: DataMart[] }>
+            <Form<NewConnectionViewModel>
                 autocomplete="off"
                 keepDirtyOnReinitialize={true}
                 initialValuesEqual={(a, b) => _.isEqual(a, b)}
@@ -186,3 +196,7 @@ const ButtonsRow = styled.div`
 const Spacer = styled.span`
     flex-grow: 1;
 `;
+
+interface NewConnectionViewModel {
+    connections: DataMart[];
+}

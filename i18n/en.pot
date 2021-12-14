@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-10T11:14:55.899Z\n"
-"PO-Revision-Date: 2021-12-10T11:14:55.899Z\n"
+"POT-Creation-Date: 2021-12-14T19:29:46.937Z\n"
+"PO-Revision-Date: 2021-12-14T19:29:46.937Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -356,6 +356,39 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
+msgid "Instructions to set up pipeline"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Step 1: Go to the pipeline creation "
+msgstr ""
+
+msgid "page"
+msgstr ""
+
+msgid "Step 3: "
+msgstr ""
+
+msgid "Configure the pipeline"
+msgstr ""
+
+msgid " with:"
+msgstr ""
+
+msgid "Remember to click on the 'Publish' button."
+msgstr ""
+
+msgid "Go to xMART"
+msgstr ""
+
+msgid "Create pipeline"
+msgstr ""
+
+msgid "Configure pipeline"
+msgstr ""
+
 msgid "Actions"
 msgstr ""
 
@@ -435,6 +468,12 @@ msgstr ""
 msgid "Connection URL"
 msgstr ""
 
+msgid "Test connection"
+msgstr ""
+
+msgid "Connection to the data mart was not possible"
+msgstr ""
+
 msgid "Deleting connections"
 msgstr ""
 
@@ -468,10 +507,10 @@ msgstr ""
 msgid "Replicate"
 msgstr ""
 
-msgid "Test connection"
+msgid "Sharing settings"
 msgstr ""
 
-msgid "Sharing settings"
+msgid "Help setting up pipeline"
 msgstr ""
 
 msgid "Run"
@@ -520,4 +559,12 @@ msgid "Connection successfully created"
 msgstr ""
 
 msgid "Error saving connection"
+msgstr ""
+
+msgctxt "PIPELINE' pipeline"
+msgid "Step 2: Create 'LOAD"
+msgstr ""
+
+msgctxt "PIPELINE'."
+msgid "The code needs to be exactly 'LOAD"
 msgstr ""

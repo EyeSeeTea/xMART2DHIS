@@ -8,11 +8,11 @@ import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
 export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (
     <React.Fragment>
         <h2>
-            {i18n.t("Step 3: ")}
+            {i18n.t("Step 3: ", { nsSeparator: false })}
             <a href={getUrl(mart)} target="_blank" rel="noreferrer">
                 {i18n.t("Configure the pipeline")}
             </a>
-            {i18n.t(" with:")}
+            {i18n.t(" with:", { nsSeparator: false })}
         </h2>
         <p>{i18n.t("Remember to click on the 'Publish' button.")}</p>
         <CopyBlock

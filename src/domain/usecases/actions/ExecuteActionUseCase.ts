@@ -128,18 +128,15 @@ export class ExecuteActionUseCase {
         ]).map((results: string[]) => results.join("\n"));
     }
 
-    private sendDataByTable<T>(data: T[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
+    private sendDataByTable<T>(data: T[], dataMart: DataMart, key: string, table: string): FutureData<string> {
         if (data.length === 0) return Future.success(i18n.t(`${key} does not found`));
 
         const fileInfo = this.generateFileInfo(data, key);
 
         return this.fileRepository
             .uploadFileAsExternal(fileInfo)
-            .flatMap(url => {
-                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", {
-                    url,
-                    table: tableCode,
-                });
+            .flatMap(({ url }) => {
+                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", { url, table });
             })
             .flatMap(() =>
                 Future.success(i18n.t(`Send {{count}} ${key.toLowerCase()} succesfully`, { count: data.length }))
