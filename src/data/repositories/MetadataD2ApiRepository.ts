@@ -91,7 +91,7 @@ export class MetadataD2ApiRepository implements MetadataRepository {
             this.api.models.organisationUnits.get({
                 paging: false,
                 filter: { level: { eq: "1" } },
-                fields: { id: true, name: true, displayName: true, path: true },
+                fields: { id: true, name: true, displayName: true, path: true, code: true },
             })
         ).map(response => response.objects);
     }
