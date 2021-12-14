@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-10T11:14:55.899Z\n"
+"POT-Creation-Date: 2021-12-13T15:34:55.640Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -264,6 +264,38 @@ msgstr "Listar"
 msgid "<No value>"
 msgstr ""
 
+msgid "Instructions to set up pipeline"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Go to XMart dashboard"
+msgstr ""
+
+msgid "Pipelines page"
+msgstr ""
+
+msgid "Create new pipeline"
+msgstr ""
+
+msgid "Configure pipeline"
+msgstr ""
+
+msgid "Copy XML"
+msgstr ""
+
+msgid "your XMart URL"
+msgstr ""
+
+msgid "Then click on the 'Create a Pipeline' button."
+msgstr ""
+
+msgid ""
+"Remember to click on the 'Validate' button to check for errors. Then click "
+"on the 'Save' button then 'Publish' button."
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -435,6 +467,9 @@ msgstr ""
 msgid "Connection URL"
 msgstr ""
 
+msgid "Test connection"
+msgstr ""
+
 msgid "Deleting connections"
 msgstr ""
 
@@ -468,10 +503,10 @@ msgstr ""
 msgid "Replicate"
 msgstr ""
 
-msgid "Test connection"
+msgid "Sharing settings"
 msgstr ""
 
-msgid "Sharing settings"
+msgid "Help setting up pipeline"
 msgstr ""
 
 msgid "Run"

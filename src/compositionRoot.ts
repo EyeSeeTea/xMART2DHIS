@@ -31,6 +31,7 @@ import { GetMappingTemplatesUseCase } from "./domain/usecases/mappin-templates/G
 import { SaveMappingTemplateUseCase } from "./domain/usecases/mappin-templates/SaveMappingTemplateUseCase";
 import { GetMetadataByIdsUseCase } from "./domain/usecases/metadata/GetMetadataByIdsUseCase";
 import { GetRootOrgUnitUseCase } from "./domain/usecases/metadata/GetRootOrgUnitUseCase";
+import { GetModelNameUseCase } from "./domain/usecases/metadata/GetModelNameUseCase";
 import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseCase";
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
@@ -65,6 +66,7 @@ export function getCompositionRoot(instance: Instance) {
             getOrgUnitRoots: new GetRootOrgUnitUseCase(metadataRepository),
             getByIds: new GetMetadataByIdsUseCase(metadataRepository),
             list: new ListMetadataUseCase(metadataRepository),
+            getModelName: new GetModelNameUseCase(metadataRepository),
         }),
         actions: getExecute({
             list: new GetActionsUseCase(actionRepository),

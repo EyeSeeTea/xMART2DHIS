@@ -34,8 +34,12 @@ export const ListMartPage: React.FC = () => {
     const columns = useMemo(() => {
         if (rows.length === 0) return [{ name: "id", text: i18n.t("Identifier") }];
 
-        return _.keys(rows[0]).map((column, idx) => ({ name: column, text: column, hidden: idx > 6 }));
-    }, [rows]);
+        return _.keys(rows[0]).map((column, idx) => ({
+            name: compositionRoot.metadata.getModelName(column),
+            text: compositionRoot.metadata.getModelName(column),
+            hidden: idx > 6,
+        }));
+    }, [rows, compositionRoot.metadata]);
 
     const fetchRows = useCallback(
         (options: ListXMartOptions) => {
@@ -61,7 +65,7 @@ export const ListMartPage: React.FC = () => {
 
     const onChange = useCallback(
         (state: TableState<TableObject>) => {
-            fetchRows(state.pagination);
+            fetchRows({ ...state.pagination, orderBy: `${state.sorting.field} ${state.sorting.order}` });
         },
         [fetchRows]
     );
