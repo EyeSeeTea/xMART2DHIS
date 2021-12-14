@@ -394,12 +394,6 @@ msgstr "Volver"
 msgid "Help"
 msgstr "Ayuda"
 
-msgid "Instructions to set up pipeline"
-msgstr ""
-
-msgid "Close"
-msgstr ""
-
 msgid "Step 1: Go to the pipeline creation "
 msgstr ""
 
@@ -422,9 +416,6 @@ msgid "Go to xMART"
 msgstr ""
 
 msgid "Create pipeline"
-msgstr ""
-
-msgid "Configure pipeline"
 msgstr ""
 
 msgid "Actions"

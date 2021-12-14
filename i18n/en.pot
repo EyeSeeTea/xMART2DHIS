@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-14T20:01:33.036Z\n"
-"PO-Revision-Date: 2021-12-14T20:01:33.036Z\n"
+"POT-Creation-Date: 2021-12-14T21:55:54.803Z\n"
+"PO-Revision-Date: 2021-12-14T21:55:54.803Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -265,38 +265,6 @@ msgid "List"
 msgstr ""
 
 msgid "<No value>"
-msgstr ""
-
-msgid "Instructions to set up pipeline"
-msgstr ""
-
-msgid "Close"
-msgstr ""
-
-msgid "Go to XMart dashboard"
-msgstr ""
-
-msgid "Pipelines page"
-msgstr ""
-
-msgid "Create new pipeline"
-msgstr ""
-
-msgid "Configure pipeline"
-msgstr ""
-
-msgid "Copy XML"
-msgstr ""
-
-msgid "your XMart URL"
-msgstr ""
-
-msgid "Then click on the 'Create a Pipeline' button."
-msgstr ""
-
-msgid ""
-"Remember to click on the 'Validate' button to check for errors. Then click "
-"on the 'Save' button then 'Publish' button."
 msgstr ""
 
 msgid "Type"
