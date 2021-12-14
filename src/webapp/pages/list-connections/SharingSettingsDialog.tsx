@@ -13,6 +13,7 @@ export const SharingSettingsDialog: React.FC<SharingSettingsDialogProps> = ({ in
         martCode: "",
         environment: "UAT",
         dataEndpoint: "",
+        connectionWorks: false,
         owner: { id: currentUser.id, name: currentUser.name },
         created: new Date(),
         lastUpdated: new Date(),

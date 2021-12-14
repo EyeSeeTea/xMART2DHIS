@@ -8,7 +8,8 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-import { Delete, Edit, FileCopy, SettingsInputAntenna, Share } from "@material-ui/icons";
+import { Tooltip } from "@material-ui/core";
+import { Check, Clear, Delete, Edit, FileCopy, Help, SettingsInputAntenna, Share } from "@material-ui/icons";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,10 @@ import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
+import {
+    PipelineSetupDialogProps,
+    PipelineSetupDialog,
+} from "../../components/pipeline-setup-dialog/PipelineSetupDialog";
 import { useAppContext } from "../../contexts/app-context";
 import { useReload } from "../../hooks/useReload";
 import { SharingSettingsDialog, SharingSettingsDialogProps } from "./SharingSettingsDialog";
@@ -32,6 +37,7 @@ export const ListConnectionsPage: React.FC = () => {
     const [search, changeSearch] = useState<string>("");
     const [selection, setSelection] = useState<TableSelection[]>([]);
     const [createDialogProps, setCreateDialogProps] = useState<SharingSettingsDialogProps>();
+    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<PipelineSetupDialogProps>();
 
     const [reloadKey, reload] = useReload();
 
@@ -41,6 +47,29 @@ export const ListConnectionsPage: React.FC = () => {
             { name: "martCode", text: i18n.t("Code") },
             { name: "environment", text: i18n.t("Type") },
             { name: "dataEndpoint", text: i18n.t("Connection URL") },
+            {
+                name: "connectionWorks",
+                text: i18n.t("Test connection"),
+                getValue: row =>
+                    row.connectionWorks ? (
+                        <Check style={{ fill: "green" }} />
+                    ) : (
+                        <Tooltip title={i18n.t("Connection to the data mart was not possible")}>
+                            <div
+                                onClick={event => {
+                                    event.stopPropagation();
+
+                                    setOpenHelpDialogProps({
+                                        onCancel: () => setOpenHelpDialogProps(undefined),
+                                        mart: row,
+                                    });
+                                }}
+                            >
+                                <Clear style={{ fill: "red" }} />
+                            </div>
+                        </Tooltip>
+                    ),
+            },
         ],
         []
     );
@@ -138,6 +167,20 @@ export const ListConnectionsPage: React.FC = () => {
         [compositionRoot.connection, currentUser.id, currentUser.name, loadingScreen, reload, rows, snackbar]
     );
 
+    const setHelpDialog = useCallback(
+        async (ids: string[]) => {
+            const connection = rows.find(({ id }) => id === ids[0]);
+            if (!connection) return;
+            if (connection) {
+                setOpenHelpDialogProps({
+                    onCancel: () => setOpenHelpDialogProps(undefined),
+                    mart: connection,
+                });
+            }
+        },
+        [rows]
+    );
+
     const testConnection = useCallback(
         async (ids: string[]) => {
             loadingScreen.show(true, i18n.t("Testing connection"));
@@ -154,16 +197,30 @@ export const ListConnectionsPage: React.FC = () => {
                     .run(
                         batch => {
                             snackbar.success(`Connection tested successfully. Batch: ${batch}`);
+                            compositionRoot.connection.save({ ...connection, connectionWorks: true }).run(
+                                () => reload(),
+                                () => null
+                            );
                             loadingScreen.reset();
                         },
                         error => {
                             snackbar.error(error);
+                            compositionRoot.connection.save({ ...connection, connectionWorks: false }).runAsync();
+                            if (
+                                error === "Origin code 'LOAD_PIPELINE' does not exists" ||
+                                error === "Sequence contains no elements"
+                            ) {
+                                setOpenHelpDialogProps({
+                                    onCancel: () => setOpenHelpDialogProps(undefined),
+                                    mart: connection,
+                                });
+                            }
                             loadingScreen.reset();
                         }
                     );
             }
         },
-        [compositionRoot.connection, loadingScreen, rows, snackbar]
+        [compositionRoot.connection, loadingScreen, rows, snackbar, reload]
     );
 
     const details: ObjectsTableDetailField<DataMart>[] = [
@@ -214,13 +271,29 @@ export const ListConnectionsPage: React.FC = () => {
             {
                 name: "sharingSettings",
                 text: i18n.t("Sharing settings"),
-                isActive: verifyUserCanEdit,
+                isActive: rows => verifyUserCanEdit(rows),
                 multiple: false,
                 icon: <Share />,
                 onClick: setSharingSettings,
             },
+            {
+                name: "helpDialog",
+                text: i18n.t("Help setting up pipeline"),
+                multiple: false,
+                icon: <Help />,
+                isActive: (connections: DataMart[]) => connections.every(value => value.connectionWorks === false),
+                onClick: setHelpDialog,
+            },
         ],
-        [deleteConnections, editConnection, replicateConnection, setSharingSettings, testConnection, verifyUserCanEdit]
+        [
+            deleteConnections,
+            editConnection,
+            replicateConnection,
+            setSharingSettings,
+            setHelpDialog,
+            testConnection,
+            verifyUserCanEdit,
+        ]
     );
     useEffect(() => {
         setLoading(true);
@@ -242,7 +315,7 @@ export const ListConnectionsPage: React.FC = () => {
     return (
         <React.Fragment>
             {createDialogProps ? <SharingSettingsDialog {...createDialogProps} /> : null}
-
+            {openHelpDialogProps ? <PipelineSetupDialog {...openHelpDialogProps} /> : null}
             <ObjectsTable<DataMart>
                 rows={rows}
                 columns={columns}

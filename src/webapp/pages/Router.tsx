@@ -25,7 +25,7 @@ export const Router = () => {
                 <Route
                     path="/actions/new"
                     element={
-                        <RouterPage title={i18n.t("Action")}>
+                        <RouterPage title={i18n.t("Action")} parentRoute="/actions">
                             <ActionDetailPage action="new" />
                         </RouterPage>
                     }
@@ -34,7 +34,7 @@ export const Router = () => {
                 <Route
                     path="/actions/edit/:id"
                     element={
-                        <RouterPage title={i18n.t("Action")}>
+                        <RouterPage title={i18n.t("Action")} parentRoute="/actions">
                             <ActionDetailPage action="edit" />
                         </RouterPage>
                     }
@@ -43,7 +43,7 @@ export const Router = () => {
                 <Route
                     path="/actions"
                     element={
-                        <RouterPage title={i18n.t("Actions")}>
+                        <RouterPage title={i18n.t("Actions")} parentRoute="/">
                             <ActionsListPage />
                         </RouterPage>
                     }
@@ -52,7 +52,7 @@ export const Router = () => {
                 <Route
                     path={"/connections/new"}
                     element={
-                        <RouterPage title={i18n.t("New connection")}>
+                        <RouterPage title={i18n.t("New connection")} parentRoute="/connections">
                             <NewConnectionPage action="new" />
                         </RouterPage>
                     }
@@ -61,7 +61,7 @@ export const Router = () => {
                 <Route
                     path={"/connections/edit/:id"}
                     element={
-                        <RouterPage title={i18n.t("Edit connection")}>
+                        <RouterPage title={i18n.t("Edit connection")} parentRoute="/connections">
                             <NewConnectionPage action="edit" />
                         </RouterPage>
                     }
@@ -70,7 +70,7 @@ export const Router = () => {
                 <Route
                     path="/connections"
                     element={
-                        <RouterPage title={i18n.t("Connections")}>
+                        <RouterPage title={i18n.t("Connections")} parentRoute="/">
                             <ListConnectionsPage />
                         </RouterPage>
                     }
@@ -79,7 +79,7 @@ export const Router = () => {
                 <Route
                     path="/mapping-templates/new"
                     element={
-                        <RouterPage title={i18n.t("Mapping Template")}>
+                        <RouterPage title={i18n.t("Mapping Template")} parentRoute="/mapping-templates">
                             <MappingTemplateDetailPage action="new" />
                         </RouterPage>
                     }
@@ -88,7 +88,7 @@ export const Router = () => {
                 <Route
                     path="/mapping-templates/edit/:id"
                     element={
-                        <RouterPage title={i18n.t("Mapping Template")}>
+                        <RouterPage title={i18n.t("Mapping Template")} parentRoute="/mapping-templates">
                             <MappingTemplateDetailPage action="edit" />
                         </RouterPage>
                     }
@@ -97,7 +97,7 @@ export const Router = () => {
                 <Route
                     path="/mapping-templates"
                     element={
-                        <RouterPage title={i18n.t("Mapping Templates")}>
+                        <RouterPage title={i18n.t("Mapping Templates")} parentRoute="/">
                             <MappingTemplateListPage />
                         </RouterPage>
                     }
@@ -106,7 +106,7 @@ export const Router = () => {
                 <Route
                     path="/list"
                     element={
-                        <RouterPage title={i18n.t("Browse xMART")}>
+                        <RouterPage title={i18n.t("Browse xMART")} parentRoute="/">
                             <ListMartPage />
                         </RouterPage>
                     }
@@ -115,7 +115,7 @@ export const Router = () => {
                 <Route
                     path="/"
                     element={
-                        <RouterPage title={i18n.t("xMART2DHIS")} isRoot={true}>
+                        <RouterPage title={i18n.t("xMART2DHIS")}>
                             <LandingPage />
                         </RouterPage>
                     }
@@ -125,13 +125,13 @@ export const Router = () => {
     );
 };
 
-const RouterPage: React.FC<{ title: string; isRoot?: boolean }> = ({ children, title, isRoot = false }) => {
+const RouterPage: React.FC<{ title: string; parentRoute?: string }> = ({ children, title, parentRoute }) => {
     const navigate = useNavigate();
 
     return (
         <Container>
             <AppHeader>
-                <PageHeader title={title} onBackClick={!isRoot ? () => navigate(-1) : undefined} />
+                <PageHeader title={title} onBackClick={parentRoute ? () => navigate(parentRoute) : undefined} />
                 <Spacer />
                 <AzureBadge />
             </AppHeader>

@@ -103,7 +103,7 @@ export function getCompositionRoot(instance: Instance) {
             save: new SaveConnectionUseCase(connectionRepository),
             delete: new DeleteConnectionsUseCase(connectionRepository),
             getById: new GetConnectionByIdUseCase(connectionRepository),
-            testConnection: new TestConnectionUseCase(martRepository, instanceRepository),
+            testConnection: new TestConnectionUseCase(martRepository, fileRepository),
         }),
     };
 }

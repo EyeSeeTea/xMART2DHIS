@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-13T15:34:55.640Z\n"
+"POT-Creation-Date: 2021-12-14T19:58:05.548Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -223,6 +223,9 @@ msgstr ""
 msgid "You do not have assigned any organisation unit"
 msgstr ""
 
+msgid "Saving action..."
+msgstr ""
+
 msgid "Cancel action wizard"
 msgstr ""
 
@@ -338,6 +341,9 @@ msgstr ""
 msgid "Mapping template"
 msgstr ""
 
+msgid "Saving mapping template..."
+msgstr ""
+
 msgid "Cancel mapping template wizard"
 msgstr ""
 
@@ -387,6 +393,39 @@ msgstr "Volver"
 
 msgid "Help"
 msgstr "Ayuda"
+
+msgid "Instructions to set up pipeline"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Step 1: Go to the pipeline creation "
+msgstr ""
+
+msgid "page"
+msgstr ""
+
+msgid "Step 3: "
+msgstr ""
+
+msgid "Configure the pipeline"
+msgstr ""
+
+msgid " with:"
+msgstr ""
+
+msgid "Remember to click on the 'Publish' button."
+msgstr ""
+
+msgid "Go to xMART"
+msgstr ""
+
+msgid "Create pipeline"
+msgstr ""
+
+msgid "Configure pipeline"
+msgstr ""
 
 msgid "Actions"
 msgstr ""
@@ -468,6 +507,9 @@ msgid "Connection URL"
 msgstr ""
 
 msgid "Test connection"
+msgstr ""
+
+msgid "Connection to the data mart was not possible"
 msgstr ""
 
 msgid "Deleting connections"
@@ -555,4 +597,12 @@ msgid "Connection successfully created"
 msgstr ""
 
 msgid "Error saving connection"
+msgstr ""
+
+msgctxt "PIPELINE' pipeline"
+msgid "Step 2: Create 'LOAD"
+msgstr ""
+
+msgctxt "PIPELINE'."
+msgid "The code needs to be exactly 'LOAD"
 msgstr ""
