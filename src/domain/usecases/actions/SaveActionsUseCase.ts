@@ -115,11 +115,7 @@ export class SaveActionUseCase implements UseCase {
 
         return this.fileRepository
             .uploadFileAsExternal(tableFileInfo)
-            .flatMap(url =>
-                this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", {
-                    url,
-                })
-            )
+            .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { url }))
             .map(() => undefined);
     }
 

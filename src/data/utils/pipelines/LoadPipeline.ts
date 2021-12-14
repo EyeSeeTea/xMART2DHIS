@@ -1,11 +1,11 @@
-<XmartPipeline IsStructure="true">
+export const LoadPipeline = `<XmartPipeline IsStructure="true">
   <Context>
     <Inputs>
       <Add Key="url" Type="text" />
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="${url}">
+    <GetWebService Url="\${url}">
       <GetJson OutputTableName="PIPELINE">
         <Path>$</Path>
       </GetJson>
@@ -16,7 +16,7 @@
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <AddColumn Name="MART_ID" FillWith="${MART_ID}" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -33,7 +33,7 @@
       <Transform>
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <AddColumn Name="MART_ID" FillWith="${MART_ID}" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -51,3 +51,4 @@
     </LoadTable>
   </Load>
 </XmartPipeline>
+`;
