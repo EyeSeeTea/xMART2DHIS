@@ -8,6 +8,7 @@ import { DataValue, DataValueSet } from "../../entities/data/DataValue";
 import { ProgramEvent, ProgramEventDataValue } from "../../entities/data/ProgramEvent";
 import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
+import { Dhis2ModelKey } from "../../entities/mapping-template/MappingTemplate";
 import { MetadataPackage } from "../../entities/metadata/Metadata";
 import { Program } from "../../entities/metadata/Program";
 import { TrakedEntityAttribute } from "../../entities/metadata/TrackedEntityAttribute";
@@ -128,23 +129,13 @@ export class ExecuteActionUseCase {
 
     private getDataValuesByXMARTTable(dataValueSets: DataValueSet[], action: SyncAction): DataByTable[] {
         return dataValueSets.reduce<DataByTable[]>((acc, dataValueSet) => {
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping =>
-                        modelMapping.metadataId === dataValueSet.dataSet && modelMapping.dhis2Model === "dataValues"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "dataValues");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, ...dataValueSet.dataValues] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: dataValueSet.dataValues }];
+            return this.AddOrEditNewDataByTable(
+                action,
+                acc,
+                dataValueSet.dataSet ?? "",
+                "dataValues",
+                dataValueSet.dataValues
+            );
         }, []);
     }
 
@@ -152,47 +143,16 @@ export class ExecuteActionUseCase {
         return events.reduce<DataByTable[]>((acc, event) => {
             const programId = this.getProgramIdByCode(programs, event.program);
 
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping => modelMapping.metadataId === programId && modelMapping.dhis2Model === "events"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "events");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, event] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: [event] }];
+            return this.AddOrEditNewDataByTable(action, acc, programId ?? "", "events", [event]);
         }, []);
     }
 
     private getEventValuesByXMARTTable(events: ProgramEvent[], action: SyncAction, programs: Program[]): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
             const programId = this.getProgramIdByCode(programs, event.program);
-
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping => modelMapping.metadataId === programId && modelMapping.dhis2Model === "eventValues"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "eventValues");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
             const eventValues = event.dataValues.map(v => ({ ...v, event: event.event } as EventValue));
 
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, ...eventValues] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: eventValues }];
+            return this.AddOrEditNewDataByTable(action, acc, programId ?? "", "eventValues", eventValues);
         }, []);
     }
 
@@ -203,22 +163,7 @@ export class ExecuteActionUseCase {
 
             const programId = this.getProgramIdByCode(programs, programOwner.program);
 
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping => modelMapping.metadataId === programId && modelMapping.dhis2Model === "teis"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "teis");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, tei] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: [tei] }];
+            return this.AddOrEditNewDataByTable(action, acc, programId ?? "", "teis", [tei]);
         }, []);
     }
 
@@ -233,26 +178,11 @@ export class ExecuteActionUseCase {
 
             const programId = this.getProgramIdByCode(programs, programOwner.program);
 
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping => modelMapping.metadataId === programId && modelMapping.dhis2Model === "teiAttributes"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "teiAttributes");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
             const teiAttributes = tei.attributes.map(
                 att => ({ ...att, trackedEntityInstance: tei.trackedEntityInstance } as TEIAttribute)
             );
 
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, ...teiAttributes] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: teiAttributes }];
+            return this.AddOrEditNewDataByTable(action, acc, programId ?? "", "teiAttributes", teiAttributes);
         }, []);
     }
 
@@ -266,27 +196,37 @@ export class ExecuteActionUseCase {
         return enrollments.reduce<DataByTable[]>((acc, enrollment) => {
             const programId = this.getProgramIdByCode(programs, enrollment.program);
 
-            const newMapping =
-                action.modelMappings.find(
-                    modelMapping => modelMapping.metadataId === programId && modelMapping.dhis2Model === "enrollments"
-                ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === "enrollments");
-
-            if (!newMapping) return acc;
-
-            const existedDataByTable = acc.find(mapping => mapping.table === newMapping.xMARTTable);
-
-            return existedDataByTable
-                ? acc.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, enrollment] }
-                          : dataByTable
-                  )
-                : [...acc, { table: newMapping.xMARTTable, data: [enrollment] }];
+            return this.AddOrEditNewDataByTable(action, acc, programId ?? "", "enrollments", [enrollment]);
         }, []);
     }
 
+    private AddOrEditNewDataByTable(
+        action: SyncAction,
+        dataByTables: DataByTable[],
+        metadataId: string,
+        dhis2Model: Dhis2ModelKey,
+        newData: Data[]
+    ): DataByTable[] {
+        const newMapping =
+            action.modelMappings.find(
+                modelMapping => modelMapping.metadataId === metadataId && modelMapping.dhis2Model === dhis2Model
+            ) ?? action.modelMappings.find(modelMapping => modelMapping.dhis2Model === dhis2Model);
+
+        if (!newMapping) return dataByTables;
+
+        const existedDataByTable = dataByTables.find(mapping => mapping.table === newMapping.xMARTTable);
+
+        return existedDataByTable
+            ? dataByTables.map(dataByTable =>
+                  dataByTable.table === newMapping.xMARTTable
+                      ? { ...dataByTable, data: [...dataByTable.data, ...newData] }
+                      : dataByTable
+              )
+            : [...dataByTables, { table: newMapping.xMARTTable, data: newData }];
+    }
+
     private sendDataByTable(data: Data[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
-        if (data.length === 0) return Future.success(i18n.t(`${key} does not found`));
+        if (data.length === 0) return Future.success(i18n.t(`${tableCode} 0 rows`));
 
         const fileInfo = this.generateFileInfo(data, key);
 
@@ -298,9 +238,7 @@ export class ExecuteActionUseCase {
                     table: tableCode,
                 });
             })
-            .flatMap(() =>
-                Future.success(i18n.t(`Send {{count}} ${key.toLowerCase()} succesfully`, { count: data.length }))
-            );
+            .flatMap(() => Future.success(i18n.t(`${tableCode} {{count}} rows`, { count: data.length })));
     }
 
     private getProgramIdByCode(programs: Program[], code: string) {
