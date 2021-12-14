@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-14T19:29:46.937Z\n"
-"PO-Revision-Date: 2021-12-14T19:29:46.937Z\n"
+"POT-Creation-Date: 2021-12-14T20:01:33.036Z\n"
+"PO-Revision-Date: 2021-12-14T20:01:33.036Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -223,6 +223,9 @@ msgstr ""
 msgid "You do not have assigned any organisation unit"
 msgstr ""
 
+msgid "Saving action..."
+msgstr ""
+
 msgid "Cancel action wizard"
 msgstr ""
 
@@ -304,6 +307,9 @@ msgid "Select mapping template"
 msgstr ""
 
 msgid "Mapping template"
+msgstr ""
+
+msgid "Saving mapping template..."
 msgstr ""
 
 msgid "Cancel mapping template wizard"

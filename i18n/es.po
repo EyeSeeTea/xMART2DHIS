@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2021-12-14T19:29:46.937Z\n"
+"POT-Creation-Date: 2021-12-14T19:58:05.548Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -223,6 +223,9 @@ msgstr ""
 msgid "You do not have assigned any organisation unit"
 msgstr ""
 
+msgid "Saving action..."
+msgstr ""
+
 msgid "Cancel action wizard"
 msgstr ""
 
@@ -304,6 +307,9 @@ msgid "Select mapping template"
 msgstr ""
 
 msgid "Mapping template"
+msgstr ""
+
+msgid "Saving mapping template..."
 msgstr ""
 
 msgid "Cancel mapping template wizard"

@@ -152,9 +152,9 @@ export class XMartDefaultRepository implements XMartRepository {
     private getInternalAPIEndpoint(environment: DataMartEnvironment): FutureData<string> {
         switch (environment) {
             case "PROD":
-                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/api");
+                return Future.success("https://extranet.who.int/xmart4/api");
             case "UAT":
-                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/api");
+                return Future.success("https://portal-uat.who.int/xmart4/api");
             default:
                 return Future.error("Unknown data mart type");
         }
@@ -163,9 +163,9 @@ export class XMartDefaultRepository implements XMartRepository {
     private getAPIEndpoint(environment: DataMartEnvironment): FutureData<string> {
         switch (environment) {
             case "PROD":
-                return Future.success("https://dev.eyeseetea.com/cors/extranet.who.int/xmart4/external");
+                return Future.success("https://extranet.who.int/xmart4/external");
             case "UAT":
-                return Future.success("https://dev.eyeseetea.com/cors/portal-uat.who.int/xmart4/external");
+                return Future.success("https://portal-uat.who.int/xmart4/external");
             default:
                 return Future.error("Unknown data mart type");
         }
