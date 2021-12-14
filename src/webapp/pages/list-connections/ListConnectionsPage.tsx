@@ -8,7 +8,7 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-import { Delete, Edit, FileCopy, SettingsInputAntenna, Share, Help, Check, Clear } from "@material-ui/icons";
+import { Check, Clear, Delete, Edit, FileCopy, Help, SettingsInputAntenna, Share } from "@material-ui/icons";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,10 +16,13 @@ import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
+import {
+    PipelineSetupDialogProps,
+    PipelineSetupDialog,
+} from "../../components/pipeline-setup-dialog/PipelineSetupDialog";
 import { useAppContext } from "../../contexts/app-context";
 import { useReload } from "../../hooks/useReload";
 import { SharingSettingsDialog, SharingSettingsDialogProps } from "./SharingSettingsDialog";
-import HelpDialog, { HelpDialogProps } from "../../components/help-dialog/HelpDialog";
 
 export const ListConnectionsPage: React.FC = () => {
     const { compositionRoot, currentUser } = useAppContext();
@@ -33,7 +36,7 @@ export const ListConnectionsPage: React.FC = () => {
     const [search, changeSearch] = useState<string>("");
     const [selection, setSelection] = useState<TableSelection[]>([]);
     const [createDialogProps, setCreateDialogProps] = useState<SharingSettingsDialogProps>();
-    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<HelpDialogProps>();
+    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<PipelineSetupDialogProps>();
 
     const [reloadKey, reload] = useReload();
 
@@ -153,8 +156,7 @@ export const ListConnectionsPage: React.FC = () => {
             if (connection) {
                 setOpenHelpDialogProps({
                     onCancel: () => setOpenHelpDialogProps(undefined),
-                    code: connection.martCode,
-                    name: connection.name,
+                    mart: connection,
                 });
             }
         },
@@ -186,11 +188,10 @@ export const ListConnectionsPage: React.FC = () => {
                         error => {
                             snackbar.error(error);
                             compositionRoot.connection.save({ ...connection, connectionWorks: false }).runAsync();
-                            if (error === "Origin code 'LOAD_PIPELINE' does not exists") {
+                            if (error === "Origin code 'LOAD_PIPELINE' does not exists" || error === "Sequence contains no elements") {
                                 setOpenHelpDialogProps({
                                     onCancel: () => setOpenHelpDialogProps(undefined),
-                                    code: connection.martCode,
-                                    name: connection.name,
+                                    mart: connection,
                                 });
                             }
                             loadingScreen.reset();
@@ -293,7 +294,7 @@ export const ListConnectionsPage: React.FC = () => {
     return (
         <React.Fragment>
             {createDialogProps ? <SharingSettingsDialog {...createDialogProps} /> : null}
-            {openHelpDialogProps ? <HelpDialog {...openHelpDialogProps} /> : null}
+            {openHelpDialogProps ? <PipelineSetupDialog {...openHelpDialogProps} /> : null}
             <ObjectsTable<DataMart>
                 rows={rows}
                 columns={columns}

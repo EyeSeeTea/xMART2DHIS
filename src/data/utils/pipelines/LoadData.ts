@@ -1,3 +1,4 @@
+export const LoadData = `
 <XmartPipeline>
   <Context>
     <Inputs>
@@ -6,15 +7,16 @@
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="${url}">
+    <GetWebService Url="\${url}">
       <GetJson OutputTableName="data">
         <Path>$</Path>
       </GetJson>
     </GetWebService>
   </Extract>
   <Load>
-    <LoadTable SourceTable="data" TargetTable="${table}" LoadStrategy="MERGE" DeleteNotInSource="false">
+    <LoadTable SourceTable="data" TargetTable="\${table}" LoadStrategy="MERGE" DeleteNotInSource="false">
       <ColumnMappings Auto="true" />
     </LoadTable>
   </Load>
 </XmartPipeline>
+`;

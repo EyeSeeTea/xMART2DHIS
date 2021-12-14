@@ -10,7 +10,10 @@ import styled from "styled-components";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
-import HelpDialog, { HelpDialogProps } from "../../components/help-dialog/HelpDialog";
+import {
+    PipelineSetupDialog,
+    PipelineSetupDialogProps,
+} from "../../components/pipeline-setup-dialog/PipelineSetupDialog";
 import { useAppContext } from "../../contexts/app-context";
 import { useGoBack } from "../../hooks/useGoBack";
 import { fields, getConnectionFieldName, RenderConnectionField } from "./ConnectionForm";
@@ -27,7 +30,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
 
     const goHome = useCallback(() => goBack(true), [goBack]);
 
-    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<HelpDialogProps>();
+    const [openHelpDialogProps, setOpenHelpDialogProps] = useState<PipelineSetupDialogProps>();
     const [error, setError] = useState<boolean>(false);
     const [initialConnection, setInitialConnection] = useState<DataMart>({
         id: generateUid(),
@@ -57,60 +60,51 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     }, [compositionRoot, id, isEdit, location]);
 
     const testConnection = async ({ connections }: { connections: DataMart[] }) => {
-        loading.show(true, i18n.t("Testing connection"));
-        if (connections && connections[0]) {
-            compositionRoot.connection.testConnection(connections[0]).run(
-                batch => {
-                    snackbar.success(`Connection tested successfully. Batch: ${batch}`);
-                    setInitialConnection(connection => ({ ...connection, connectionWorks: true }));
-                    loading.reset();
-                },
-                error => {
-                    snackbar.error(error);
-                    setInitialConnection(connection => ({ ...connection, connectionWorks: false }));
-                    if (error === "Origin code 'LOAD_PIPELINE' does not exists") {
-                        setOpenHelpDialogProps({
-                            onCancel: () => setOpenHelpDialogProps(undefined),
-                            code: connections && connections[0] ? connections[0].martCode : "",
-                            name: connections && connections[0] ? connections[0].name : "",
-                        });
-                    }
+        const [connection] = connections;
+        if (!connection) return;
 
-                    loading.reset();
+        loading.show(true, i18n.t("Testing connection"));
+        compositionRoot.connection.testConnection(connection).run(
+            batch => {
+                snackbar.success(`Connection tested successfully. Batch: ${batch}`);
+                setInitialConnection(connection => ({ ...connection, connectionWorks: true }));
+                loading.reset();
+            },
+            error => {
+                snackbar.error(error);
+                setInitialConnection(connection => ({ ...connection, connectionWorks: false }));
+                if (error === "Origin code 'LOAD_PIPELINE' does not exists" || error === "Sequence contains no elements") {
+                    setOpenHelpDialogProps({
+                        onCancel: () => setOpenHelpDialogProps(undefined),
+                        mart: connection,
+                    });
                 }
-            );
-        }
+
+                loading.reset();
+            }
+        );
     };
 
     const onSubmit = useCallback(
         async ({ connections }: { connections: DataMart[] }) => {
-            if (connections === undefined) return { FORM_ERROR };
+            const [connection] = connections;
+            if (!connection) return { FORM_ERROR };
 
             loading.show(true, i18n.t("Saving connection"));
-            let connectionToSave: DataMart;
-
-            if (connections[0]) {
-                connectionToSave = {
-                    ...initialConnection,
-                    ...connections[0],
-                };
-                compositionRoot.connection.save(connectionToSave).run(
-                    () => {
-                        snackbar.success(
-                            isEdit
-                                ? i18n.t("Connection successfully edited")
-                                : i18n.t("Connection successfully created")
-                        );
-                        loading.reset();
-                        goHome();
-                    },
-                    () => {
-                        snackbar.error("An error has occurred saving the connection");
-                        loading.reset();
-                        goHome();
-                    }
-                );
-            }
+            compositionRoot.connection.save({ ...initialConnection, ...connection }).run(
+                () => {
+                    snackbar.success(
+                        isEdit ? i18n.t("Connection successfully edited") : i18n.t("Connection successfully created")
+                    );
+                    loading.reset();
+                    goHome();
+                },
+                () => {
+                    snackbar.error("An error has occurred saving the connection");
+                    loading.reset();
+                    goHome();
+                }
+            );
         },
         [compositionRoot, loading, snackbar, goHome, initialConnection, isEdit]
     );
@@ -119,7 +113,8 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
 
     return (
         <Container>
-            {openHelpDialogProps ? <HelpDialog {...openHelpDialogProps} /> : null}
+            {openHelpDialogProps ? <PipelineSetupDialog {...openHelpDialogProps} /> : null}
+
             <Form<{ connections: DataMart[] }>
                 autocomplete="off"
                 keepDirtyOnReinitialize={true}
