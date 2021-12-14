@@ -1,5 +1,4 @@
-export const LoadData = `
-<XmartPipeline>
+export const LoadData = `<XmartPipeline>
   <Context>
     <Inputs>
       <Add Key="url" Type="text" />
