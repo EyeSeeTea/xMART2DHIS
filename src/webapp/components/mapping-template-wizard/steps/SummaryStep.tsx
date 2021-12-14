@@ -120,10 +120,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
 
             <LiEntry label={i18n.t("Description")} value={mappingTemplate.description} />
 
-            <LiEntry
-                //@ts-ignore
-                label={i18n.t("Model mappings")}
-            >
+            <LiEntry label={i18n.t("Model mappings")}>
                 <ul>
                     {mappingTemplate.modelMappings.map(modelMapping => (
                         <LiEntry

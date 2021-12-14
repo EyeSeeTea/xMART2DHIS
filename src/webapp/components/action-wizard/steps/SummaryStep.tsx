@@ -100,9 +100,8 @@ interface SummaryStepContentProps {
     action: SyncAction;
 }
 
-export const SummaryStepContent = (props: SummaryStepContentProps) => {
-    const { action } = props;
-    const { compositionRoot } = useAppContext();
+export const SummaryStepContent: React.FC<SummaryStepContentProps> = ({ action }) => {
+    const { compositionRoot, api } = useAppContext();
     const snackbar = useSnackbar();
 
     const [connection, setConnection] = useState<DataMart>();
@@ -167,10 +166,7 @@ export const SummaryStepContent = (props: SummaryStepContentProps) => {
                 )}
             </LiEntry>
 
-            <LiEntry
-                //@ts-ignore
-                label={i18n.t("Model mappings")}
-            >
+            <LiEntry label={i18n.t("Model mappings")}>
                 <ul>
                     {action.modelMappings.map(modelMapping => (
                         <LiEntry
