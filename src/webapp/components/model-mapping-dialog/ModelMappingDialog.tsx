@@ -1,4 +1,12 @@
-import { DialogContent, FormLabel, RadioGroup, FormControlLabel, Radio, TextField } from "@material-ui/core";
+import {
+    DialogContent,
+    FormLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    TextField,
+    CircularProgress,
+} from "@material-ui/core";
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import i18n from "../../../locales";
@@ -64,6 +72,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     const [xMARTConnection, setXMartConnection] = useState<DataMart>();
     const [xMartTableMode, setXMartTableMode] = useState<"existed" | "new">("new");
     const [metadataItems, setMetadataItems] = useState<MetadataEntity[]>([]);
+    const [loadingMetadata, setLoadingMetadata] = useState(false);
 
     const metadataModel = useMemo(
         () => metadataModelByData[modelMappingState.dhis2Model],
@@ -103,6 +112,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
 
     useEffect(() => {
         setMetadataItems([]);
+        setLoadingMetadata(true);
         compositionRoot.metadata
             .list({
                 paging: false,
@@ -113,6 +123,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
             .run(
                 items => {
                     setMetadataItems(items.objects);
+                    setLoadingMetadata(false);
                 },
                 error => snackbar.error(error)
             );
@@ -193,13 +204,16 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                 </Container>
 
                 <Container>
-                    <Dropdown
-                        label={i18n.t("Metadata")}
-                        items={metadataItems}
-                        value={modelMappingState.metadataId ?? ""}
-                        onValueChange={handleMetadataItemChange}
-                        hideEmpty={true}
-                    />
+                    {!loadingMetadata && (
+                        <Dropdown
+                            label={i18n.t("Metadata")}
+                            items={metadataItems}
+                            value={modelMappingState.metadataId ?? ""}
+                            onValueChange={handleMetadataItemChange}
+                            hideEmpty={true}
+                        />
+                    )}
+                    {loadingMetadata && <CircularProgress />}
                 </Container>
 
                 <Container>
