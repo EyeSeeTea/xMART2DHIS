@@ -2,6 +2,7 @@ import { Button, NoticeBox } from "@dhis2/ui";
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Paper } from "@material-ui/core";
 import { FORM_ERROR } from "final-form";
+import _ from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { Form } from "react-final-form";
 import { useLocation, useParams } from "react-router-dom";
@@ -9,10 +10,10 @@ import styled from "styled-components";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
+import HelpDialog, { HelpDialogProps } from "../../components/help-dialog/HelpDialog";
 import { useAppContext } from "../../contexts/app-context";
 import { useGoBack } from "../../hooks/useGoBack";
 import { fields, getConnectionFieldName, RenderConnectionField } from "./ConnectionForm";
-import HelpDialog, { HelpDialogProps } from "../../components/help-dialog/HelpDialog";
 
 export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) => {
     const { compositionRoot, currentUser } = useAppContext();
@@ -122,6 +123,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
             <Form<{ connections: DataMart[] }>
                 autocomplete="off"
                 keepDirtyOnReinitialize={true}
+                initialValuesEqual={(a, b) => _.isEqual(a, b)}
                 onSubmit={onSubmit}
                 initialValues={{ connections: [initialConnection] }}
                 render={({ handleSubmit, values, submitError }) => (
