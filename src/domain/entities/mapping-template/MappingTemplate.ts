@@ -16,6 +16,7 @@ export interface ModelMapping {
     metadataType?: string;
     metadataId?: string;
     xMARTTable: string;
+    valuesAsColumns?: boolean;
 }
 
 export type Dhis2ModelKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments";

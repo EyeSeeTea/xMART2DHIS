@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-13T05:20:57.899Z\n"
-"PO-Revision-Date: 2021-12-13T05:20:57.899Z\n"
+"POT-Creation-Date: 2021-12-14T11:24:13.418Z\n"
+"PO-Revision-Date: 2021-12-14T11:24:13.418Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -387,11 +387,6 @@ msgid "An error has ocurred deleting actionn"
 msgstr ""
 
 msgid "Executing the action"
-msgstr ""
-
-msgid ""
-"Successfully executed the action.\n"
-"{{result}}"
 msgstr ""
 
 msgid ""
