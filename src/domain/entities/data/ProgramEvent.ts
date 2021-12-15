@@ -9,6 +9,7 @@ export interface ProgramEvent {
         longitude: string;
     };
     attributeOptionCombo?: string;
+    attributeCategoryOptions?: string;
     trackedEntityInstance?: string;
     programStage?: string;
     dataValues: ProgramEventDataValue[];

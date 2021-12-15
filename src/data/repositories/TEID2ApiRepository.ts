@@ -31,10 +31,6 @@ export class TEID2ApiRepository implements TEIRepository {
         const fetchApi = (program: string, page: number) => {
             return apiToFuture(
                 this.api.get<TEIsResponse>("/trackedEntityInstances", {
-                    dataElementIdScheme: "CODE",
-                    categoryOptionComboIdScheme: "CODE",
-                    orgUnitIdScheme: "CODE",
-                    programIdScheme: "CODE",
                     pageSize: 250,
                     totalPages: true,
                     page,
