@@ -56,8 +56,8 @@ export class AggregatedD2ApiRepository implements AggregatedRepository {
                 .getSet({
                     dataSet: dataSetIds,
                     orgUnit: orgUnits,
-                    startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
-                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
+                    startDate: start.format("YYYY-MM-DD"),
+                    endDate: end.format("YYYY-MM-DD"),
                 })
                 .map(response => response.data.dataValues)
         );
