@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Instance } from "../domain/entities/Instance";
+import { Instance } from "../domain/entities/instance/Instance";
 import { D2Api } from "../types/d2-api";
 
 export function getMajorVersion(version: string): number {

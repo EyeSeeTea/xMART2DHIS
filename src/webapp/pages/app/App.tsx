@@ -1,6 +1,7 @@
+import { MsalProvider } from "@azure/msal-react";
 import { useConfig } from "@dhis2/app-runtime";
 import { HeaderBar } from "@dhis2/ui";
-import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
+import { LoadingProvider, SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import _ from "lodash";
 //@ts-ignore
@@ -8,11 +9,11 @@ import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import React, { useEffect, useState } from "react";
 import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../compositionRoot";
-import { Instance } from "../../../domain/entities/Instance";
+import { Instance } from "../../../domain/entities/instance/Instance";
 import { D2Api } from "../../../types/d2-api";
+import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
-import Share from "../../components/share/Share";
 import "./App.css";
 import { AppConfig } from "./AppConfig";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
@@ -31,9 +32,11 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             const { data: currentUser } = await compositionRoot.instance.getCurrentUser().runAsync();
             if (!currentUser) throw new Error("User not logged in");
 
+            const azureInstance = compositionRoot.azure.getInstance();
+            setAppContext({ api, instance, currentUser, compositionRoot, azureInstance });
+
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
-            setAppContext({ api, currentUser, compositionRoot });
             setShowShareButton(isShareButtonVisible);
             initFeedbackTool(d2, appConfig);
             setLoading(false);
@@ -41,24 +44,28 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         setup();
     }, [d2, api, baseUrl]);
 
-    if (loading) return null;
+    if (loading || !appContext) return null;
 
     return (
-        <MuiThemeProvider theme={muiTheme}>
-            <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
-                <SnackbarProvider>
-                    <HeaderBar appName="Data Management" />
+        <MsalProvider instance={appContext.azureInstance}>
+            <MuiThemeProvider theme={muiTheme}>
+                <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
+                    <SnackbarProvider>
+                        <LoadingProvider>
+                            <HeaderBar appName="xMART2DHIS" />
 
-                    <div id="app" className="content">
-                        <AppContext.Provider value={appContext}>
-                            <Router />
-                        </AppContext.Provider>
-                    </div>
+                            <div id="app" className="content">
+                                <AppContext.Provider value={appContext}>
+                                    <Router />
+                                </AppContext.Provider>
+                            </div>
 
-                    <Share visible={showShareButton} />
-                </SnackbarProvider>
-            </OldMuiThemeProvider>
-        </MuiThemeProvider>
+                            <Share visible={showShareButton} />
+                        </LoadingProvider>
+                    </SnackbarProvider>
+                </OldMuiThemeProvider>
+            </MuiThemeProvider>
+        </MsalProvider>
     );
 };
 

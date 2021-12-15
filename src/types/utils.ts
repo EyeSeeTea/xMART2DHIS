@@ -64,3 +64,7 @@ export function recordOf<T>() {
         return obj;
     };
 }
+
+export function buildObject<Value>() {
+    return <T>(object: { [K in keyof T]: Value }) => object;
+}

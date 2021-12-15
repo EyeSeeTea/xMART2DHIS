@@ -1,14 +1,20 @@
 import { FutureData } from "../entities/Future";
-import { XMartContent, XMartResponse, XMartTable } from "../entities/XMart";
+import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
 
 export interface XMartRepository {
-    listTables(): FutureData<XMartTable[]>;
-    list(table: string, options?: ListOptions): FutureData<XMartResponse>;
-    listAll(table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
-    count(table: string): FutureData<number>;
+    listMartSuggestions(): FutureData<MartSuggestions>;
+    listTables(mart: DataMart): FutureData<MartTable[]>;
+    listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
+    listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
+    countTableElements(mart: DataMart, table: string): FutureData<number>;
+    runPipeline(
+        mart: DataMart,
+        pipeline: string,
+        params: Record<string, string | number | boolean>
+    ): FutureData<number>;
 }
 
-export type ListOptions = ListAllOptions & {
+export type ListXMartOptions = ListAllOptions & {
     pageSize?: number;
     page?: number;
 };
@@ -20,3 +26,5 @@ export type ListAllOptions = {
     filter?: string; // Filter results to be included in the response (ie: "contains(TEST_TYPE_FK, 'value')")
     orderBy?: string; // Order the results by properties
 };
+
+export type MartSuggestions = Record<DataMartEnvironment, { label: string; value: string }[]>;

@@ -1,25 +1,20 @@
 import React from "react";
 import styled from "styled-components";
-import { PageHeader } from "../page-header/PageHeader";
 import { MenuCard, MenuCardProps } from "./MenuCard";
 
-export const CardGrid: React.FC<CardGridProps> = ({ title, cards, onBackClick }) => {
+export const CardGrid: React.FC<CardGridProps> = ({ cards }) => {
     return (
-        <React.Fragment>
-            {!!title && <PageHeader title={title} onBackClick={onBackClick} />}
+        <Container>
+            {cards.map(({ key, title, children }) => (
+                <div key={key}>
+                    {!!title && <Title>{title}</Title>}
 
-            <Container>
-                {cards.map(({ key, title, children }) => (
-                    <div key={key}>
-                        {!!title && <Title>{title}</Title>}
-
-                        {children.map(props => (
-                            <MenuCard key={props.name} {...props} />
-                        ))}
-                    </div>
-                ))}
-            </Container>
-        </React.Fragment>
+                    {children.map(props => (
+                        <MenuCard key={props.name} {...props} />
+                    ))}
+                </div>
+            ))}
+        </Container>
     );
 };
 
