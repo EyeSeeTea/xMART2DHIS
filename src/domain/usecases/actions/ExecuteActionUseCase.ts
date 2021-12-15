@@ -1,3 +1,4 @@
+import _ from "lodash";
 import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
@@ -6,7 +7,7 @@ import { DataValue } from "../../entities/data/DataValue";
 import { ProgramEvent } from "../../entities/data/ProgramEvent";
 import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
-import { MetadataPackage } from "../../entities/metadata/Metadata";
+import { MetadataEntities, MetadataPackage } from "../../entities/metadata/Metadata";
 import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
@@ -16,6 +17,7 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
+import { cleanOrgUnitPaths } from "../../utils";
 export class ExecuteActionUseCase {
     constructor(
         private actionRepository: ActionRepository,
@@ -34,12 +36,15 @@ export class ExecuteActionUseCase {
             .flatMap(action => {
                 return Future.joinObj({
                     action: Future.success(action),
-                    metadata: this.extractMetadata(action.metadataIds),
+                    metadataInAction: this.extractMetadata([
+                        ...action.metadataIds,
+                        ...cleanOrgUnitPaths(action.orgUnitPaths),
+                    ]),
                     dataMart: this.connectionsRepository.getById(action.connectionId),
                 });
             })
-            .flatMap(({ action, metadata, dataMart }) => {
-                const { programs = [], dataSets = [] } = metadata;
+            .flatMap(({ action, metadataInAction, dataMart }) => {
+                const { programs = [], dataSets = [] } = metadataInAction;
 
                 const programIds = programs.map(p => p.id);
                 const dataSetIds = dataSets.map(p => p.id);
@@ -49,6 +54,7 @@ export class ExecuteActionUseCase {
                 return Future.joinObj({
                     dataMart: Future.success(dataMart),
                     action: Future.success(action),
+                    metadataInAction: Future.success(metadataInAction),
                     events: this.eventsRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
                     teis: this.teiRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
                     dataValues: this.aggregatedRespository.get({
@@ -60,14 +66,141 @@ export class ExecuteActionUseCase {
                     }),
                 });
             })
-            .flatMap(({ dataMart, events, teis, dataValues, action }) => {
+            .flatMap(({ dataMart, events, teis, dataValues, action, metadataInAction }) => {
+                return Future.joinObj({
+                    dataMart: Future.success(dataMart),
+                    action: Future.success(action),
+                    data: this.replaceIdsByCode(events, teis, dataValues, metadataInAction),
+                });
+            })
+            .flatMap(({ dataMart, data, action }) => {
+                const { events, teis, dataValues } = data;
                 return this.sendData(dataMart, events, teis, dataValues, action);
             });
+    }
+    private replaceIdsByCode(
+        events: ProgramEvent[],
+        teis: TrackedEntityInstance[],
+        dataValues: DataValue[],
+        metadataInAction: MetadataPackage
+    ): FutureData<{ events: ProgramEvent[]; teis: TrackedEntityInstance[]; dataValues: DataValue[] }> {
+        const idsInEvents = events.reduce<string[]>((acc, event) => {
+            const dataElementIds = event.dataValues.map(dv => dv.dataElement);
+            const ids: string[] = _.compact([
+                ...dataElementIds,
+                event.attributeOptionCombo ?? null,
+                event.attributeCategoryOptions ?? null,
+                event.programStage ?? null,
+            ]);
+
+            return [...acc, ...ids];
+        }, []);
+
+        const idsInDataValues = dataValues.reduce<string[]>((acc, dataValue) => {
+            const ids: string[] = _.compact([
+                dataValue.dataElement,
+                dataValue.categoryOptionCombo ?? null,
+                dataValue.attributeOptionCombo ?? null,
+            ]);
+
+            return [...acc, ...ids];
+        }, []);
+
+        const idsTEIs = teis.reduce<string[]>((acc, tei) => {
+            const attributeIds = tei.attributes.map(att => att.attribute);
+            return [...acc, ...attributeIds];
+        }, []);
+
+        const ids = _.uniq([...idsTEIs, ...idsInDataValues, ...idsInEvents]);
+
+        return this.extractMetadata(ids).flatMap(metadataInData => {
+            const eventWithCodes = events.map(event => {
+                const orgUnit = this.getCode(metadataInAction, "organisationUnits", event.orgUnit);
+                const program = this.getCode(metadataInAction, "programs", event.program);
+                const programStage = this.getCode(metadataInData, "programStages", event.programStage);
+
+                const attributeCategoryOptions = this.getCode(
+                    metadataInData,
+                    "categoryOptions",
+                    event.attributeCategoryOptions
+                );
+
+                const attributeOptionCombo = this.getCode(
+                    metadataInData,
+                    "categoryOptionCombos",
+                    event.attributeOptionCombo
+                );
+
+                return {
+                    ...event,
+                    orgUnit,
+                    program,
+                    programStage,
+                    attributeCategoryOptions,
+                    attributeOptionCombo,
+                    dataValues: event.dataValues.map(v => {
+                        const dataElement = this.getCode(metadataInData, "dataElements", v.dataElement);
+                        return { ...v, dataElement };
+                    }),
+                };
+            });
+
+            const dataValuesWithCodes = dataValues.map(dv => {
+                const orgUnit = this.getCode(metadataInAction, "organisationUnits", dv.orgUnit);
+
+                const dataElement = this.getCode(metadataInData, "dataElements", dv.dataElement);
+
+                const categoryOptionCombo = this.getCode(
+                    metadataInData,
+                    "categoryOptionCombos",
+                    dv.categoryOptionCombo
+                );
+
+                const attributeOptionCombo = this.getCode(
+                    metadataInData,
+                    "categoryOptionCombos",
+                    dv.attributeOptionCombo
+                );
+
+                return {
+                    ...dv,
+                    orgUnit,
+                    dataElement,
+                    categoryOptionCombo,
+                    attributeOptionCombo,
+                };
+            });
+
+            const teisWithCodes = teis.map(tei => {
+                return {
+                    ...tei,
+                    attributes: tei.attributes.map(att => {
+                        const attribute = this.getCode(metadataInData, "trackedEntityAttributes", att.attribute);
+                        return { ...att, attribute };
+                    }),
+                    enrollments: tei.enrollments.map(enrollment => {
+                        const orgUnit = this.getCode(metadataInAction, "organisationUnits", enrollment.orgUnit);
+                        const program = this.getCode(metadataInAction, "programs", enrollment.program);
+
+                        return { ...enrollment, orgUnit, program };
+                    }),
+                };
+            });
+
+            return Future.success({ events: eventWithCodes, teis: teisWithCodes, dataValues: dataValuesWithCodes });
+        });
+    }
+
+    private getCode(metadata: MetadataPackage, key: keyof MetadataEntities, id?: string): string {
+        if (!id) return "";
+
+        const object = metadata[key]?.find(m => m.id === id);
+        return object?.code ?? object?.name ?? object?.id ?? id;
     }
 
     @cache()
     private extractMetadata(ids: string[]): FutureData<MetadataPackage> {
-        return this.metadataRepository.getMetadataByIds(ids, "id,name,type");
+        return this.metadataRepository.getMetadataByIds(ids, "id,name,type,code", true);
     }
 
     private sendData(
@@ -129,7 +262,7 @@ export class ExecuteActionUseCase {
     }
 
     private sendDataByTable<T>(data: T[], dataMart: DataMart, key: string, table: string): FutureData<string> {
-        if (data.length === 0) return Future.success(i18n.t(`${key} does not found`));
+        if (data.length === 0) return Future.success(i18n.t(`{{key}} not found`, { key }));
 
         const fileInfo = this.generateFileInfo(data, key);
 

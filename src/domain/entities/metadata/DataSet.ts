@@ -1,7 +1,3 @@
-import { Id } from "./Ref";
+import { IdentifiableObject } from "./Metadata";
 
-export type DataSet = {
-    id: Id;
-    name: string;
-    displayName: string;
-};
+export interface DataSet extends IdentifiableObject {}
