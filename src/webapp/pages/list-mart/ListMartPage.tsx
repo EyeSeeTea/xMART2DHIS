@@ -61,7 +61,7 @@ export const ListMartPage: React.FC = () => {
 
     const onChange = useCallback(
         (state: TableState<TableObject>) => {
-            fetchRows(state.pagination);
+            fetchRows({ ...state.pagination, orderBy: `${state.sorting.field} ${state.sorting.order}` });
         },
         [fetchRows]
     );
