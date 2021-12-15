@@ -262,7 +262,7 @@ export class ExecuteActionUseCase {
     }
 
     private sendDataByTable<T>(data: T[], dataMart: DataMart, key: string, table: string): FutureData<string> {
-        if (data.length === 0) return Future.success(i18n.t(`${key} does not found`));
+        if (data.length === 0) return Future.success(i18n.t(`{{key}} not found`, { key }));
 
         const fileInfo = this.generateFileInfo(data, key);
 
