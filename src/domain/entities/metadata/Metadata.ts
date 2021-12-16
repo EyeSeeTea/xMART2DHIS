@@ -1,15 +1,9 @@
 import { DataSet } from "./DataSet";
 import { OrganisationUnit } from "./OrganisationUnit";
 import { Program } from "./Program";
-import { Ref } from "./Ref";
+import { Id, Ref } from "./Ref";
 
-export type MetadataModel =
-    | "categoryOptionCombos"
-    | "categoryOptions"
-    | "optionSets"
-    | "organisationUnits"
-    | "programs"
-    | "dataSets";
+export type MetadataModel = keyof MetadataEntities;
 
 export const displayName: Record<string, string> = {
     categoryOptionCombos: "Category option combo",
@@ -45,6 +39,18 @@ export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
     programs: Program[];
     dataSets: DataSet[];
+    categoryOptions: IdentifiableObject[];
+    categoryOptionCombos: IdentifiableObject[];
+    dataElements: IdentifiableObject[];
+    trackedEntityAttributes: IdentifiableObject[];
+    programStages: IdentifiableObject[];
 };
 
 export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEntity[]>>;
+
+export interface IdentifiableObject {
+    id: Id;
+    name: string;
+    code?: string;
+    displayName?: string;
+}

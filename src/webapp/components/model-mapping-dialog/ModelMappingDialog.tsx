@@ -131,6 +131,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
         compositionRoot.metadata
             .list({
                 paging: false,
+                fields: { id: true, name: true },
                 model: metadataModel.getCollectionName(),
                 aditionalFilters: metadataModel.getApiModelFilters(),
                 sorting: { field: "displayName", order: "asc" },
@@ -163,10 +164,15 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
         (metadataId?: string) => {
             const metadataType = metadataModel.getMetadataType();
 
+            const id = metadataId !== "" ? metadataId : undefined;
+
+            const valuesAsColumns = id ? modelMappingState.valuesAsColumns : false;
+
             setModelMappingState({
                 ...modelMappingState,
                 metadataType,
-                metadataId,
+                metadataId: id,
+                valuesAsColumns,
             });
         },
         [modelMappingState, metadataModel]
@@ -237,7 +243,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                             items={metadataItems}
                             value={modelMappingState.metadataId ?? ""}
                             onValueChange={handleMetadataItemChange}
-                            hideEmpty={true}
+                            hideEmpty={false}
                         />
                     )}
                     {loadingMetadata && <CircularProgress />}
@@ -245,7 +251,9 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
 
                 <Container>
                     <Toggle
-                        disabled={!selectedDataModel?.enableValuesAsColumn}
+                        disabled={
+                            !(selectedDataModel?.enableValuesAsColumn && modelMappingState.metadataId !== undefined)
+                        }
                         label={i18n.t("Values as Columns")}
                         onValueChange={onChangeValuesAsColumns}
                         value={modelMappingState.valuesAsColumns || false}

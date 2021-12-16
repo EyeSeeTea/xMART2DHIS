@@ -17,13 +17,14 @@ export class AzureMSALRepository implements AzureRepository {
                 authority: `https://login.microsoftonline.com/${this.tenantId}`,
                 redirectUri: window.location.href.split("/#")[0],
             },
+            cache: { cacheLocation: "localStorage" },
         });
     }
 
     public getToken(scope: string): FutureData<string> {
         const client = this.getInstance();
         const [account] = client.getAllAccounts();
-        if (!account) return Future.error("No active account");
+        if (!account) return Future.error("The user is not logged in");
 
         const request = {
             authenticationScheme: AuthenticationScheme.BEARER,

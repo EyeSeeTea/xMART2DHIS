@@ -1,9 +1,5 @@
-import { Id } from "./Ref";
+import { IdentifiableObject } from "./Metadata";
 
-export type OrganisationUnit = {
-    id: Id;
-    name: string;
-    code: string;
-    displayName: string;
+export interface OrganisationUnit extends IdentifiableObject {
     path: string;
-};
+}

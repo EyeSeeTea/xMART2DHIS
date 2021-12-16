@@ -1,9 +1,5 @@
-import { Id } from "./Ref";
+import { IdentifiableObject } from "./Metadata";
 
-export type Program = {
-    id: Id;
-    name: string;
-    code: string;
-    displayName: string;
+export interface Program extends IdentifiableObject {
     programType: "WITH_REGISTRATION" | "WITHOUT_REGISTRATION";
-};
+}

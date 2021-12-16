@@ -1,16 +1,16 @@
-<XmartPipeline IsStructure="true">
+export const LoadModel = `<XmartPipeline IsStructure="true">
   <Context>
     <Inputs>
       <Add Key="url" Type="text" />
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="${url}">
+    <GetWebService Url="\${url}">
       <GetJson OutputTableName="tables">
         <Path>tables</Path>
       </GetJson>
     </GetWebService>
-    <GetWebService Url="${url}">
+    <GetWebService Url="\${url}">
       <GetJson OutputTableName="fields">
         <Path>fields</Path>
       </GetJson>
@@ -23,7 +23,7 @@
         <AddColumn Name="ON_DELETE_CASCADE" FillWith="0" />
         <AddColumn Name="_RecordID" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <AddColumn Name="MART_ID" FillWith="${MART_ID}" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -50,7 +50,7 @@
         <AddColumn Name="DO_NOT_COMPARE" FillWith="0" />
         <AddColumn Name="_RecordID" />
         <AddColumn Name="_Delete" FillWith="0" />
-        <AddColumn Name="MART_ID" FillWith="${MART_ID}" />
+        <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
         <FindReplace Find=" " ReplaceWith="_" Column="FK_TABLE_CODE" />
@@ -67,8 +67,8 @@
       </LookupIDs>
       <Validate>
         <TestNotEmpty Impact="Error_RemoveRow" Tag="Field Type Not found." ContextColumns="CODE,FIELD_TYPE_CODE" Column="FIELD_TYPE_ID" />
-        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\s*(?!sys_).*?$" />
-        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\s*(?!_Record)(?!_Delete).*?$" />
+        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\\s*(?!sys_).*?$" />
+        <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\\s*(?!_Record)(?!_Delete).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must only contain alpha-numeric or underscore characters" Column="CODE" Pattern="^[A-Za-z0-9_]+$" />
         <TestRow Impact="Error_RemoveRow" Tag="TEXT_MAX not allowed as BPK" ContextColumns="CODE,FIELD_TYPE,IS_PRIMARY_KEY">
           <Expression>row["IS_PRIMARY_KEY"].NumberValue == 0 || row["FIELD_TYPE_CODE"].StringValue != "TEXT_MAX"</Expression>
@@ -92,3 +92,4 @@
     </LoadTable>
   </Load>
 </XmartPipeline>
+`;

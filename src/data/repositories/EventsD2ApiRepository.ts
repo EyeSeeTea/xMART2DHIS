@@ -72,10 +72,6 @@ export class EventsD2ApiRepository implements EventsRepository {
         const fetchApi = (orgUnit: string, page: number) => {
             return apiToFuture(
                 this.api.events.get({
-                    dataElementIdScheme: "CODE",
-                    categoryOptionComboIdScheme: "CODE",
-                    orgUnitIdScheme: "CODE",
-                    programIdScheme: "CODE",
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -122,10 +118,6 @@ export class EventsD2ApiRepository implements EventsRepository {
         const fetchApi = (program: string, orgUnit: string, page: number) => {
             return apiToFuture(
                 this.api.events.get({
-                    dataElementIdScheme: "CODE",
-                    categoryOptionComboIdScheme: "CODE",
-                    orgUnitIdScheme: "CODE",
-                    programIdScheme: "CODE",
                     pageSize: 250,
                     totalPages: true,
                     page,

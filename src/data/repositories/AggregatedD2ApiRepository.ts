@@ -53,17 +53,14 @@ export class AggregatedD2ApiRepository implements AggregatedRepository {
 
         return apiToFuture(
             this.api.dataValues.getSet({
-                dataElementIdScheme: "CODE",
-                orgUnitIdScheme: "CODE",
-                categoryOptionComboIdScheme: "CODE",
                 dataSet: dataSetIds,
                 orgUnit: orgUnits,
-                startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
-                endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
+                startDate: start.format("YYYY-MM-DD"),
+                endDate: end.format("YYYY-MM-DD"),
             })
         ).map(dataValuesSet =>
             filters.dataSetIds.length === 1 && !dataValuesSet.dataSet
-                ? { ...dataValuesSet, dataSetId: filters.dataSetIds[0] }
+                ? { ...dataValuesSet, dataSet: filters.dataSetIds[0] }
                 : dataValuesSet
         );
     }
