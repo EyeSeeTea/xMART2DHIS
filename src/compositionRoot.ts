@@ -35,6 +35,8 @@ import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseC
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
+import { ListMartSuggestionsUseCase } from "./domain/usecases/xmart/ListMartSuggestionsUseCase";
+
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
@@ -55,6 +57,7 @@ export function getCompositionRoot(instance: Instance) {
             listTables: new ListMartTablesUseCase(martRepository),
             listTableContent: new ListMartContentsUseCase(martRepository),
             listAllTableContent: new ListAllMartContentsUseCase(martRepository),
+            listSuggestions: new ListMartSuggestionsUseCase(martRepository)
         }),
         instance: getExecute({
             getCurrentUser: new GetCurrentUserUseCase(instanceRepository),

@@ -47,7 +47,26 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
         userAccesses: [],
         userGroupAccesses: [],
     });
+    /*
+    validate={(values) => {
+                    const ff = compositionRoot.xmart.listSuggestions().runAsync()
+                    console.log(ff)
+                    const errors: any = {};
+                    if (!values?.connections[0]?.martCode) {
+                      errors["martCode"] = "Required";
+                    }
+                    return errors;
+                  }}
+    */
+   const getSuggestions = async ({ connections }: { connections: DataMart[] }) => {
+       if(connections && connections[0]) {
+        compositionRoot.xmart.listTables(connections[0]).run(
+            (data) => console.log(data),
+            (error) => console.log(error),
+            )
+       }
 
+   }
     useEffect(() => {
         if (location.state?.connection) {
             setInitialConnection(location.state?.connection);
@@ -57,6 +76,11 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
                 () => setError(true)
             );
         }
+        /*compositionRoot.xmart.listSuggestions().run(
+        (data) => console.log(data),
+        (error) => console.log(error)
+        )*/
+          //          console.log(ff)
     }, [compositionRoot, id, isEdit, location]);
 
     const testConnection = async ({ connections }: { connections: DataMart[] }) => {
@@ -155,7 +179,9 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
                             </Button>
 
                             <Spacer />
-
+                            <Button type="button" onClick={() => getSuggestions(values)}>
+                                {i18n.t("get suggestions")}
+                            </Button>
                             <Button type="button" onClick={() => testConnection(values)}>
                                 {i18n.t("Test connection")}
                             </Button>
