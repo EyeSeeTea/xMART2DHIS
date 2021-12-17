@@ -7,7 +7,7 @@ export type CategoryCombo = {
 };
 
 export interface DataElementRef extends IdentifiableObject {
-    categoryCombo:CategoryCombo;
+    categoryCombo: CategoryCombo;
 }
 
 export type DataSetElement = {

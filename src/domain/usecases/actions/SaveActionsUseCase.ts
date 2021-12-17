@@ -8,7 +8,7 @@ import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
 import { DataSet } from "../../entities/metadata/DataSet";
 import { MetadataPackage } from "../../entities/metadata/Metadata";
-import { Program } from "../../entities/metadata/Program";
+import { Program, ProgramStage } from "../../entities/metadata/Program";
 import { DataMart } from "../../entities/xmart/DataMart";
 import {
     XMartFieldDefinition,
@@ -60,12 +60,16 @@ export class SaveActionUseCase implements UseCase {
                         "id,name,code,displayName,dataSetElements[dataElement[id,name,code,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
                     ).map(m => m.dataSets || []),
                     programs: this.extractMetadata(
-                        metadata.programs?.map(ds => ds.id) || [],
-                        "id,name,code,displayName,programStages[id,name,code,displayName,programStageDataElements[dataElement[id,name,code,displayName]]],programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,displayName]]"
+                        metadata.programs?.map(p => p.id) || [],
+                        "id,name,code,displayName,programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,displayName]]"
                     ).map(m => m.programs || []),
+                    programStages: this.extractMetadata(
+                        metadata.programStages?.map(ps => ps.id) || [],
+                        "id,name,code,displayName,programStageDataElements[dataElement[id,name,code,displayName]]"
+                    ).map(m => m.programStages || []),
                 });
             })
-            .flatMap(({ dataSets, programs }) => {
+            .flatMap(({ dataSets, programs, programStages }) => {
                 const initialXMARTModels: XMartLoadModelData = { tables: [], fields: [] };
 
                 const xMARTModels: XMartLoadModelData = action.modelMappings.reduce((acc, modelMapping) => {
@@ -78,6 +82,7 @@ export class SaveActionUseCase implements UseCase {
                     const newfieldsDefinition: XMartFieldDefinition[] = this.getFields(
                         dataSets as DataSet[],
                         programs as Program[],
+                        programStages as ProgramStage[],
                         modelMapping
                     );
                     return {
@@ -95,7 +100,12 @@ export class SaveActionUseCase implements UseCase {
             });
     }
 
-    private getFields(dataSets: DataSet[], programs: Program[], modelMapping: ModelMapping): XMartFieldDefinition[] {
+    private getFields(
+        dataSets: DataSet[],
+        programs: Program[],
+        programStages: ProgramStage[],
+        modelMapping: ModelMapping
+    ): XMartFieldDefinition[] {
         const tableDefinition = xMartSyncTableTemplates[modelMapping.dhis2Model];
         const defaultFields = tableDefinition.fields.map(field => ({
             ...field,
@@ -112,9 +122,9 @@ export class SaveActionUseCase implements UseCase {
                           dataSets.find(ds => ds.id === modelMapping.metadataId)
                       )
                     : modelMapping.dhis2Model === "eventValues"
-                    ? this.createEventValuesFieldsByProgram(
+                    ? this.createEventValuesFieldsByProgramStage(
                           modelMapping.xMARTTable,
-                          programs.find(p => p.id === modelMapping.metadataId)
+                          programStages.find(p => p.id === modelMapping.metadataId)
                       )
                     : this.createTEIAttributesFieldsByProgram(
                           modelMapping.xMARTTable,
@@ -152,28 +162,25 @@ export class SaveActionUseCase implements UseCase {
         return fields;
     }
 
-    private createEventValuesFieldsByProgram(tableCode: string, program?: Program): XMartFieldDefinition[] {
-        if (!program) return [];
+    private createEventValuesFieldsByProgramStage(
+        tableCode: string,
+        programStage?: ProgramStage
+    ): XMartFieldDefinition[] {
+        if (!programStage) return [];
 
-        const fields = program.programStages
-            .map(stage =>
-                stage.programStageDataElements.map(stageDataElement => {
-                    const stageCode = generateXMartFieldCode(stage);
-                    const dataElementCode = generateXMartFieldCode(stageDataElement.dataElement);
-                    const field = `${stageCode}_${dataElementCode}`;
+        const fields = programStage.programStageDataElements.map(stageDataElement => {
+            const field = generateXMartFieldCode(stageDataElement.dataElement);
 
-                    return {
-                        TABLE_CODE: tableCode,
-                        CODE: field,
-                        TITLE: field,
-                        FIELD_TYPE_CODE: "TEXT_MAX",
-                        IS_REQUIRED: 0,
-                        IS_PRIMARY_KEY: 0,
-                        IS_ROW_TITLE: 0,
-                    } as XMartFieldDefinition;
-                })
-            )
-            .flat();
+            return {
+                TABLE_CODE: tableCode,
+                CODE: field,
+                TITLE: field,
+                FIELD_TYPE_CODE: "TEXT_MAX",
+                IS_REQUIRED: 0,
+                IS_PRIMARY_KEY: 0,
+                IS_ROW_TITLE: 0,
+            } as XMartFieldDefinition;
+        });
 
         return fields;
     }
