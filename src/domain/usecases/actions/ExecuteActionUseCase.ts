@@ -20,7 +20,7 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { cleanOrgUnitPaths, generateXMartFieldCode } from "../../utils";
+import { cleanOrgUnitPaths, getIdentifiable } from "../../utils";
 
 interface EventValue extends ProgramEventDataValue {
     event: string;
@@ -58,6 +58,9 @@ export class ExecuteActionUseCase {
                     metadataInAction: this.extractMetadata([
                         ...action.metadataIds,
                         ...cleanOrgUnitPaths(action.orgUnitPaths),
+                        ..._(action.modelMappings.map(m => m.metadataId).flat())
+                            .compact()
+                            .value(),
                     ]),
                     dataMart: this.connectionsRepository.getById(action.connectionId),
                 });
@@ -233,7 +236,7 @@ export class ExecuteActionUseCase {
         if (!id) return "";
 
         const object = metadata[key]?.find(m => m.id === id);
-        return object ? generateXMartFieldCode(object) : id;
+        return object ? getIdentifiable(object) : id;
     }
 
     @cache()
@@ -251,9 +254,11 @@ export class ExecuteActionUseCase {
     ): FutureData<string> {
         try {
             const programs = metadataInAction.programs || [];
+            const programStages = metadataInAction.programStages || [];
+
             const dataValuesByTable = this.getDataValuesByXMARTTable(dataValueSets, action);
             const eventsByTable = this.getEventsByXMARTTable(events, action, programs);
-            const eventsValuesByTable = this.getEventValuesByXMARTTable(events, action, programs);
+            const eventsValuesByTable = this.getEventValuesByXMARTTable(events, action, programStages);
             const teisByTable = this.getTeisByXMARTTable(teis, action, programs);
             const teiAttributesByTable = this.getTEIAttributesByXMARTTable(teis, action, programs);
             const enrollmentsByTable = this.getEnrollmentsByXMARTTable(teis, action, programs);
@@ -295,7 +300,7 @@ export class ExecuteActionUseCase {
         programs: IdentifiableObject[]
     ): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
-            const programId = this.getProgramIdByCode(programs, event.program);
+            const programId = this.getMetadataIdByCode(programs, event.program);
 
             return this.AddOrEditNewDataByTable(action, acc, programId, "events", [event]);
         }, []);
@@ -304,13 +309,13 @@ export class ExecuteActionUseCase {
     private getEventValuesByXMARTTable(
         events: ProgramEvent[],
         action: SyncAction,
-        programs: IdentifiableObject[]
+        programStages: IdentifiableObject[]
     ): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
-            const programId = this.getProgramIdByCode(programs, event.program);
+            const programStageId = this.getMetadataIdByCode(programStages, event.programStage ?? "");
             const eventValues = event.dataValues.map(v => ({ ...v, event: event.event } as EventValue));
 
-            return this.AddOrEditNewDataByTable(action, acc, programId, "eventValues", eventValues);
+            return this.AddOrEditNewDataByTable(action, acc, programStageId, "eventValues", eventValues);
         }, []);
     }
 
@@ -323,7 +328,7 @@ export class ExecuteActionUseCase {
             const programOwner = _.first(tei.programOwners);
             if (!programOwner) return acc;
 
-            const programId = this.getProgramIdByCode(programs, programOwner.program);
+            const programId = this.getMetadataIdByCode(programs, programOwner.program);
 
             return this.AddOrEditNewDataByTable(action, acc, programId, "teis", [tei]);
         }, []);
@@ -338,7 +343,7 @@ export class ExecuteActionUseCase {
             const programOwner = _.first(tei.programOwners);
             if (!programOwner) return acc;
 
-            const programId = this.getProgramIdByCode(programs, programOwner.program);
+            const programId = this.getMetadataIdByCode(programs, programOwner.program);
 
             const teiAttributes = tei.attributes.map(
                 att => ({ ...att, trackedEntityInstance: tei.trackedEntityInstance } as TEIAttribute)
@@ -356,7 +361,7 @@ export class ExecuteActionUseCase {
         const enrollments = teis.map(t => t.enrollments).flat();
 
         return enrollments.reduce<DataByTable[]>((acc, enrollment) => {
-            const programId = this.getProgramIdByCode(programs, enrollment.program);
+            const programId = this.getMetadataIdByCode(programs, enrollment.program);
             return this.AddOrEditNewDataByTable(action, acc, programId, "enrollments", [enrollment]);
         }, []);
     }
@@ -406,8 +411,8 @@ export class ExecuteActionUseCase {
             .flatMap(() => Future.success(i18n.t(`${tableCode} {{count}} rows`, { count: data.length })));
     }
 
-    private getProgramIdByCode(programs: IdentifiableObject[], code: string) {
-        return programs.find(p => p.code === code)?.id ?? "";
+    private getMetadataIdByCode(items: IdentifiableObject[], code: string) {
+        return items.find(p => p.code === code || p.name === code)?.id ?? "";
     }
 
     private generateFileInfo(teis: unknown, key: string) {

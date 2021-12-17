@@ -1,4 +1,6 @@
+import { Ref } from "@eyeseetea/d2-api";
 import { IdentifiableObject } from "./Metadata";
+import { Id } from "./Ref";
 
 export interface DataElementRef extends IdentifiableObject {}
 
@@ -8,6 +10,7 @@ export type ProgramStageDataElement = {
 
 export interface ProgramStage extends IdentifiableObject {
     programStageDataElements: ProgramStageDataElement[];
+    program: { id: Id; name: string };
 }
 
 export interface TrackedEntityAttribute extends IdentifiableObject {}

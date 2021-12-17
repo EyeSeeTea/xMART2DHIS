@@ -16,10 +16,17 @@ import { DataMart, MartTable } from "../../../domain/entities/xmart/DataMart";
 import { useAppContext } from "../../contexts/app-context";
 import styled from "styled-components";
 import { MetadataEntity } from "../../../domain/entities/metadata/Metadata";
-import { DataSetModel, AllProgramsModel, TrackerProgramsModel } from "../../../domain/entities/models/D2Models";
+import {
+    DataSetModel,
+    AllProgramsModel,
+    TrackerProgramsModel,
+    AllProgramStagesModel,
+} from "../../../domain/entities/models/D2Models";
 import { D2Model } from "../../../domain/entities/models/D2Model";
 import { Toggle } from "../toggle/Toggle";
 import { applyXMartCodeRules } from "../../../domain/utils";
+import { ProgramStage } from "../../../domain/entities/metadata/Program";
+import _ from "lodash";
 
 const Container = styled.div`
     margin-bottom: 16px;
@@ -63,7 +70,7 @@ const dhis2DataModels: dhis2DataModel[] = [
 const metadataModelByData: Record<Dhis2ModelKey, typeof D2Model> = {
     dataValues: DataSetModel,
     events: AllProgramsModel,
-    eventValues: AllProgramsModel,
+    eventValues: AllProgramStagesModel,
     teis: TrackerProgramsModel,
     teiAttributes: TrackerProgramsModel,
     enrollments: TrackerProgramsModel,
@@ -132,14 +139,33 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
         compositionRoot.metadata
             .list({
                 paging: false,
-                fields: { id: true, name: true },
+                fields: metadataModel.getFields(),
                 model: metadataModel.getCollectionName(),
                 aditionalFilters: metadataModel.getApiModelFilters(),
                 sorting: { field: "displayName", order: "asc" },
             })
             .run(
-                items => {
-                    setMetadataItems(items.objects);
+                response => {
+                    //TODO: this transformation should be not here
+                    const items = _(
+                        metadataModel === AllProgramStagesModel
+                            ? response.objects.map(stage => {
+                                  const programStage = stage as ProgramStage;
+
+                                  const name =
+                                      programStage.program !== undefined &&
+                                      programStage.name !== programStage.program.name
+                                          ? `${programStage.program.name} - ${programStage.name}`
+                                          : programStage.name;
+
+                                  return { ...programStage, name };
+                              })
+                            : response.objects
+                    )
+                        .sortBy("name")
+                        .value();
+
+                    setMetadataItems(items);
                     setLoadingMetadata(false);
                 },
                 error => snackbar.error(error)
@@ -240,7 +266,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                 <Container>
                     {!loadingMetadata && (
                         <Dropdown
-                            label={i18n.t("Metadata")}
+                            label={metadataModel.getMetadataType()}
                             items={metadataItems}
                             value={modelMappingState.metadataId ?? ""}
                             onValueChange={handleMetadataItemChange}

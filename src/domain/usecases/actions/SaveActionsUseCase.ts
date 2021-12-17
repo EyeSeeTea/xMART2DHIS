@@ -175,8 +175,6 @@ export class SaveActionUseCase implements UseCase {
             )
             .flat();
 
-        debugger;
-
         return fields;
     }
 
@@ -221,7 +219,7 @@ export class SaveActionUseCase implements UseCase {
 
     validateModelMappings(action: SyncAction): FutureData<SyncAction> {
         return this.metadataRepository
-            .getMetadataByIds(action.metadataIds, "id,programType, displayName")
+            .getMetadataByIds(action.metadataIds, "id,programType,displayName,programStages[id,displayName]")
             .flatMap(metadata => {
                 const trackerPrograms = metadata.programs?.filter(
                     program => (program as Program).programType === "WITH_REGISTRATION"
@@ -250,7 +248,7 @@ export class SaveActionUseCase implements UseCase {
                                       mapping.dhis2Model === "events" &&
                                       (mapping.metadataId === program.id || !mapping.metadataId)
                               )
-                                  ? i18n.t(`The program ${program.displayName} has not associated a events mapping`)
+                                  ? i18n.t(`The program ${program.displayName} has not associated an events mapping`)
                                   : null;
                           })
                           .flat();
@@ -258,16 +256,22 @@ export class SaveActionUseCase implements UseCase {
                 const eventValuesErrors = !metadata.programs
                     ? []
                     : metadata.programs
-                          ?.map(program => {
-                              return !action.modelMappings.some(
-                                  mapping =>
-                                      mapping.dhis2Model === "eventValues" &&
-                                      (mapping.metadataId === program.id || !mapping.metadataId)
-                              )
-                                  ? i18n.t(
-                                        `The program ${program.displayName} has not associated a eventValues mapping`
-                                    )
-                                  : null;
+                          ?.map(p => {
+                              const program = p as Program;
+
+                              return program.programStages
+                                  .map(programStage => {
+                                      return !action.modelMappings.some(
+                                          mapping =>
+                                              mapping.dhis2Model === "eventValues" &&
+                                              (mapping.metadataId === programStage.id || !mapping.metadataId)
+                                      )
+                                          ? i18n.t(
+                                                `The program stage ${programStage.displayName} in the program ${program.displayName} has not associated an eventValues mapping`
+                                            )
+                                          : null;
+                                  })
+                                  .flat();
                           })
                           .flat();
 

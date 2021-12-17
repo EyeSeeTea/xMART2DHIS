@@ -45,8 +45,12 @@ export function buildPeriodFromParams(params: {
     };
 }
 
+export function getIdentifiable(object: IdentifiableObject) {
+    return object.code ?? object.name ?? object.id;
+}
+
 export function generateXMartFieldCode(object: IdentifiableObject) {
-    return applyXMartCodeRules(object.code ?? object.name ?? object.id);
+    return applyXMartCodeRules(getIdentifiable(object));
 }
 
 export function applyXMartCodeRules(value: string) {
