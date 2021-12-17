@@ -20,7 +20,7 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { cleanOrgUnitPaths } from "../../utils";
+import { cleanOrgUnitPaths, generateXMartFieldCode } from "../../utils";
 
 interface EventValue extends ProgramEventDataValue {
     event: string;
@@ -233,7 +233,7 @@ export class ExecuteActionUseCase {
         if (!id) return "";
 
         const object = metadata[key]?.find(m => m.id === id);
-        return object?.code ?? object?.name ?? object?.id ?? id;
+        return object ? generateXMartFieldCode(object) : id;
     }
 
     @cache()
@@ -377,7 +377,6 @@ export class ExecuteActionUseCase {
             );
 
         if (!newMapping) {
-            debugger;
             throw new Error(
                 `An error has ocurred converting ${dhis2Model} for metadata Id ${metadataId} to xMART data because a mapping has not been found.`
             );

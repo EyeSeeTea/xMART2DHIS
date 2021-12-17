@@ -59,12 +59,12 @@ export default function MappingSelection({
             { name: "dhis2Model", text: i18n.t("Dhis2 Model") },
             { name: "metadataType", text: i18n.t("Metadata Type") },
             { name: "metadataId", text: i18n.t("Metadata Id") },
+            { name: "xMARTTable", text: i18n.t("xMART Table") },
             {
                 name: "valuesAsColumns",
                 text: i18n.t("Values as Columns"),
                 getValue: (row: ModelMappingRow) => (row.valuesAsColumns ? <Icon>check</Icon> : null),
             },
-            { name: "xMARTTable", text: i18n.t("xMART Table") },
         ],
         []
     );
@@ -74,12 +74,12 @@ export default function MappingSelection({
             { name: "dhis2Model", text: i18n.t("Dhis2 Model") },
             { name: "metadataType", text: i18n.t("Metadata Type") },
             { name: "metadataId", text: i18n.t("Metadata Id") },
+            { name: "xMARTTable", text: i18n.t("xMART Table") },
             {
                 name: "valuesAsColumns",
                 text: i18n.t("Values as Columns"),
                 getValue: (row: ModelMappingRow) => (row.valuesAsColumns ? <Icon>check</Icon> : null),
             },
-            { name: "xMARTTable", text: i18n.t("xMART Table") },
         ],
         []
     );

@@ -19,6 +19,7 @@ import { MetadataEntity } from "../../../domain/entities/metadata/Metadata";
 import { DataSetModel, AllProgramsModel, TrackerProgramsModel } from "../../../domain/entities/models/D2Models";
 import { D2Model } from "../../../domain/entities/models/D2Model";
 import { Toggle } from "../toggle/Toggle";
+import { applyXMartCodeRules } from "../../../domain/utils";
 
 const Container = styled.div`
     margin-bottom: 16px;
@@ -203,7 +204,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
         (event: React.ChangeEvent<{ value: string }>) => {
             setModelMappingState({
                 ...modelMappingState,
-                xMARTTable: event.target.value.toUpperCase().replaceAll(/ |-/g, "_"),
+                xMARTTable: applyXMartCodeRules(event.target.value.toUpperCase()),
             });
         },
         [modelMappingState]

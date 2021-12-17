@@ -1,8 +1,13 @@
+import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
 import i18n from "../../../locales";
+import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
 import { Future, FutureData } from "../../entities/Future";
+import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
+import { DataSet } from "../../entities/metadata/DataSet";
+import { MetadataPackage } from "../../entities/metadata/Metadata";
 import { Program } from "../../entities/metadata/Program";
 import { DataMart } from "../../entities/xmart/DataMart";
 import {
@@ -16,6 +21,7 @@ import { ConnectionsRepository } from "../../repositories/ConnectionsRepository"
 import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
+import { generateXMartFieldCode } from "../../utils";
 
 export class SaveActionUseCase implements UseCase {
     constructor(
@@ -44,29 +50,163 @@ export class SaveActionUseCase implements UseCase {
     }
 
     private loadModelsInXMart(dataMart: DataMart, action: SyncAction): FutureData<void> {
-        const initialXMARTModels: XMartLoadModelData = { tables: [], fields: [] };
+        const metadataIds = _.compact(action.modelMappings.filter(m => m.valuesAsColumns).map(m => m.metadataId));
 
-        const xMARTModels: XMartLoadModelData = action.modelMappings.reduce((acc, modelMapping) => {
-            const newTableDefinition: XMartTableDefinition = {
-                ...xMartSyncTableTemplates[modelMapping.dhis2Model].table,
-                CODE: modelMapping.xMARTTable,
-                TITLE: modelMapping.xMARTTable,
-            };
-            const newfieldsDefinition: XMartFieldDefinition[] = xMartSyncTableTemplates[
-                modelMapping.dhis2Model
-            ].fields.map(field => ({
-                ...field,
-                TABLE_CODE: newTableDefinition.CODE,
-            }));
-            return { tables: [...acc.tables, newTableDefinition], fields: [...acc.fields, ...newfieldsDefinition] };
-        }, initialXMARTModels);
+        return this.extractMetadata(metadataIds)
+            .flatMap(metadata => {
+                return Future.joinObj({
+                    dataSets: this.extractMetadata(
+                        metadata.dataSets?.map(ds => ds.id) || [],
+                        "id,name,code,displayName,dataSetElements[dataElement[id,name,code,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
+                    ).map(m => m.dataSets || []),
+                    programs: this.extractMetadata(
+                        metadata.programs?.map(ds => ds.id) || [],
+                        "id,name,code,displayName,programStages[id,name,code,displayName,programStageDataElements[dataElement[id,name,code,displayName]]],programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,displayName]]"
+                    ).map(m => m.programs || []),
+                });
+            })
+            .flatMap(({ dataSets, programs }) => {
+                const initialXMARTModels: XMartLoadModelData = { tables: [], fields: [] };
 
-        const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
+                const xMARTModels: XMartLoadModelData = action.modelMappings.reduce((acc, modelMapping) => {
+                    const newTableDefinition: XMartTableDefinition = {
+                        ...xMartSyncTableTemplates[modelMapping.dhis2Model].table,
+                        CODE: modelMapping.xMARTTable,
+                        TITLE: modelMapping.xMARTTable,
+                    };
 
-        return this.fileRepository
-            .uploadFileAsExternal(tableFileInfo)
-            .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { url }))
-            .map(() => undefined);
+                    const newfieldsDefinition: XMartFieldDefinition[] = this.getFields(
+                        dataSets as DataSet[],
+                        programs as Program[],
+                        modelMapping
+                    );
+                    return {
+                        tables: [...acc.tables, newTableDefinition],
+                        fields: [...acc.fields, ...newfieldsDefinition],
+                    };
+                }, initialXMARTModels);
+
+                const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
+
+                return this.fileRepository
+                    .uploadFileAsExternal(tableFileInfo)
+                    .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { url }))
+                    .map(() => undefined);
+            });
+    }
+
+    private getFields(dataSets: DataSet[], programs: Program[], modelMapping: ModelMapping): XMartFieldDefinition[] {
+        const tableDefinition = xMartSyncTableTemplates[modelMapping.dhis2Model];
+        const defaultFields = tableDefinition.fields.map(field => ({
+            ...field,
+            TABLE_CODE: modelMapping.xMARTTable,
+        }));
+
+        if (modelMapping.valuesAsColumns && modelMapping.metadataId) {
+            const fixedFields = defaultFields.filter(f => !tableDefinition.optionalFields?.includes(f.CODE));
+
+            const valuesAsColumnsFields =
+                modelMapping.dhis2Model === "dataValues"
+                    ? this.createDataValuesFieldsByDataSet(
+                          modelMapping.xMARTTable,
+                          dataSets.find(ds => ds.id === modelMapping.metadataId)
+                      )
+                    : modelMapping.dhis2Model === "eventValues"
+                    ? this.createEventValuesFieldsByProgram(
+                          modelMapping.xMARTTable,
+                          programs.find(p => p.id === modelMapping.metadataId)
+                      )
+                    : this.createTEIAttributesFieldsByProgram(
+                          modelMapping.xMARTTable,
+                          programs.find(p => p.id === modelMapping.metadataId)
+                      );
+
+            return [...fixedFields, ...valuesAsColumnsFields];
+        } else {
+            return defaultFields;
+        }
+    }
+
+    private createDataValuesFieldsByDataSet(tableCode: string, dataSet?: DataSet): XMartFieldDefinition[] {
+        if (!dataSet) return [];
+
+        const fields = dataSet.dataSetElements
+            .map(dataElementSet =>
+                dataElementSet.dataElement.categoryCombo.categoryOptionCombos.map(coc => {
+                    const dataElementCode = generateXMartFieldCode(dataElementSet.dataElement);
+                    const cocCode = generateXMartFieldCode(coc);
+                    const field = `${dataElementCode}_${cocCode}`;
+                    return {
+                        TABLE_CODE: tableCode,
+                        CODE: field,
+                        TITLE: field,
+                        FIELD_TYPE_CODE: "TEXT_MAX",
+                        IS_REQUIRED: 0,
+                        IS_PRIMARY_KEY: 0,
+                        IS_ROW_TITLE: 0,
+                    } as XMartFieldDefinition;
+                })
+            )
+            .flat();
+
+        return fields;
+    }
+
+    private createEventValuesFieldsByProgram(tableCode: string, program?: Program): XMartFieldDefinition[] {
+        if (!program) return [];
+
+        const fields = program.programStages
+            .map(stage =>
+                stage.programStageDataElements.map(stageDataElement => {
+                    const stageCode = generateXMartFieldCode(stage);
+                    const dataElementCode = generateXMartFieldCode(stageDataElement.dataElement);
+                    const field = `${stageCode}_${dataElementCode}`;
+
+                    return {
+                        TABLE_CODE: tableCode,
+                        CODE: field,
+                        TITLE: field,
+                        FIELD_TYPE_CODE: "TEXT_MAX",
+                        IS_REQUIRED: 0,
+                        IS_PRIMARY_KEY: 0,
+                        IS_ROW_TITLE: 0,
+                    } as XMartFieldDefinition;
+                })
+            )
+            .flat();
+
+        debugger;
+
+        return fields;
+    }
+
+    private createTEIAttributesFieldsByProgram(tableCode: string, program?: Program): XMartFieldDefinition[] {
+        if (!program) return [];
+
+        const fields = program.programTrackedEntityAttributes
+            .map(programAttribute => {
+                const field = generateXMartFieldCode(programAttribute.trackedEntityAttribute);
+
+                return {
+                    TABLE_CODE: tableCode,
+                    CODE: field,
+                    TITLE: field,
+                    FIELD_TYPE_CODE: "TEXT_MAX",
+                    IS_REQUIRED: 0,
+                    IS_PRIMARY_KEY: 0,
+                    IS_ROW_TITLE: 0,
+                } as XMartFieldDefinition;
+            })
+            .flat();
+
+        return fields;
+    }
+
+    @cache()
+    private extractMetadata(ids: string[], fields = "id"): FutureData<MetadataPackage> {
+        if (ids.length === 0) Future.success({});
+
+        return this.metadataRepository.getMetadataByIds(ids, fields, true);
     }
 
     private generateFileInfo(teis: unknown, key: string) {

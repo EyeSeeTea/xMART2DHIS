@@ -33,7 +33,7 @@ export function isValidMetadataItem(item: any): item is MetadataItem {
     return item.id;
 }
 
-export type MetadataEntity = OrganisationUnit | Program | DataSet;
+export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];

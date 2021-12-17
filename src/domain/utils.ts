@@ -1,6 +1,7 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
 import { availablePeriods, DataSyncPeriod } from "./entities/metadata/DataSyncPeriod";
+import { IdentifiableObject } from "./entities/metadata/Metadata";
 
 export function cleanOrgUnitPaths(orgUnitPaths: string[]): string[] {
     return orgUnitPaths.map(cleanOrgUnitPath);
@@ -42,4 +43,12 @@ export function buildPeriodFromParams(params: {
         startDate: moment().subtract(startAmount, startType).startOf(startType),
         endDate: moment().subtract(endAmount, endType).endOf(endType),
     };
+}
+
+export function generateXMartFieldCode(object: IdentifiableObject) {
+    return applyXMartCodeRules(object.code ?? object.name ?? object.id);
+}
+
+export function applyXMartCodeRules(value: string) {
+    return value.replace(/ |-/g, "_").replace(/\W/g, "");
 }
