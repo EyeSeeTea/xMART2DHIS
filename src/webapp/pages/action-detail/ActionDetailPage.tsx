@@ -2,8 +2,12 @@ import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
+import { SyncCustomAction } from "../../../domain/entities/actions/SyncCustomAction";
+
 import i18n from "../../../locales";
 import ActionWizard from "../../components/action-wizard/ActionWizard";
+import CustomActionWizard from "../../components/custom-action-wizard/CustomActionWizard";
+
 import { useAppContext } from "../../contexts/app-context";
 
 //TODO: implement confirmation dialog to back or cancel in the RouterPage
@@ -16,7 +20,8 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
 
     const { id } = useParams();
 
-    const [syncAction, updateSyncAction] = useState(() => SyncAction.build());
+    const [syncAction, updateSyncAction] = useState<SyncAction>(SyncAction.build());
+    const [syncCustomAction, updateSyncCustomAction] = useState<SyncCustomAction>(SyncCustomAction.build());
 
     useEffect(() => {
         if (action === "edit" && !!id) {
@@ -24,7 +29,10 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
 
             compositionRoot.actions.get(id).run(
                 action => {
-                    updateSyncAction(action ?? SyncAction.build());
+                    if(action && action.type === "custom") {
+                        updateSyncCustomAction(SyncCustomAction.build(action));
+                    }
+                    else updateSyncAction(action ?? SyncAction.build(action));
                     loading.reset();
                 },
                 () => {
@@ -37,11 +45,15 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
 
     return (
         <React.Fragment>
-            <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate("/actions")} />
+            {action === "custom" || (action === "edit" && syncCustomAction.connectionId !== "")
+            ? <CustomActionWizard action={syncCustomAction} onChange={updateSyncCustomAction} onCancel={() => navigate("/actions")} />
+            : <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate("/actions")} />
+
+            }
         </React.Fragment>
     );
 };
 
 export interface ActionDetailPageProps {
-    action: "edit" | "new";
+    action: "edit" | "new" | "custom";
 }

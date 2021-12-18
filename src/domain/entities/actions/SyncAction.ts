@@ -4,9 +4,12 @@ import { ModelMapping } from "../mapping-template/MappingTemplate";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
+export type ActionType = "standard" | "custom";
+
 export interface SyncActionData {
     id: string;
     name: string;
+    type: ActionType;
     description?: string;
     connectionId: string;
     period: DataSyncPeriod;
@@ -20,6 +23,7 @@ export interface SyncActionData {
 export class SyncAction implements SyncActionData {
     public readonly id: string;
     public readonly name: string;
+    public readonly type: ActionType;
     public readonly description?: string;
     public readonly connectionId: string;
     public readonly period: DataSyncPeriod;
@@ -32,6 +36,7 @@ export class SyncAction implements SyncActionData {
     constructor(data: SyncActionData) {
         this.id = data.id;
         this.name = data.name;
+        this.type = data.type;
         this.description = data.description;
         this.connectionId = data.connectionId;
         this.period = data.period;
@@ -68,6 +73,7 @@ export class SyncAction implements SyncActionData {
         return [
             { property: "name", validation: { type: "Standard", validation: "hasText" } },
             { property: "connectionId", validation: { type: "Standard", validation: "hasValue" } },
+            { property: "type", validation: { type: "Standard", validation: "hasText" } },
             { property: "period", validation: { type: "Standard", validation: "hasValue" } },
             { property: "orgUnitPaths", validation: { type: "Standard", validation: "hasItems" } },
             { property: "metadataIds", validation: { type: "Standard", validation: "hasItems" } },
@@ -108,6 +114,7 @@ export class SyncAction implements SyncActionData {
             name: "",
             description: "",
             connectionId: "",
+            type: "standard",
             period: "ALL",
             orgUnitPaths: [],
             metadataIds: [],
@@ -121,6 +128,7 @@ export class SyncAction implements SyncActionData {
             name: this.name,
             description: this.description,
             connectionId: this.connectionId,
+            type: this.type,
             period: this.period,
             startDate: this.startDate,
             endDate: this.endDate,

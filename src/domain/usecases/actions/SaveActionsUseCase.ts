@@ -2,6 +2,8 @@ import { UseCase } from "../../../compositionRoot";
 import i18n from "../../../locales";
 import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
+import { SyncCustomAction } from "../../entities/actions/SyncCustomAction";
+import _ from "lodash";
 import { Future, FutureData } from "../../entities/Future";
 import { Program } from "../../entities/metadata/Program";
 import { DataMart } from "../../entities/xmart/DataMart";
@@ -26,21 +28,29 @@ export class SaveActionUseCase implements UseCase {
         private connectionsRepository: ConnectionsRepository
     ) {}
 
-    public execute(action: SyncAction): FutureData<void> {
-        return this.validateModelMappings(action)
+    public execute(action: SyncAction | SyncCustomAction): FutureData<void> {
+        const isCustomAction = _.has(action, 'customCode');
+
+        if(isCustomAction) {
+            return this.actionRepository.save(action);
+        }
+        else {
+            return this.validateModelMappings(action as SyncAction)
             .flatMap(action =>
                 Future.joinObj({
                     saveResult: this.actionRepository.save(action),
                     dataMart: this.connectionsRepository.getById(action.connectionId),
                 })
             )
-            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action))
+            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action as SyncAction))
             .flatMap(() => Future.success(undefined))
             .flatMapError(error => {
                 return Future.error(
                     i18n.t(`An error has occurred saving the action:\n{{error}}`, { error, nsSeparator: false })
                 );
             });
+        }
+        
     }
 
     validateModelMappings(action: SyncAction): FutureData<SyncAction> {

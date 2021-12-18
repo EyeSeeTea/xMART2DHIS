@@ -22,6 +22,14 @@ export const Router = () => {
     return (
         <HashRouter>
             <Routes>
+            <Route
+                    path="/actions/new/custom"
+                    element={
+                        <RouterPage title={i18n.t("Custom Action")} parentRoute="/actions">
+                            <ActionDetailPage action="custom" />
+                        </RouterPage>
+                    }
+                />
                 <Route
                     path="/actions/new"
                     element={

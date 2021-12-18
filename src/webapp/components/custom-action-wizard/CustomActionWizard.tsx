@@ -2,24 +2,21 @@ import { Wizard, WizardStep } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { SyncAction } from "../../../domain/entities/actions/SyncAction";
+import { SyncCustomAction } from "../../../domain/entities/actions/SyncCustomAction";
 
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
-import { MappingSelectionStep } from "./steps/MappingSelectionStep";
-import { MetadataSelectionStep } from "./steps/MetadataSelectionStep";
-import { OrganisationUnitsSelectionStep } from "./steps/OrganisationUnitsSelectionStep";
-import { PeriodSelectionStep } from "./steps/PeriodSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";
+import { CustomCodeStep } from "./steps/CustomCodeStep";
 
-interface ActionWizardProps {
-    action: SyncAction;
+interface CustomActionWizardProps {
+    action: SyncCustomAction;
     isDialog?: boolean;
-    onChange?(action: SyncAction): void;
+    onChange?(action: SyncCustomAction): void;
     onCancel?(): void;
 }
 
-export const stepsBaseInfo: ActionWizardStep[] = [
+export const stepsBaseInfo: CustomActionWizardStep[] = [
     {
         key: "general-info",
         label: i18n.t("General info"),
@@ -27,28 +24,10 @@ export const stepsBaseInfo: ActionWizardStep[] = [
         validationKeys: ["name", "connectionId"],
     },
     {
-        key: "organisations-units",
-        label: i18n.t("Organisation units"),
-        component: OrganisationUnitsSelectionStep,
-        validationKeys: ["orgUnitPaths"],
-    },
-    {
-        key: "metadata",
-        label: i18n.t("Metadata"),
-        component: MetadataSelectionStep,
-        validationKeys: ["metadataIds"],
-    },
-    {
-        key: "period",
-        label: i18n.t("Period"),
-        component: PeriodSelectionStep,
-        validationKeys: ["startDate", "endDate"],
-    },
-    {
-        key: "mapping",
-        label: i18n.t("Mapping"),
-        component: MappingSelectionStep,
-        validationKeys: ["modelMappings"],
+        key: "custom-code",
+        label: i18n.t("Custom code"),
+        component: CustomCodeStep,
+        validationKeys: [],
     },
     {
         key: "summary",
@@ -57,19 +36,18 @@ export const stepsBaseInfo: ActionWizardStep[] = [
         validationKeys: [],
     },
 ];
-
-export interface ActionWizardStep extends WizardStep {
+export interface CustomActionWizardStep extends WizardStep {
     validationKeys: string[];
-    hidden?: (action: SyncAction) => boolean;
+    hidden?: (action: SyncCustomAction) => boolean;
 }
 
-export interface ActionWizardStepProps {
-    action: SyncAction;
-    onChange: (action: SyncAction) => void;
+export interface CustomActionWizardStepProps {
+    action: SyncCustomAction;
+    onChange: (action: SyncCustomAction) => void;
     onCancel: () => void;
 }
 
-const ActionWizard: React.FC<ActionWizardProps> = ({ action, onCancel, onChange }) => {
+const CustomActionWizard: React.FC<CustomActionWizardProps> = ({ action, onCancel, onChange }) => {
     const location = useLocation();
     const steps = stepsBaseInfo.map(step => ({ ...step, props: { action, onCancel, onChange } }));
 
@@ -98,4 +76,4 @@ const ActionWizard: React.FC<ActionWizardProps> = ({ action, onCancel, onChange 
     );
 };
 
-export default ActionWizard;
+export default CustomActionWizard;
