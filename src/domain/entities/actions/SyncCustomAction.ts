@@ -18,7 +18,6 @@ export class SyncCustomAction implements SyncCustomActionData {
     public readonly connectionId: string;
     public readonly customCode: string;
 
-
     constructor(data: SyncCustomActionData) {
         this.id = data.id;
         this.name = data.name;
@@ -26,7 +25,6 @@ export class SyncCustomAction implements SyncCustomActionData {
         this.description = data.description;
         this.connectionId = data.connectionId;
         this.customCode = data.customCode;
-
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -49,7 +47,6 @@ export class SyncCustomAction implements SyncCustomActionData {
             { property: "connectionId", validation: { type: "Standard", validation: "hasValue" } },
             { property: "customCode", validation: { type: "Standard", validation: "hasValue" } },
             { property: "type", validation: { type: "Standard", validation: "hasText" } },
-
         ];
     }
 
@@ -64,7 +61,7 @@ export class SyncCustomAction implements SyncCustomActionData {
             description: "",
             type: "custom",
             connectionId: "",
-            customCode: template
+            customCode: template,
         };
     };
 
@@ -75,7 +72,7 @@ export class SyncCustomAction implements SyncCustomActionData {
             type: this.type,
             description: this.description,
             connectionId: this.connectionId,
-            customCode: this.customCode
+            customCode: this.customCode,
         };
     }
 }

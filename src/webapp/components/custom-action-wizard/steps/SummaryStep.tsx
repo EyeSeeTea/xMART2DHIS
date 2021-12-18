@@ -116,7 +116,7 @@ const SummaryStepContent: React.FC<SummaryStepContentProps> = ({ action }) => {
 
             <LiEntry label={i18n.t("Connection")} value={connection?.name} />
 
-            {action.description && <LiEntry label={i18n.t("Description")} value={action.description} /> }
+            {action.description && <LiEntry label={i18n.t("Description")} value={action.description} />}
 
             <LiEntry label={i18n.t("Custom Code")} value={action.customCode} />
         </ul>

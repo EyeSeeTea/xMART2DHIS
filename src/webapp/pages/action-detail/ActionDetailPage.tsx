@@ -29,10 +29,9 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
 
             compositionRoot.actions.get(id).run(
                 action => {
-                    if(action && action.type === "custom") {
-                        updateSyncCustomAction(SyncCustomAction.build(action));
-                    }
-                    else updateSyncAction(action ?? SyncAction.build(action));
+                    if (action && action.type === "custom") {
+updateSyncCustomAction(SyncCustomAction.build(action));
+                    } else updateSyncAction(action ?? SyncAction.build(action));
                     loading.reset();
                 },
                 () => {
@@ -45,11 +44,15 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
 
     return (
         <React.Fragment>
-            {action === "custom" || (action === "edit" && syncCustomAction.connectionId !== "")
-            ? <CustomActionWizard action={syncCustomAction} onChange={updateSyncCustomAction} onCancel={() => navigate("/actions")} />
-            : <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate("/actions")} />
-
-            }
+            {action === "custom" || (action === "edit" && syncCustomAction.connectionId !== "") ? (
+                <CustomActionWizard
+                    action={syncCustomAction}
+                    onChange={updateSyncCustomAction}
+                    onCancel={() => navigate("/actions")}
+                />
+            ) : (
+                <ActionWizard action={syncAction} onChange={updateSyncAction} onCancel={() => navigate("/actions")} />
+            )}
         </React.Fragment>
     );
 };

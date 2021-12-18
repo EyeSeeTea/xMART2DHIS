@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-15T09:14:33.064Z\n"
-"PO-Revision-Date: 2021-12-15T09:14:33.064Z\n"
+"POT-Creation-Date: 2021-12-18T21:53:55.870Z\n"
+"PO-Revision-Date: 2021-12-18T21:53:55.870Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -267,6 +267,12 @@ msgstr ""
 msgid "List"
 msgstr ""
 
+msgid "Custom code"
+msgstr ""
+
+msgid "Custom Code"
+msgstr ""
+
 msgid "<No value>"
 msgstr ""
 
@@ -398,6 +404,9 @@ msgstr ""
 msgid "Configure pipeline"
 msgstr ""
 
+msgid "Custom Action"
+msgstr ""
+
 msgid "Actions"
 msgstr ""
 
@@ -457,6 +466,15 @@ msgid "Execute"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
+msgid "Choose action type"
+msgstr ""
+
+msgid "Standard action"
+msgstr ""
+
+msgid "Custom action"
 msgstr ""
 
 msgid "Actions are a way to trigger events in your application"

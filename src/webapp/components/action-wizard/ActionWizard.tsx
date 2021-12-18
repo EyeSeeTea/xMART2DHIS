@@ -3,7 +3,6 @@ import _ from "lodash";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
-
 import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
 import { MappingSelectionStep } from "./steps/MappingSelectionStep";

@@ -29,28 +29,26 @@ export class SaveActionUseCase implements UseCase {
     ) {}
 
     public execute(action: SyncAction | SyncCustomAction): FutureData<void> {
-        const isCustomAction = _.has(action, 'customCode');
+        const isCustomAction = _.has(action, "customCode");
 
-        if(isCustomAction) {
+        if (isCustomAction) {
             return this.actionRepository.save(action);
-        }
-        else {
+        } else {
             return this.validateModelMappings(action as SyncAction)
-            .flatMap(action =>
-                Future.joinObj({
-                    saveResult: this.actionRepository.save(action),
-                    dataMart: this.connectionsRepository.getById(action.connectionId),
-                })
-            )
-            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action as SyncAction))
-            .flatMap(() => Future.success(undefined))
-            .flatMapError(error => {
-                return Future.error(
-                    i18n.t(`An error has occurred saving the action:\n{{error}}`, { error, nsSeparator: false })
-                );
-            });
+                .flatMap(action =>
+                    Future.joinObj({
+                        saveResult: this.actionRepository.save(action),
+                        dataMart: this.connectionsRepository.getById(action.connectionId),
+                    })
+                )
+                .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action as SyncAction))
+                .flatMap(() => Future.success(undefined))
+                .flatMapError(error => {
+                    return Future.error(
+                        i18n.t(`An error has occurred saving the action:\n{{error}}`, { error, nsSeparator: false })
+                    );
+                });
         }
-        
     }
 
     validateModelMappings(action: SyncAction): FutureData<SyncAction> {

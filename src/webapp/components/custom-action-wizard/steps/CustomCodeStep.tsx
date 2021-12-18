@@ -13,7 +13,6 @@ export const CustomCodeStep = ({ action, onChange }: CustomActionWizardStepProps
     );
 };
 
-
 const MonacoEditor: React.FC<{ value: string; onChange: (value: string | undefined) => void }> = ({
     value,
     onChange,

@@ -45,6 +45,8 @@ export const ActionsListPage: React.FC = () => {
         () => [
             { name: "name", text: i18n.t("Name") },
             { name: "description", text: i18n.t("Description") },
+            { name: "type", text: i18n.t("Type") },
+
         ],
         []
     );
@@ -52,6 +54,8 @@ export const ActionsListPage: React.FC = () => {
     const details: ObjectsTableDetailField<SyncAction>[] = [
         { name: "name", text: i18n.t("Name") },
         { name: "description", text: i18n.t("Description") },
+        { name: "type", text: i18n.t("Type") },
+
     ];
 
     const goToCreateAction = useCallback(() => {
@@ -184,14 +188,14 @@ export const ActionsListPage: React.FC = () => {
                     title={i18n.t("Choose action type")}
                     disableSave={true}
                 >
-                    <DialogContent style={{display: "flex", flexDirection: "column"}}>
-                    <Button type="reset" onClick={goToCreateAction} primary={true}>
-                        {i18n.t("Standard action")}
-                    </Button>
-                    <br/>
-                    <Button type="reset" onClick={goToCreateCustomAction} primary={true}>
-                        {i18n.t("Custom action")}
-                    </Button>
+                    <DialogContent style={{ display: "flex", flexDirection: "column" }}>
+                        <Button type="reset" onClick={goToCreateAction} primary={true}>
+                            {i18n.t("Standard action")}
+                        </Button>
+                        <br />
+                        <Button type="reset" onClick={goToCreateCustomAction} primary={true}>
+                            {i18n.t("Custom action")}
+                        </Button>
                     </DialogContent>
                 </ConfirmationDialog>
             )}
