@@ -10,15 +10,15 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-import { Button } from "@dhis2/ui";
-import { Icon, DialogContent } from "@material-ui/core";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Icon } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
+import { SpeedDialActionTable, SpeedDialActionOption } from "../../components/speed-dial-action-table/SpeedDialActionTable";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ActionsListPage: React.FC = () => {
@@ -32,7 +32,6 @@ export const ActionsListPage: React.FC = () => {
     const [selection, updateSelection] = useState<TableSelection[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);
     const [results, setResults] = useState<SyncResult[]>();
-    const [openActionOptions, setOpenActionOptions] = useState<boolean>(false);
 
     useEffect(() => {
         compositionRoot.actions.list().run(
@@ -159,6 +158,10 @@ export const ActionsListPage: React.FC = () => {
         ],
         [goToEditAction, execute]
     );
+    const speedDialActions: SpeedDialActionOption[] = [
+        { icon: <Icon>control_point</Icon>, name: 'Standard action', onClick: goToCreateAction },
+        { icon: <Icon>code</Icon>, name: 'Custom action', onClick: goToCreateCustomAction },
+      ];
 
     return (
         <React.Fragment>
@@ -181,25 +184,6 @@ export const ActionsListPage: React.FC = () => {
                 />
             )}
 
-            {openActionOptions && (
-                <ConfirmationDialog
-                    isOpen={true}
-                    onCancel={() => setOpenActionOptions(false)}
-                    title={i18n.t("Choose action type")}
-                    disableSave={true}
-                >
-                    <DialogContent style={{ display: "flex", flexDirection: "column" }}>
-                        <Button type="reset" onClick={goToCreateAction} primary={true}>
-                            {i18n.t("Standard action")}
-                        </Button>
-                        <br />
-                        <Button type="reset" onClick={goToCreateCustomAction} primary={true}>
-                            {i18n.t("Custom action")}
-                        </Button>
-                    </DialogContent>
-                </ConfirmationDialog>
-            )}
-
             <ObjectsTable<SyncAction>
                 rows={rows}
                 columns={columns}
@@ -207,8 +191,8 @@ export const ActionsListPage: React.FC = () => {
                 selection={selection}
                 actions={actions}
                 onChange={handleTableChange}
-                onActionButtonClick={() => setOpenActionOptions(true)}
             />
+            <SpeedDialActionTable actions={speedDialActions}/>
         </React.Fragment>
     );
 };
