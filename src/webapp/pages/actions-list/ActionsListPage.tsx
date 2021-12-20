@@ -18,7 +18,10 @@ import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
-import { SpeedDialActionTable, SpeedDialActionOption } from "../../components/speed-dial-action-table/SpeedDialActionTable";
+import {
+    SpeedDialActionTable,
+    SpeedDialActionOption,
+} from "../../components/speed-dial-action-table/SpeedDialActionTable";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ActionsListPage: React.FC = () => {
@@ -45,7 +48,6 @@ export const ActionsListPage: React.FC = () => {
             { name: "name", text: i18n.t("Name") },
             { name: "description", text: i18n.t("Description") },
             { name: "type", text: i18n.t("Type") },
-
         ],
         []
     );
@@ -54,7 +56,6 @@ export const ActionsListPage: React.FC = () => {
         { name: "name", text: i18n.t("Name") },
         { name: "description", text: i18n.t("Description") },
         { name: "type", text: i18n.t("Type") },
-
     ];
 
     const goToCreateAction = useCallback(() => {
@@ -159,9 +160,9 @@ export const ActionsListPage: React.FC = () => {
         [goToEditAction, execute]
     );
     const speedDialActions: SpeedDialActionOption[] = [
-        { icon: <Icon>control_point</Icon>, name: 'Standard action', onClick: goToCreateAction },
-        { icon: <Icon>code</Icon>, name: 'Custom action', onClick: goToCreateCustomAction },
-      ];
+        { icon: <Icon>control_point</Icon>, name: "Standard", onClick: goToCreateAction },
+        { icon: <Icon>code</Icon>, name: "Custom", onClick: goToCreateCustomAction },
+    ];
 
     return (
         <React.Fragment>
@@ -192,7 +193,7 @@ export const ActionsListPage: React.FC = () => {
                 actions={actions}
                 onChange={handleTableChange}
             />
-            <SpeedDialActionTable actions={speedDialActions}/>
+            <SpeedDialActionTable actions={speedDialActions} />
         </React.Fragment>
     );
 };

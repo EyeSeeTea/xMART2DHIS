@@ -30,7 +30,7 @@ export const ActionDetailPage: React.FC<ActionDetailPageProps> = ({ action }) =>
             compositionRoot.actions.get(id).run(
                 action => {
                     if (action && action.type === "custom") {
-updateSyncCustomAction(SyncCustomAction.build(action));
+                        updateSyncCustomAction(SyncCustomAction.build(action));
                     } else updateSyncAction(action ?? SyncAction.build(action));
                     loading.reset();
                 },
