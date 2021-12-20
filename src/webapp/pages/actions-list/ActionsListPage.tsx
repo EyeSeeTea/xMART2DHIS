@@ -19,6 +19,7 @@ import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
+import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeriod";
 
 export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -43,6 +44,13 @@ export const ActionsListPage: React.FC = () => {
         () => [
             { name: "name", text: i18n.t("Name") },
             { name: "description", text: i18n.t("Description") },
+            {
+                name: "period",
+                text: i18n.t("Period"),
+                sortable: false,
+                getValue: ({ period }: SyncAction) => availablePeriods[period].name ?? "-",
+            },
+
         ],
         []
     );

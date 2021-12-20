@@ -48,4 +48,5 @@ export const PeriodSelectionStep: React.FC<ActionWizardStepProps> = ({ action, o
     }, [action]);
 
     return <PeriodSelection objectWithPeriod={objectWithPeriod} onFieldChange={onFieldChange} />;
+   
 };

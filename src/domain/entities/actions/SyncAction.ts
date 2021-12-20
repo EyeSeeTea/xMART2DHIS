@@ -2,7 +2,12 @@ import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import { ModelMapping } from "../mapping-template/MappingTemplate";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
+import { Ref } from "../metadata/Ref";
+
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
+
+export type Scheduling = { sequence: number; variable: number };
+export type SaveScheduling = Scheduling & Ref;
 
 export interface SyncActionData {
     id: string;
@@ -15,6 +20,7 @@ export interface SyncActionData {
     orgUnitPaths: string[];
     metadataIds: string[];
     modelMappings: ModelMapping[];
+    scheduling: Scheduling;
 }
 
 export class SyncAction implements SyncActionData {
@@ -28,6 +34,8 @@ export class SyncAction implements SyncActionData {
     public readonly orgUnitPaths: string[];
     public readonly metadataIds: string[];
     public readonly modelMappings: ModelMapping[];
+    public readonly scheduling: Scheduling;
+
 
     constructor(data: SyncActionData) {
         this.id = data.id;
@@ -40,6 +48,7 @@ export class SyncAction implements SyncActionData {
         this.orgUnitPaths = data.orgUnitPaths;
         this.metadataIds = data.metadataIds;
         this.modelMappings = data.modelMappings;
+        this.scheduling = data.scheduling;
     }
 
     public validate(filter?: string[]): ValidationError[] {
@@ -112,6 +121,7 @@ export class SyncAction implements SyncActionData {
             orgUnitPaths: [],
             metadataIds: [],
             modelMappings: [],
+            scheduling: { sequence: 0, variable: 0 }
         };
     };
 
@@ -127,6 +137,7 @@ export class SyncAction implements SyncActionData {
             orgUnitPaths: this.orgUnitPaths,
             metadataIds: this.metadataIds,
             modelMappings: this.modelMappings,
+            scheduling: this.scheduling
         };
     }
 }
