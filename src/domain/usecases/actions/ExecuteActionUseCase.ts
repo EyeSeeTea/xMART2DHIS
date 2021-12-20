@@ -1,4 +1,3 @@
-import { Enrollment } from "@eyeseetea/d2-api/api/trackedEntityInstances";
 import _ from "lodash";
 import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
@@ -8,7 +7,7 @@ import { DataValue, DataValueSet } from "../../entities/data/DataValue";
 import { ProgramEvent, ProgramEventDataValue } from "../../entities/data/ProgramEvent";
 import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
-import { Dhis2ModelKey } from "../../entities/mapping-template/MappingTemplate";
+import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
 import { TrakedEntityAttribute } from "../../entities/metadata/TrackedEntityAttribute";
 import { IdentifiableObject, MetadataEntities, MetadataPackage } from "../../entities/metadata/Metadata";
 import { DataMart } from "../../entities/xmart/DataMart";
@@ -20,7 +19,7 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { cleanOrgUnitPaths, getIdentifiable } from "../../utils";
+import { applyXMartCodeRules, cleanOrgUnitPaths, getIdentifiable } from "../../utils";
 
 interface EventValue extends ProgramEventDataValue {
     event: string;
@@ -30,11 +29,13 @@ interface TEIAttribute extends TrakedEntityAttribute {
     trackedEntityInstance: string;
 }
 
-type Data = DataValue | ProgramEvent | EventValue | TrackedEntityInstance | TEIAttribute | Enrollment;
-
 interface DataByTable {
     table: string;
-    data: Data[];
+    data: unknown[];
+}
+
+interface DataValueWithDataSet extends DataValue {
+    dataSet: string;
 }
 
 export class ExecuteActionUseCase {
@@ -55,13 +56,15 @@ export class ExecuteActionUseCase {
             .flatMap(action => {
                 return Future.joinObj({
                     action: Future.success(action),
-                    metadataInAction: this.extractMetadata([
-                        ...action.metadataIds,
-                        ...cleanOrgUnitPaths(action.orgUnitPaths),
-                        ..._(action.modelMappings.map(m => m.metadataId).flat())
-                            .compact()
-                            .value(),
-                    ]),
+                    metadataInAction: this.extractMetadata(
+                        _.uniq([
+                            ...action.metadataIds,
+                            ...cleanOrgUnitPaths(action.orgUnitPaths),
+                            ..._(action.modelMappings.map(m => m.metadataId).flat())
+                                .compact()
+                                .value(),
+                        ])
+                    ),
                     dataMart: this.connectionsRepository.getById(action.connectionId),
                 });
             })
@@ -173,8 +176,10 @@ export class ExecuteActionUseCase {
             });
 
             const dataValuesSetsWithCodes = dataValuesSets.map(dvs => {
+                const dataSet = this.getCode(metadataInAction, "dataSets", dvs.dataSet);
+
                 return {
-                    ...dvs,
+                    dataSet,
                     dataValues: dvs.dataValues.map(dv => {
                         const orgUnit = this.getCode(metadataInAction, "organisationUnits", dv.orgUnit);
 
@@ -255,8 +260,9 @@ export class ExecuteActionUseCase {
         try {
             const programs = metadataInAction.programs || [];
             const programStages = metadataInAction.programStages || [];
+            const dataSets = metadataInAction.dataSets || [];
 
-            const dataValuesByTable = this.getDataValuesByXMARTTable(dataValueSets, action);
+            const dataValuesByTable = this.getDataValuesByXMARTTable(dataValueSets, action, dataSets);
             const eventsByTable = this.getEventsByXMARTTable(events, action, programs);
             const eventsValuesByTable = this.getEventValuesByXMARTTable(events, action, programStages);
             const teisByTable = this.getTeisByXMARTTable(teis, action, programs);
@@ -282,15 +288,56 @@ export class ExecuteActionUseCase {
         }
     }
 
-    private getDataValuesByXMARTTable(dataValueSets: DataValueSet[], action: SyncAction): DataByTable[] {
+    private getDataValuesByXMARTTable(
+        dataValueSets: DataValueSet[],
+        action: SyncAction,
+        dataSets: IdentifiableObject[]
+    ): DataByTable[] {
         return dataValueSets.reduce<DataByTable[]>((acc, dataValueSet) => {
-            return this.AddOrEditNewDataByTable(
-                action,
-                acc,
-                dataValueSet.dataSet ?? "",
-                "dataValues",
-                dataValueSet.dataValues
-            );
+            const dataSetId = this.getMetadataIdByCode(dataSets, dataValueSet.dataSet ?? "");
+            const mapping = this.getModelMapping(action, "dataValues", dataSetId);
+
+            const dataValuesWithDataSet: DataValueWithDataSet[] = dataValueSet.dataValues.map(dv => ({
+                ...dv,
+                dataSet: dataValueSet.dataSet ?? "",
+            }));
+
+            const convertDataAsColumns = () =>
+                dataValuesWithDataSet.reduce((acc: any, dataValue: DataValueWithDataSet) => {
+                    const existedDataValue = acc.find(
+                        (existed: any) =>
+                            existed.dataSet === dataValue.dataSet &&
+                            existed.period === dataValue.period &&
+                            existed.orgUnit === dataValue.orgUnit
+                    );
+
+                    const createColumn = (dataValue: DataValueWithDataSet) => ({
+                        [applyXMartCodeRules(`${dataValue.dataElement}_${dataValue.categoryOptionCombo}`)]:
+                            dataValue.value,
+                    });
+
+                    return existedDataValue
+                        ? acc.map((dv: any) =>
+                              dv.dataSet === existedDataValue.dataSet &&
+                              dv.period === existedDataValue.period &&
+                              dv.orgUnit === existedDataValue.orgUnit
+                                  ? { ...dv, ...createColumn(dataValue) }
+                                  : dv
+                          )
+                        : [
+                              ...acc,
+                              {
+                                  dataSet: dataValue.dataSet,
+                                  period: dataValue.period,
+                                  orgUnit: dataValue.orgUnit,
+                                  ...createColumn(dataValue),
+                              },
+                          ];
+                }, []);
+
+            const data = !mapping.valuesAsColumns ? dataValuesWithDataSet : convertDataAsColumns();
+
+            return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
     }
 
@@ -301,8 +348,9 @@ export class ExecuteActionUseCase {
     ): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
             const programId = this.getMetadataIdByCode(programs, event.program);
+            const mapping = this.getModelMapping(action, "events", programId);
 
-            return this.AddOrEditNewDataByTable(action, acc, programId, "events", [event]);
+            return this.AddOrEditNewDataByTable(mapping, acc, [event]);
         }, []);
     }
 
@@ -314,8 +362,32 @@ export class ExecuteActionUseCase {
         return events.reduce<DataByTable[]>((acc, event) => {
             const programStageId = this.getMetadataIdByCode(programStages, event.programStage ?? "");
             const eventValues = event.dataValues.map(v => ({ ...v, event: event.event } as EventValue));
+            const mapping = this.getModelMapping(action, "eventValues", programStageId);
 
-            return this.AddOrEditNewDataByTable(action, acc, programStageId, "eventValues", eventValues);
+            const convertDataAsColumns = () =>
+                eventValues.reduce((acc: any, eventValue: EventValue) => {
+                    const existedEventValue = acc.find((existed: any) => existed.event === eventValue.event);
+
+                    const createColumn = (value: EventValue) => ({
+                        [applyXMartCodeRules(value.dataElement)]: value.value,
+                    });
+
+                    return existedEventValue
+                        ? acc.map((ev: any) =>
+                              ev.event === existedEventValue.event ? { ...ev, ...createColumn(eventValue) } : ev
+                          )
+                        : [
+                              ...acc,
+                              {
+                                  event: eventValue.event,
+                                  ...createColumn(eventValue),
+                              },
+                          ];
+                }, []);
+
+            const data = !mapping.valuesAsColumns ? eventValues : convertDataAsColumns();
+
+            return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
     }
 
@@ -329,8 +401,9 @@ export class ExecuteActionUseCase {
             if (!programOwner) return acc;
 
             const programId = this.getMetadataIdByCode(programs, programOwner.program);
+            const mapping = this.getModelMapping(action, "teis", programId);
 
-            return this.AddOrEditNewDataByTable(action, acc, programId, "teis", [tei]);
+            return this.AddOrEditNewDataByTable(mapping, acc, [tei]);
         }, []);
     }
 
@@ -344,12 +417,40 @@ export class ExecuteActionUseCase {
             if (!programOwner) return acc;
 
             const programId = this.getMetadataIdByCode(programs, programOwner.program);
+            const mapping = this.getModelMapping(action, "teiAttributes", programId);
 
             const teiAttributes = tei.attributes.map(
                 att => ({ ...att, trackedEntityInstance: tei.trackedEntityInstance } as TEIAttribute)
             );
 
-            return this.AddOrEditNewDataByTable(action, acc, programId, "teiAttributes", teiAttributes);
+            const convertDataAsColumns = () =>
+                teiAttributes.reduce((acc: any, attribute: TEIAttribute) => {
+                    const existedAttByTEI = acc.find(
+                        (existed: any) => existed.event === attribute.trackedEntityInstance
+                    );
+
+                    const createColumn = (att: TEIAttribute) => ({
+                        [applyXMartCodeRules(att.attribute)]: att.value,
+                    });
+
+                    return existedAttByTEI
+                        ? acc.map((att: any) =>
+                              att.trackedEntityInstance === attribute.trackedEntityInstance
+                                  ? { ...att, ...createColumn(attribute) }
+                                  : att
+                          )
+                        : [
+                              ...acc,
+                              {
+                                  trackedEntityInstance: attribute.trackedEntityInstance,
+                                  ...createColumn(attribute),
+                              },
+                          ];
+                }, []);
+
+            const data = !mapping.valuesAsColumns ? teiAttributes : convertDataAsColumns();
+
+            return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
     }
 
@@ -362,17 +463,29 @@ export class ExecuteActionUseCase {
 
         return enrollments.reduce<DataByTable[]>((acc, enrollment) => {
             const programId = this.getMetadataIdByCode(programs, enrollment.program);
-            return this.AddOrEditNewDataByTable(action, acc, programId, "enrollments", [enrollment]);
+            const mapping = this.getModelMapping(action, "enrollments", programId);
+
+            return this.AddOrEditNewDataByTable(mapping, acc, [enrollment]);
         }, []);
     }
 
     private AddOrEditNewDataByTable(
-        action: SyncAction,
+        modelMapping: ModelMapping,
         dataByTables: DataByTable[],
-        metadataId: string,
-        dhis2Model: Dhis2ModelKey,
-        newData: Data[]
+        newData: unknown[]
     ): DataByTable[] {
+        const existedDataByTable = dataByTables.find(mapping => mapping.table === modelMapping.xMARTTable);
+
+        return existedDataByTable
+            ? dataByTables.map(dataByTable =>
+                  dataByTable.table === modelMapping.xMARTTable
+                      ? { ...dataByTable, data: [...dataByTable.data, ...newData] }
+                      : dataByTable
+              )
+            : [...dataByTables, { table: modelMapping.xMARTTable, data: newData }];
+    }
+
+    private getModelMapping(action: SyncAction, dhis2Model: string, metadataId: string): ModelMapping {
         const newMapping =
             action.modelMappings.find(
                 modelMapping => modelMapping.dhis2Model === dhis2Model && modelMapping.metadataId === metadataId
@@ -386,19 +499,11 @@ export class ExecuteActionUseCase {
                 `An error has ocurred converting ${dhis2Model} for metadata Id ${metadataId} to xMART data because a mapping has not been found.`
             );
         } else {
-            const existedDataByTable = dataByTables.find(mapping => mapping.table === newMapping.xMARTTable);
-
-            return existedDataByTable
-                ? dataByTables.map(dataByTable =>
-                      dataByTable.table === newMapping.xMARTTable
-                          ? { ...dataByTable, data: [...dataByTable.data, ...newData] }
-                          : dataByTable
-                  )
-                : [...dataByTables, { table: newMapping.xMARTTable, data: newData }];
+            return newMapping;
         }
     }
 
-    private sendDataByTable(data: Data[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
+    private sendDataByTable(data: unknown[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
         if (data.length === 0) return Future.success(i18n.t(`${tableCode} 0 rows`));
 
         const fileInfo = this.generateFileInfo(data, key);
