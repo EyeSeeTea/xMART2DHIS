@@ -86,9 +86,7 @@ export const ActionsListPage: React.FC = () => {
         {
             name: "period",
             text: i18n.t("Period"),
-            getValue: ({ period }: SyncAction) => {
-                return availablePeriods[period].name ?? "-";
-            },
+            getValue: ({ period }: SyncAction) => availablePeriods[period].name ?? "-",
         },
         { name: "startDate", text: i18n.t("Start Date") },
         { name: "endDate", text: i18n.t("End Date") },
