@@ -10,7 +10,7 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
-import { Icon } from "@material-ui/core";
+import { Icon, Tooltip } from "@material-ui/core";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
+import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeriod";
 
 export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -43,13 +44,76 @@ export const ActionsListPage: React.FC = () => {
         () => [
             { name: "name", text: i18n.t("Name") },
             { name: "description", text: i18n.t("Description") },
+            { name: "connectionId", text: i18n.t("Connection") },
+            {
+                name: "period",
+                text: i18n.t("Period"),
+                getValue: ({ period }: SyncAction) => availablePeriods[period].name ?? "-",
+            },
+            { name: "startDate", text: i18n.t("Start Date") },
+            { name: "endDate", text: i18n.t("End Date") },
+            {
+                name: "orgUnitPaths",
+                text: i18n.t("Org Unit Paths"),
+                getValue: ({ orgUnitPaths }: SyncAction) => buildEllipsizedList(buildList(orgUnitPaths)),
+            },
+            {
+                name: "metadataIds",
+                text: i18n.t("Metadata Id"),
+                getValue: ({ metadataIds }: SyncAction) => buildEllipsizedList(buildList(metadataIds)),
+            },
+            {
+                name: "modelMappings",
+                text: i18n.t("Model Mappings"),
+                getValue: ({ modelMappings }: SyncAction) => {
+                    const buildModelMappingList = modelMappings.map((item, idx) => (
+                        <li key={`org-unit-${idx}`}>
+                            {item.dhis2Model}: {item.xMARTTable}
+                        </li>
+                    ));
+                    return buildEllipsizedList(buildModelMappingList);
+                },
+            },
         ],
         []
     );
+    const buildList = (items: string[]) => items.map((item, idx) => <li key={`org-unit-${idx}`}>{item}</li>);
 
     const details: ObjectsTableDetailField<SyncAction>[] = [
         { name: "name", text: i18n.t("Name") },
         { name: "description", text: i18n.t("Description") },
+        { name: "connectionId", text: i18n.t("Connection") },
+        {
+            name: "period",
+            text: i18n.t("Period"),
+            getValue: ({ period }: SyncAction) => {
+                return availablePeriods[period].name ?? "-";
+            },
+        },
+        { name: "startDate", text: i18n.t("Start Date") },
+        { name: "endDate", text: i18n.t("End Date") },
+        {
+            name: "orgUnitPaths",
+            text: i18n.t("Org Unit Paths"),
+            getValue: ({ orgUnitPaths }: SyncAction) => buildEllipsizedList(buildList(orgUnitPaths)),
+        },
+        {
+            name: "metadataIds",
+            text: i18n.t("Metadata Id"),
+            getValue: ({ metadataIds }: SyncAction) => buildEllipsizedList(buildList(metadataIds)),
+        },
+        {
+            name: "modelMappings",
+            text: i18n.t("Model Mappings"),
+            getValue: ({ modelMappings }: SyncAction) => {
+                const buildModelMappingList = modelMappings.map((item, idx) => (
+                    <li key={`org-unit-${idx}`}>
+                        {item.dhis2Model}: {item.xMARTTable}
+                    </li>
+                ));
+                return buildEllipsizedList(buildModelMappingList);
+            },
+        },
     ];
 
     const goToCreateAction = useCallback(() => {
@@ -181,5 +245,19 @@ export const ActionsListPage: React.FC = () => {
                 onActionButtonClick={goToCreateAction}
             />
         </React.Fragment>
+    );
+};
+
+const buildEllipsizedList = (items: JSX.Element[], limit = 3) => {
+    const overflow = items.length - limit;
+    const hasOverflow = overflow > 0;
+    return (
+        <Tooltip title={items} disableHoverListener={!hasOverflow}>
+            <ul>
+                {_.take(items, limit)}
+
+                {hasOverflow && <li>{i18n.t("And {{overflow}} more...", { overflow })}</li>}
+            </ul>
+        </Tooltip>
     );
 };
