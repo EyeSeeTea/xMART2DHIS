@@ -36,11 +36,10 @@ const useStyles = makeStyles({
 });
 
 export const SummaryStep = ({ action, onCancel }: ActionWizardStepProps) => {
-    const { compositionRoot } = useAppContext();
+    const { compositionRoot, azureInstance } = useAppContext();
     const snackbar = useSnackbar();
     const classes = useStyles();
     const loading = useLoading();
-
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
     const openCancelDialog = () => setCancelDialogOpen(true);
@@ -49,6 +48,11 @@ export const SummaryStep = ({ action, onCancel }: ActionWizardStepProps) => {
 
     const save = async () => {
         const errors = action.validate().map(e => e.description);
+        const [account] = azureInstance.getAllAccounts();
+
+        if (!account) {
+            errors.push("The user is not logged in");
+        }
         if (errors.length > 0) {
             snackbar.error(errors.join("\n"));
         } else {
