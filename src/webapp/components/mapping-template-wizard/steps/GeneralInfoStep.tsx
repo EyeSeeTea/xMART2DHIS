@@ -22,7 +22,6 @@ export const GeneralInfoStep = ({ mappingTemplate, onChange }: MappingTemplateWi
             return (event: React.ChangeEvent<{ value: unknown }>) => {
                 const newAction = mappingTemplate.update({ [field]: event.target.value });
                 const messages = newAction.validate([field]).map(e => e.description);
-
                 setErrors(errors => ({ ...errors, [field]: messages.join("\n") }));
                 onChange(newAction);
             };
