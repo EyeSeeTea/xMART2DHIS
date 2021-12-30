@@ -4,6 +4,7 @@ import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
+import { SyncCustomAction } from "../../entities/actions/SyncCustomAction";
 import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
 import { DataSet } from "../../entities/metadata/DataSet";
@@ -14,7 +15,7 @@ import {
     XMartFieldDefinition,
     XMartLoadModelData,
     xMartSyncTableTemplates,
-    XMartTableDefinition,
+    XMartTableDefinition
 } from "../../entities/xmart/xMartSyncTableTemplates";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
@@ -32,21 +33,31 @@ export class SaveActionUseCase implements UseCase {
         private connectionsRepository: ConnectionsRepository
     ) {}
 
-    public execute(action: SyncAction): FutureData<void> {
-        return this.validateModelMappings(action)
-            .flatMap(action =>
-                Future.joinObj({
-                    saveResult: this.actionRepository.save(action),
-                    dataMart: this.connectionsRepository.getById(action.connectionId),
-                })
-            )
-            .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action))
-            .flatMap(() => Future.success(undefined))
-            .flatMapError(error => {
-                return Future.error(
-                    i18n.t(`An error has occurred saving the action.\n{{error}}`, { error: String(error) })
-                );
-            });
+    public execute(action: SyncAction | SyncCustomAction): FutureData<void> {
+        const isCustomAction = _.has(action, "customCode");
+
+        if (isCustomAction) {
+            return this.actionRepository.save(action);
+        } else {
+            return (
+                //@ts-ignore
+                this.validateModelMappings(action)
+                    .flatMap(action =>
+                        Future.joinObj({
+                            saveResult: this.actionRepository.save(action),
+                            dataMart: this.connectionsRepository.getById(action.connectionId),
+                        })
+                    )
+                    //@ts-ignore
+                    .flatMap(({ dataMart }) => this.loadModelsInXMart(dataMart, action))
+                    .flatMap(() => Future.success(undefined))
+                    .flatMapError(error => {
+                        return Future.error(
+                            i18n.t(`An error has occurred saving the action.\n{{error}}`, { error: String(error) })
+                        );
+                    })
+            );
+        }
     }
 
     private loadModelsInXMart(dataMart: DataMart, action: SyncAction): FutureData<void> {

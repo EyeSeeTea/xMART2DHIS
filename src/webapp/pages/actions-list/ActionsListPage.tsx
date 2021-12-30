@@ -8,7 +8,7 @@ import {
     TableSelection,
     TableState,
     useLoading,
-    useSnackbar,
+    useSnackbar
 } from "@eyeseetea/d2-ui-components";
 import { Icon, Tooltip } from "@material-ui/core";
 import _ from "lodash";
@@ -16,10 +16,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
+import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeriod";
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
+import {
+    SpeedDialActionOption, SpeedDialActionTable
+} from "../../components/speed-dial-action-table/SpeedDialActionTable";
 import { useAppContext } from "../../contexts/app-context";
-import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeriod";
 
 export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -74,6 +77,7 @@ export const ActionsListPage: React.FC = () => {
                     return buildEllipsizedList(buildModelMappingList);
                 },
             },
+            { name: "type", text: i18n.t("Type") },
         ],
         []
     );
@@ -112,10 +116,15 @@ export const ActionsListPage: React.FC = () => {
                 return buildEllipsizedList(buildModelMappingList);
             },
         },
+        { name: "type", text: i18n.t("Type") },
     ];
 
     const goToCreateAction = useCallback(() => {
         navigate("/actions/new");
+    }, [navigate]);
+
+    const goToCreateCustomAction = useCallback(() => {
+        navigate("/actions/new/custom");
     }, [navigate]);
 
     const goToEditAction = useCallback(
@@ -211,6 +220,10 @@ export const ActionsListPage: React.FC = () => {
         ],
         [goToEditAction, execute]
     );
+    const speedDialActions: SpeedDialActionOption[] = [
+        { icon: <Icon>control_point</Icon>, name: "Standard", onClick: goToCreateAction },
+        { icon: <Icon>code</Icon>, name: "Custom", onClick: goToCreateCustomAction },
+    ];
 
     return (
         <React.Fragment>
@@ -240,8 +253,8 @@ export const ActionsListPage: React.FC = () => {
                 selection={selection}
                 actions={actions}
                 onChange={handleTableChange}
-                onActionButtonClick={goToCreateAction}
             />
+            <SpeedDialActionTable actions={speedDialActions} />
         </React.Fragment>
     );
 };
