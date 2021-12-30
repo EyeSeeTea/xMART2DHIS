@@ -8,7 +8,7 @@ import {
     TableSelection,
     TableState,
     useLoading,
-    useSnackbar
+    useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import { Icon, Tooltip } from "@material-ui/core";
 import _ from "lodash";
@@ -20,7 +20,8 @@ import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeri
 import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import {
-    SpeedDialActionOption, SpeedDialActionTable
+    SpeedDialActionOption,
+    SpeedDialActionTable,
 } from "../../components/speed-dial-action-table/SpeedDialActionTable";
 import { useAppContext } from "../../contexts/app-context";
 
@@ -170,9 +171,15 @@ export const ActionsListPage: React.FC = () => {
 
             compositionRoot.actions.execute(id).run(
                 result => {
-                    snackbar.success(i18n.t("Successfully executed the action. Summary:\n{{result}}", { result }), {
-                        autoHideDuration: null,
-                    });
+                    snackbar.success(
+                        i18n.t("Successfully executed the action. Summary:\n{{result}}", {
+                            result,
+                            nsSeparator: false,
+                        }),
+                        {
+                            autoHideDuration: null,
+                        }
+                    );
 
                     loading.reset();
                     setToDelete([]);

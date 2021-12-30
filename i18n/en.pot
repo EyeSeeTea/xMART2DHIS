@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-17T16:03:00.195Z\n"
-"PO-Revision-Date: 2021-12-17T16:03:00.195Z\n"
+"POT-Creation-Date: 2021-12-30T09:18:18.873Z\n"
+"PO-Revision-Date: 2021-12-30T09:18:18.873Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -437,9 +437,6 @@ msgstr ""
 msgid "Org Unit Paths"
 msgstr ""
 
-msgid "Metadata Id"
-msgstr ""
-
 msgid "Model Mappings"
 msgstr ""
 
@@ -453,6 +450,11 @@ msgid "An error has ocurred deleting actionn"
 msgstr ""
 
 msgid "Executing the action"
+msgstr ""
+
+msgid ""
+"Successfully executed the action. Summary:\n"
+"{{result}}"
 msgstr ""
 
 msgid ""

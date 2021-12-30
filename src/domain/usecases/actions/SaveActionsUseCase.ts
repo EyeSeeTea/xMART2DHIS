@@ -15,7 +15,7 @@ import {
     XMartFieldDefinition,
     XMartLoadModelData,
     xMartSyncTableTemplates,
-    XMartTableDefinition
+    XMartTableDefinition,
 } from "../../entities/xmart/xMartSyncTableTemplates";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";

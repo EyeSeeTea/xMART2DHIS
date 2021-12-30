@@ -23,19 +23,17 @@ export class MetadataD2ApiRepository implements MetadataRepository {
     }
 
     @cache()
-    public list(options: ListMetadataOptions): FutureData<ListMetadataResponse> {
-        const {
-            model,
-            paging = true,
-            page,
-            pageSize,
-            search,
-            sorting = { field: "id", order: "asc" },
-            selectedIds,
-            aditionalFilters,
-            fields = { $owner: true },
-        } = options;
-
+    public list({
+        model,
+        paging = true,
+        page,
+        pageSize,
+        search,
+        sorting = { field: "id", order: "asc" },
+        selectedIds,
+        aditionalFilters,
+        fields = { $owner: true },
+    }: ListMetadataOptions): FutureData<ListMetadataResponse> {
         const idsFilter = selectedIds && selectedIds?.length > 0 ? { id: { in: selectedIds } } : {};
 
         return apiToFuture(
