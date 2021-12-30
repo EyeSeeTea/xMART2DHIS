@@ -56,6 +56,7 @@ export class MappingTemplate implements MappingTemplateData {
         this.id = data.id;
         this.name = data.name;
         this.connectionId = data.connectionId;
+        this.description = data.description;
         this.modelMappings = data.modelMappings;
     }
 
@@ -87,6 +88,7 @@ export class MappingTemplate implements MappingTemplateData {
             id: generateUid(),
             connectionId: "",
             name: "",
+            description: "",
             modelMappings: [],
         };
     };
