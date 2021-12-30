@@ -7,6 +7,7 @@ import { EventsRepository, GetEventsFilters, SaveEventsParams } from "../../doma
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import i18n from "../../locales";
 import { D2Api } from "../../types/d2-api";
+import { promiseMap } from "../../utils/common";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
 import { postImport } from "../utils/Dhis2Import";
@@ -70,8 +71,8 @@ export class EventsD2ApiRepository implements EventsRepository {
         if (orgUnits.length === 0) return Future.success([]);
 
         const fetchApi = (orgUnit: string, page: number) => {
-            return apiToFuture(
-                this.api.events.get({
+            return this.api.events
+                .get({
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -79,21 +80,20 @@ export class EventsD2ApiRepository implements EventsRepository {
                     startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
                     endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
                 })
-            );
+                .getData();
         };
 
-        return Future.sequential(
-            orgUnits.map(orgUnit => {
-                return fetchApi(orgUnit, 1).flatMap(({ events, pager }) => {
-                    return Future.joinObj({
-                        events: Future.success(events),
-                        paginatedEvents: Future.sequential(
-                            _.range(2, pager.pageCount + 1).map(page => {
-                                return fetchApi(orgUnit, page).map(({ events }) => events);
-                            })
-                        ),
-                    }).map(({ events, paginatedEvents }) => [...events, ..._.flatten(paginatedEvents)]);
+        //TODO: avoid use Future.fromPromise and promiseMap and to use futures
+        return Future.fromPromise(
+            promiseMap(orgUnits, async orgUnit => {
+                const { events, pager } = await fetchApi(orgUnit, 1);
+
+                const paginatedEvents = await promiseMap(_.range(2, pager.pageCount + 1), async page => {
+                    const { events } = await fetchApi(orgUnit, page);
+                    return events;
                 });
+
+                return [...events, ..._.flatten(paginatedEvents)];
             })
         )
             .flatMapError(error => Future.error(`An error has occurred retrieving events\n${String(error)}`))
@@ -115,9 +115,9 @@ export class EventsD2ApiRepository implements EventsRepository {
 
         const orgUnits = cleanOrgUnitPaths(orgUnitPaths);
 
-        const fetchApi = (program: string, orgUnit: string, page: number) => {
-            return apiToFuture(
-                this.api.events.get({
+        const fetchApi = async (program: string, orgUnit: string, page: number) => {
+            return this.api.events
+                .get({
                     pageSize: 250,
                     totalPages: true,
                     page,
@@ -126,25 +126,23 @@ export class EventsD2ApiRepository implements EventsRepository {
                     startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
                     endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
                 })
-            );
+                .getData();
         };
 
-        return Future.sequential(
-            programIds.map(programId => {
-                return Future.sequential(
-                    orgUnits.map(orgUnit => {
-                        return fetchApi(programId, orgUnit, 1).flatMap(({ events, pager }) => {
-                            return Future.joinObj({
-                                events: Future.success(events),
-                                paginatedEvents: Future.sequential(
-                                    _.range(2, pager.pageCount + 1).map(page => {
-                                        return fetchApi(programId, orgUnit, page).map(({ events }) => events);
-                                    })
-                                ),
-                            }).map(({ events, paginatedEvents }) => [...events, ..._.flatten(paginatedEvents)]);
-                        });
-                    })
-                ).map(events => _.flatten(events));
+        return Future.fromPromise(
+            promiseMap(programIds, async programId => {
+                const filteredEvents = await promiseMap(orgUnits, async orgUnit => {
+                    const { events, pager } = await fetchApi(programId, orgUnit, 1);
+
+                    const paginatedEvents = await promiseMap(_.range(2, pager.pageCount + 1), async page => {
+                        const { events } = await fetchApi(programId, orgUnit, page);
+                        return events;
+                    });
+
+                    return [...events, ..._.flatten(paginatedEvents)];
+                });
+
+                return _.flatten(filteredEvents);
             })
         )
             .flatMapError(error => Future.error(`An error has occurred retrieving events\n${String(error)}`))
