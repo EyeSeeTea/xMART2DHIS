@@ -17,7 +17,7 @@ import React, { ChangeEvent, ReactNode, useCallback, useEffect, useState } from 
 import { MetadataType } from "../../../utils/d2";
 import { D2Model } from "../../../domain/entities/models/D2Model";
 import { useAppContext } from "../../contexts/app-context";
-import { ProgramModel } from "../../../domain/entities/models/D2Models";
+import { AllProgramsModel } from "../../../domain/entities/models/D2Models";
 import { ListMetadataOptions } from "../../../domain/repositories/MetadataRepository";
 import i18n from "../../../locales";
 import { Dropdown } from "../dropdown/Dropdown";
@@ -95,7 +95,7 @@ const MetadataTable: React.FC<MetadataTableProps> = ({
 
     const snackbar = useSnackbar();
 
-    const [model, updateModel] = useState<typeof D2Model>(() => models[0] ?? ProgramModel);
+    const [model, updateModel] = useState<typeof D2Model>(() => models[0] ?? AllProgramsModel);
     //const [ids, updateIds] = useState<string[]>([]);
 
     const [stateSelection, setStateSelection] = useState<string[]>(externalSelection ?? []);
@@ -103,10 +103,9 @@ const MetadataTable: React.FC<MetadataTableProps> = ({
     const selectedIds = externalSelection ?? stateSelection;
     const [filters, setFilters] = useState<ListMetadataOptions>({
         model: model.getCollectionName(),
-        order: initialState.sorting,
+        sorting: initialState.sorting,
         page: initialState.pagination.page,
         pageSize: initialState.pagination.pageSize,
-        disableFilterRows: false,
         ...model.getApiModelFilters(),
     });
 
@@ -123,7 +122,7 @@ const MetadataTable: React.FC<MetadataTableProps> = ({
 
     const changeModelFilter = (modelName: string) => {
         if (models.length === 0) throw new Error("You need to provide at least one model");
-        const model = _.find(models, model => model.getMetadataType() === modelName) ?? models[0] ?? ProgramModel;
+        const model = _.find(models, model => model.getMetadataType() === modelName) ?? models[0] ?? AllProgramsModel;
         setRows([]);
         updateModel(() => model);
 

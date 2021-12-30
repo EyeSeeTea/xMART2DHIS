@@ -1,7 +1,7 @@
 import { Id } from "../../types/d2-api";
 import { FutureData } from "../entities/Future";
 import { ImportResult } from "../entities/data/ImportResult";
-import { MetadataItem, MetadataModel, MetadataPackage, MetadataPayload } from "../entities/metadata/Metadata";
+import { MetadataEntity, MetadataModel, MetadataPackage, MetadataPayload } from "../entities/metadata/Metadata";
 import { OrganisationUnit } from "../entities/metadata/OrganisationUnit";
 
 export interface MetadataRepository {
@@ -17,16 +17,18 @@ export interface MetadataRepository {
 
 export interface ListMetadataOptions {
     model: MetadataModel;
+    paging?: boolean;
     page?: number;
     pageSize?: number;
     search?: string;
     sorting?: { field: string; order: "asc" | "desc" };
     fields?: object;
     selectedIds?: string[];
+    aditionalFilters?: Record<string, any>;
 }
 
 export interface ListMetadataResponse {
-    objects: MetadataItem[];
+    objects: MetadataEntity[];
     pager: Pager;
 }
 
