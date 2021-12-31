@@ -1,11 +1,11 @@
 import { DataSyncPeriod } from "../entities/metadata/DataSyncPeriod";
-import { DataValue } from "../entities/data/DataValue";
+import { DataValue, DataValueSet } from "../entities/data/DataValue";
 import { FutureData } from "../entities/Future";
 import { SyncResult } from "../entities/data/SyncResult";
 
 export interface AggregatedRepository {
     save(dataValues: DataValue[], params: SaveAggregatedParams): FutureData<SyncResult>;
-    get(filters: GetAggregatedFilters): FutureData<DataValue[]>;
+    get(filters: GetAggregatedFilters): FutureData<DataValueSet>;
 }
 
 export type SaveAggregatedParams = {
