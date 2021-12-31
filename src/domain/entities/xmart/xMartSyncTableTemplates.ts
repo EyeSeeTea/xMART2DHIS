@@ -41,6 +41,7 @@ export interface XMartPipelineDefinition {
 export interface xMartTable {
     table: XMartTableDefinition;
     fields: XMartFieldDefinition[];
+    optionalFields?: string[];
 }
 
 export const xMARTTempTableCodes = {
@@ -55,14 +56,15 @@ export const xMARTTempTableCodes = {
 export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     dataValues: {
         table: { CODE: xMARTTempTableCodes.dataValues, TITLE: "Data Values" },
+        optionalFields: ["dataElement", "attributeOptionCombo", "categoryOptionCombo", "value", "created"],
         fields: [
             {
                 TABLE_CODE: xMARTTempTableCodes.dataValues,
-                CODE: "value",
-                TITLE: "Value",
-                FIELD_TYPE_CODE: "TEXT_MAX",
+                CODE: "dataSet",
+                TITLE: "dataSet",
+                FIELD_TYPE_CODE: "TEXT_50",
                 IS_REQUIRED: 1,
-                IS_PRIMARY_KEY: 0,
+                IS_PRIMARY_KEY: 1,
                 IS_ROW_TITLE: 0,
             },
             {
@@ -108,6 +110,15 @@ export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
                 FIELD_TYPE_CODE: "TEXT_50",
                 IS_REQUIRED: 1,
                 IS_PRIMARY_KEY: 1,
+                IS_ROW_TITLE: 0,
+            },
+            {
+                TABLE_CODE: xMARTTempTableCodes.dataValues,
+                CODE: "value",
+                TITLE: "Value",
+                FIELD_TYPE_CODE: "TEXT_MAX",
+                IS_REQUIRED: 1,
+                IS_PRIMARY_KEY: 0,
                 IS_ROW_TITLE: 0,
             },
             {
@@ -209,6 +220,7 @@ export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     },
     eventValues: {
         table: { CODE: xMARTTempTableCodes.eventValues, TITLE: "Event Values" },
+        optionalFields: ["dataElement", "value", "created"],
         fields: [
             {
                 TABLE_CODE: "",
@@ -282,6 +294,7 @@ export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     },
     teiAttributes: {
         table: { CODE: xMARTTempTableCodes.teiAttributes, TITLE: "TEI Attributes" },
+        optionalFields: ["attribute", "displayName", "value", "created"],
         fields: [
             {
                 TABLE_CODE: "",
