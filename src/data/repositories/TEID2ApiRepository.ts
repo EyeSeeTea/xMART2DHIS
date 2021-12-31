@@ -28,7 +28,7 @@ export class TEID2ApiRepository implements TEIRepository {
 
         if (orgUnits.length === 0) return Future.success([]);
 
-        const fetchApi = async (program: string, page: number) => {
+        const fetchApi = async (program: string, orgUnits: string[], page: number) => {
             return this.api
                 .get<TEIsResponse>("/trackedEntityInstances", {
                     pageSize: 250,
@@ -45,14 +45,18 @@ export class TEID2ApiRepository implements TEIRepository {
 
         return Future.fromPromise(
             promiseMap(programIds, async programId => {
-                const { trackedEntityInstances, pager } = await fetchApi(programId, 1);
+                const teis = await promiseMap(_.chunk(orgUnits, 250), async orgUnits => {
+                    const { trackedEntityInstances, pager } = await fetchApi(programId, orgUnits, 1);
 
-                const paginatedETeis = await promiseMap(_.range(2, pager.pageCount + 1), async page => {
-                    const { trackedEntityInstances } = await fetchApi(programId, page);
-                    return trackedEntityInstances;
+                    const paginatedETeis = await promiseMap(_.range(2, pager.pageCount + 1), async page => {
+                        const { trackedEntityInstances } = await fetchApi(programId, orgUnits, page);
+                        return trackedEntityInstances;
+                    });
+
+                    return [...trackedEntityInstances, ..._.flatten(paginatedETeis)];
                 });
 
-                return [...trackedEntityInstances, ..._.flatten(paginatedETeis)];
+                return _.flatten(teis);
             })
         )
             .flatMapError(() => Future.error("An error has occurred rerieving events"))
