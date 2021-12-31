@@ -163,6 +163,14 @@ export const programFields = {
     categoryCombo: include,
 };
 
+export const programStageFields = {
+    ...d2BaseModelFields,
+    program: {
+        id: include,
+        name: include,
+    },
+};
+
 export const programFieldsWithDataElements = {
     ...programFields,
     programStages: {
