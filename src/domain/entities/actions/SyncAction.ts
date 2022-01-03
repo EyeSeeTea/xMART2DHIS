@@ -3,15 +3,9 @@ import { generateUid } from "../../../utils/uid";
 import { ModelMapping } from "../mapping-template/MappingTemplate";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
+import { Action, ActionType } from "./Action";
 
-export type ActionType = "standard" | "custom";
-
-export interface SyncActionData {
-    id: string;
-    name: string;
-    type: ActionType;
-    description?: string;
-    connectionId: string;
+export interface SyncActionData extends Action {
     period: DataSyncPeriod;
     startDate?: Date;
     endDate?: Date;

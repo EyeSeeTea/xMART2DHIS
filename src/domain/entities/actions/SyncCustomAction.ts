@@ -1,12 +1,8 @@
 import { generateUid } from "../../../utils/uid";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
-import { ActionType } from "./SyncAction";
-export interface SyncCustomActionData {
-    id: string;
-    name: string;
-    type: ActionType;
-    description?: string;
-    connectionId: string;
+import { Action, ActionType } from "./Action";
+
+export interface SyncCustomActionData extends Action {
     customCode: string;
 }
 
