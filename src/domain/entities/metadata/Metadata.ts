@@ -3,7 +3,7 @@ import { OrganisationUnit } from "./OrganisationUnit";
 import { Program } from "./Program";
 import { Id, Ref } from "./Ref";
 
-export type MetadataModel = "categoryOptionCombos" | "categoryOptions" | "optionSets" | "organisationUnits";
+export type MetadataModel = keyof MetadataEntities;
 
 export const displayName: Record<string, string> = {
     categoryOptionCombos: "Category option combo",
@@ -33,7 +33,7 @@ export function isValidMetadataItem(item: any): item is MetadataItem {
     return item.id;
 }
 
-export type MetadataEntity = OrganisationUnit | Program | DataSet;
+export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
@@ -50,7 +50,7 @@ export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEnt
 
 export interface IdentifiableObject {
     id: Id;
-    name?: string;
+    name: string;
     code?: string;
     displayName?: string;
 }

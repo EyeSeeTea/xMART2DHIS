@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-15T09:14:33.064Z\n"
-"PO-Revision-Date: 2021-12-15T09:14:33.064Z\n"
+"POT-Creation-Date: 2021-12-31T11:19:13.075Z\n"
+"PO-Revision-Date: 2021-12-31T11:19:13.075Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Field {{field}} is not valid"
 msgstr ""
 
-msgid "Only can exists a mapping model by dhis2 model"
+msgid "Only can exists a mapping model by metadata and dhis2 model"
 msgstr ""
 
 msgid "All time"
@@ -98,30 +98,9 @@ msgstr ""
 msgid "Last 5 years"
 msgstr ""
 
-msgid "{{key}} not found"
-msgstr ""
-
 msgid ""
-"An error has occurred saving the action:\n"
+"An error has occurred saving the action.\n"
 "{{error}}"
-msgstr ""
-
-msgid "You need to select one dataValues mapping"
-msgstr ""
-
-msgid "You need to select one events mapping"
-msgstr ""
-
-msgid "You need to select one eventValues mapping"
-msgstr ""
-
-msgid "You need to select one tracked entity instances mapping"
-msgstr ""
-
-msgid "You need to select one tracked entity instance attributes mapping"
-msgstr ""
-
-msgid "You need to select one enrollent mapping"
 msgstr ""
 
 msgid "Name"
@@ -188,33 +167,6 @@ msgid "Name (*)"
 msgstr ""
 
 msgid "Connection"
-msgstr ""
-
-msgid "Dhis2 Model"
-msgstr ""
-
-msgid "xMART Table"
-msgstr ""
-
-msgid "Details"
-msgstr ""
-
-msgid "Delete"
-msgstr ""
-
-msgid "Delete Actions?"
-msgstr ""
-
-msgid "Are you sure you want to delete {{total}} model mappings?"
-msgstr ""
-
-msgid "Ok"
-msgstr ""
-
-msgid "Model Mapping"
-msgstr ""
-
-msgid "Import Template"
 msgstr ""
 
 msgid "Selected {{difference}} elements"
@@ -294,6 +246,9 @@ msgstr ""
 msgid "Import Results"
 msgstr ""
 
+msgid "Ok"
+msgstr ""
+
 msgid "Import"
 msgstr ""
 
@@ -304,6 +259,39 @@ msgid "Messages"
 msgstr ""
 
 msgid "JSON Response"
+msgstr ""
+
+msgid "Dhis2 Model"
+msgstr ""
+
+msgid "Metadata Type"
+msgstr ""
+
+msgid "Metadata Id"
+msgstr ""
+
+msgid "xMART Table"
+msgstr ""
+
+msgid "Values as Columns"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete Actions?"
+msgstr ""
+
+msgid "Are you sure you want to delete {{total}} model mappings?"
+msgstr ""
+
+msgid "Import Template"
 msgstr ""
 
 msgid "Select mapping template"
@@ -351,6 +339,9 @@ msgid "TEI Attributes"
 msgstr ""
 
 msgid "Enrollments"
+msgstr ""
+
+msgid "Model Mapping"
 msgstr ""
 
 msgid "Existed Table"
@@ -441,16 +432,13 @@ msgid "Executing the action"
 msgstr ""
 
 msgid ""
-"Successfully executed the action.\n"
+"Successfully executed the action. Summary:\n"
 "{{result}}"
 msgstr ""
 
 msgid ""
 "An error has ocurred executing the action.\n"
 "{{error}}"
-msgstr ""
-
-msgid "Edit"
 msgstr ""
 
 msgid "Execute"

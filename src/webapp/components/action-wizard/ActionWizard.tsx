@@ -7,7 +7,7 @@ import i18n from "../../../locales";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
 import { ScheduleSelectionStep } from "./steps/ScheduleSelectionStep";
 
-import { MappingSelectionStep } from "./steps/MappingSelectionStep";
+import MappingSelectionStep from "./steps/MappingSelectionStep";
 import { MetadataSelectionStep } from "./steps/MetadataSelectionStep";
 import { OrganisationUnitsSelectionStep } from "./steps/OrganisationUnitsSelectionStep";
 import { PeriodSelectionStep } from "./steps/PeriodSelectionStep";

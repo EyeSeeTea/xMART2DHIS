@@ -1,6 +1,5 @@
-import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
-import { ModelMapping } from "../mapping-template/MappingTemplate";
+import { ModelMapping, modelMappingsValidation } from "../mapping-template/MappingTemplate";
 import { DataSyncPeriod } from "../metadata/DataSyncPeriod";
 import { Ref } from "../metadata/Ref";
 
@@ -86,32 +85,7 @@ export class SyncAction implements SyncActionData {
             { property: "orgUnitPaths", validation: { type: "Standard", validation: "hasItems" } },
             { property: "metadataIds", validation: { type: "Standard", validation: "hasItems" } },
             { property: "modelMappings", validation: { type: "Standard", validation: "hasItems" } },
-            {
-                property: "modelMappings",
-                validation: {
-                    type: "Custom",
-                    validation: {
-                        error: "custom_error",
-                        getDescription: (field: string) =>
-                            i18n.t("Only can exists a mapping model by dhis2 model", { field }),
-                        check: (value?: unknown[]) => {
-                            const modelMappings = value as ModelMapping[];
-                            return (
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "dataValues").length >
-                                    1 ||
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "events").length > 1 ||
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "eventValues").length >
-                                    1 ||
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "teis").length > 1 ||
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "teiAttributes")
-                                    .length > 1 ||
-                                modelMappings.filter(modelMapping => modelMapping.dhis2Model === "enrollments").length >
-                                    1
-                            );
-                        },
-                    },
-                },
-            },
+            modelMappingsValidation,
             ...dateValidations,
         ];
     }
