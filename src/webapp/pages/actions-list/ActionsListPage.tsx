@@ -32,6 +32,7 @@ export const ActionsListPage: React.FC = () => {
     const [selection, updateSelection] = useState<TableSelection[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);
     const [results, setResults] = useState<SyncResult[]>();
+    const [mdNames, setMdNames] = useState<string[]>();
 
     useEffect(() => {
         compositionRoot.actions.list().run(
@@ -39,6 +40,27 @@ export const ActionsListPage: React.FC = () => {
             error => snackbar.error(error)
         );
     }, [compositionRoot, snackbar, refreshKey]);
+    useEffect(() => {
+        /* for each row get the names for all metadata Ids and then at the end set the rows
+
+        */
+        const newRows = rows.map(async row => {
+            const { data, error } = await compositionRoot.metadata.getByIds(row.metadataIds).runAsync();
+            const mdNames = _(data)
+                .mapValues((value, key) => {
+                    if (value !== undefined) {
+                        return _.flatten(value);
+                    }
+                    return [];
+                })
+                .values()
+                .flatten()
+                .value().map(mdValue => mdValue?.displayName || "");
+                return {...row, metadataIds: mdNames}
+            });
+        console.log(newRows);
+    }, [compositionRoot.metadata, rows]);
+
 
     const columns: TableColumn<SyncAction>[] = useMemo(
         () => [
