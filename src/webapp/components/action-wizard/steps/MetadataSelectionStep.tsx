@@ -1,13 +1,13 @@
 import { RowConfig, useSnackbar } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 import React, { useCallback, useState } from "react";
-import { DataSetModel, ProgramModel } from "../../../../domain/entities/models/D2Models";
-import i18n from "../../../../locales";
-import { MetadataType } from "../../../../utils/d2";
 import MetadataTable from "../../metadata-table/MetadataTable";
 import { ActionWizardStepProps } from "../ActionWizard";
+import { MetadataType } from "../../../../utils/d2";
+import i18n from "../../../../locales";
+import { DataSetModel, AllProgramsModel } from "../../../../domain/entities/models/D2Models";
 
-const models = [ProgramModel, DataSetModel];
+const models = [AllProgramsModel, DataSetModel];
 
 export function MetadataSelectionStep({ action, onChange }: ActionWizardStepProps) {
     const snackbar = useSnackbar();

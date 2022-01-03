@@ -109,7 +109,7 @@ export const ActionsListPage: React.FC = () => {
 
             compositionRoot.actions.execute(id).run(
                 result => {
-                    snackbar.success(i18n.t("Successfully executed the action.\n{{result}}", { result }), {
+                    snackbar.success(i18n.t("Successfully executed the action. Summary:\n{{result}}", { result, nsSeparator: false }), {
                         autoHideDuration: null,
                     });
 
