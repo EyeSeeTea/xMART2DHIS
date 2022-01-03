@@ -6,7 +6,12 @@ import { Ref } from "../metadata/Ref";
 
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
-export type Scheduling = { sequence: number; variable: number };
+export type Scheduling = { 
+    enabled: boolean;
+    frequency: string;
+    sequence: number; 
+    variable: number; 
+};
 export type SaveScheduling = Scheduling & Ref;
 
 export interface SyncActionData {
@@ -121,7 +126,7 @@ export class SyncAction implements SyncActionData {
             orgUnitPaths: [],
             metadataIds: [],
             modelMappings: [],
-            scheduling: { sequence: 0, variable: 0 }
+            scheduling: { enabled: false, frequency: "", sequence: 0, variable: 0 }
         };
     };
 

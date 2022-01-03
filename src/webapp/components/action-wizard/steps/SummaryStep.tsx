@@ -166,6 +166,15 @@ export const SummaryStepContent: React.FC<SummaryStepContentProps> = ({ action }
                 )}
             </LiEntry>
 
+            <LiEntry label={i18n.t("Scheduling")}>
+                    <ul>
+                        <LiEntry label={i18n.t("Sequence")} value={action.scheduling.sequence.toString()} />
+                    </ul>
+                    <ul>
+                        <LiEntry label={i18n.t("Variable")} value={action.scheduling.variable.toString()} />
+                    </ul>
+            </LiEntry>
+
             <LiEntry label={i18n.t("Model mappings")}>
                 <ul>
                     {action.modelMappings.map(modelMapping => (

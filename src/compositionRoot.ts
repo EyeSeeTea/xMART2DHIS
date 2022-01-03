@@ -11,10 +11,12 @@ import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiReposi
 import { StorageDataStoreRepository } from "./data/repositories/StorageDataStoreRepository";
 import { TEID2ApiRepository } from "./data/repositories/TEID2ApiRepository";
 import { XMartDefaultRepository } from "./data/repositories/XMartDefaultRepository";
+import { SchedulerD2ApiRepository } from "./data/repositories/SchedulerD2ApiRepository";
 import { Instance } from "./domain/entities/instance/Instance";
 import { DeleteActionsUseCase } from "./domain/usecases/actions/DeleteActionsUseCase";
 import { ExecuteActionUseCase } from "./domain/usecases/actions/ExecuteActionUseCase";
 import { GetActionByIdUseCase } from "./domain/usecases/actions/GetActionByIdUseCase";
+import { GetMultipleActionsByIdUseCase } from "./domain/usecases/actions/GetMultipleActionsByIdUseCase";
 import { GetActionsUseCase } from "./domain/usecases/actions/GetActionsUseCase";
 import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase";
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
@@ -35,6 +37,8 @@ import { ListMetadataUseCase } from "./domain/usecases/metadata/ListMetadataUseC
 import { ListAllMartContentsUseCase } from "./domain/usecases/xmart/ListAllMartContentsUseCase";
 import { ListMartContentsUseCase } from "./domain/usecases/xmart/ListMartContentsUseCase";
 import { ListMartTablesUseCase } from "./domain/usecases/xmart/ListMartTablesUseCase";
+import { GetLastSchedulerExecutionUseCase } from "./domain/usecases/scheduler/GetLastSchedulerExecutionUseCase";
+import { UpdateLastSchedulerExecutionUseCase } from "./domain/usecases/scheduler/UpdateLastSchedulerExecutionUseCase";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceD2ApiRepository(instance);
@@ -49,6 +53,7 @@ export function getCompositionRoot(instance: Instance) {
     const aggregatedRespository = new AggregatedD2ApiRepository(instance);
     const fileRepository = new FileD2ApiRepository(instance);
     const mappingRepository = new MappingTemplateDataStoreRepository(dataStoreClient);
+    const schedulerRepository = new SchedulerD2ApiRepository(dataStoreClient);
 
     return {
         xmart: getExecute({
@@ -69,6 +74,7 @@ export function getCompositionRoot(instance: Instance) {
         actions: getExecute({
             list: new GetActionsUseCase(actionRepository),
             get: new GetActionByIdUseCase(actionRepository),
+            getMultiple: new GetMultipleActionsByIdUseCase(actionRepository),
             delete: new DeleteActionsUseCase(actionRepository),
             save: new SaveActionUseCase(
                 actionRepository,
@@ -102,6 +108,10 @@ export function getCompositionRoot(instance: Instance) {
             delete: new DeleteConnectionsUseCase(connectionRepository),
             getById: new GetConnectionByIdUseCase(connectionRepository),
             testConnection: new TestConnectionUseCase(martRepository, fileRepository),
+        }),
+        scheduler: getExecute({
+            getLastExecution: new GetLastSchedulerExecutionUseCase(schedulerRepository),
+            updateLastExecution: new UpdateLastSchedulerExecutionUseCase(schedulerRepository),
         }),
     };
 }

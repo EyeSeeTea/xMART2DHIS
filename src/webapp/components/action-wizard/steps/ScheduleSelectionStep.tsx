@@ -1,4 +1,4 @@
-import { TextField } from "@material-ui/core";
+import { TextField, Switch } from "@material-ui/core";
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { Scheduling } from "../../../../domain/entities/actions/SyncAction";
@@ -19,11 +19,20 @@ export const ScheduleSelectionStep = ({ action, onChange }: ActionWizardStepProp
     return (
         <React.Fragment>
             <Row>
+                <Switch
+                    checked={action.scheduling.enabled}
+                    onChange={onChangeField("enabled")}
+                    name="enabled"
+                    inputProps={{ 'aria-label': 'secondary checkbox' }}
+                />
+            </Row>
+            <Row>
                 <TextField
                     fullWidth={true}
                     label={i18n.t("Scheduling Sequence")}
                     value={action.scheduling.sequence ?? ""}
                     onChange={onChangeField("sequence")}
+                    type={"number"}
                 />
             </Row>
             <Row>
@@ -32,6 +41,7 @@ export const ScheduleSelectionStep = ({ action, onChange }: ActionWizardStepProp
                     label={i18n.t("Scheduling Variable")}
                     value={action.scheduling.variable ?? ""}
                     onChange={onChangeField("variable")}
+                    type={"number"}
                 />
             </Row>
         </React.Fragment>

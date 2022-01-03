@@ -18,6 +18,8 @@ import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 import { cleanOrgUnitPaths } from "../../utils";
+import { timeout } from "../../../utils/promises";
+
 export class ExecuteActionUseCase {
     constructor(
         private actionRepository: ActionRepository,
@@ -30,53 +32,59 @@ export class ExecuteActionUseCase {
         private connectionsRepository: ConnectionsRepository
     ) {}
 
-    public execute(actionId: string): FutureData<string> {
+    public execute(actionId: string[], delay = 500): FutureData<string[]> {
         return this.actionRepository
-            .getById(actionId)
-            .flatMap(action => {
-                return Future.joinObj({
-                    action: Future.success(action),
-                    metadataInAction: this.extractMetadata([
-                        ...action.metadataIds,
-                        ...cleanOrgUnitPaths(action.orgUnitPaths),
-                    ]),
-                    dataMart: this.connectionsRepository.getById(action.connectionId),
-                });
+            .getMultipleById(actionId)
+            .flatMap(actions => {
+                const orderedActions = _.sortBy(actions, ["scheduling.sequence", "scheduling.variable", "id"]);
+                return Future.futureMap(orderedActions, (action) => {
+                    return Future.joinObj({
+                        action: Future.success(action),
+                        metadataInAction: this.extractMetadata([
+                            ...action.metadataIds,
+                            ...cleanOrgUnitPaths(action.orgUnitPaths),
+                        ]),
+                        dataMart: this.connectionsRepository.getById(action.connectionId),
+                    })
+                    .flatMap(({ action, metadataInAction, dataMart }) => {
+                        const { programs = [], dataSets = [] } = metadataInAction;
+        
+                        const programIds = programs.map(p => p.id);
+                        const dataSetIds = dataSets.map(p => p.id);
+        
+                        const { orgUnitPaths, period, startDate, endDate } = action;
+        
+                        return Future.joinObj({
+                            dataMart: Future.success(dataMart),
+                            action: Future.success(action),
+                            metadataInAction: Future.success(metadataInAction),
+                            events: this.eventsRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
+                            teis: this.teiRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
+                            dataValues: this.aggregatedRespository.get({
+                                orgUnitPaths,
+                                dataSetIds,
+                                period,
+                                startDate,
+                                endDate,
+                            }),
+                        });
+                    })
+                    .flatMap(({ dataMart, events, teis, dataValues, action, metadataInAction }) => {
+                        return Future.joinObj({
+                            dataMart: Future.success(dataMart),
+                            action: Future.success(action),
+                            data: this.replaceIdsByCode(events, teis, dataValues, metadataInAction),
+                        });
+                    })
+                    .flatMap(result => Future.fromPromise<string, unknown>(timeout(delay)).map(() => result))
+                    .flatMap(({ dataMart, data, action }) => {
+                        const { events, teis, dataValues } = data;
+                        return this.sendData(dataMart, events, teis, dataValues, action);
+                    });
+                })
+ 
             })
-            .flatMap(({ action, metadataInAction, dataMart }) => {
-                const { programs = [], dataSets = [] } = metadataInAction;
-
-                const programIds = programs.map(p => p.id);
-                const dataSetIds = dataSets.map(p => p.id);
-
-                const { orgUnitPaths, period, startDate, endDate } = action;
-
-                return Future.joinObj({
-                    dataMart: Future.success(dataMart),
-                    action: Future.success(action),
-                    metadataInAction: Future.success(metadataInAction),
-                    events: this.eventsRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
-                    teis: this.teiRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
-                    dataValues: this.aggregatedRespository.get({
-                        orgUnitPaths,
-                        dataSetIds,
-                        period,
-                        startDate,
-                        endDate,
-                    }),
-                });
-            })
-            .flatMap(({ dataMart, events, teis, dataValues, action, metadataInAction }) => {
-                return Future.joinObj({
-                    dataMart: Future.success(dataMart),
-                    action: Future.success(action),
-                    data: this.replaceIdsByCode(events, teis, dataValues, metadataInAction),
-                });
-            })
-            .flatMap(({ dataMart, data, action }) => {
-                const { events, teis, dataValues } = data;
-                return this.sendData(dataMart, events, teis, dataValues, action);
-            });
+            
     }
     private replaceIdsByCode(
         events: ProgramEvent[],

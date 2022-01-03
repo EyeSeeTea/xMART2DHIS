@@ -7,10 +7,15 @@ export const Namespaces = {
     CONNECTIONS: "connections",
     ACTIONS: "actions",
     MAPPINGTEMPLATES: "mapping-templates",
+    SETTINGS: "settings",
+    SCHEDULER_EXECUTIONS: "scheduler-executions",
+
 };
 
 export const NamespaceProperties: Record<Namespace, string[]> = {
     [Namespaces.CONNECTIONS]: [],
     [Namespaces.ACTIONS]: [],
     [Namespaces.MAPPINGTEMPLATES]: [],
+    [Namespaces.SETTINGS]: [],
+    [Namespaces.SCHEDULER_EXECUTIONS]: [],
 };

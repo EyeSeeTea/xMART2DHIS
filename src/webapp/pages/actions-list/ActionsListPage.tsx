@@ -20,6 +20,7 @@ import i18n from "../../../locales";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 import { availablePeriods } from "../../../domain/entities/metadata/DataSyncPeriod";
+import { SchedulerInfo } from "./SchedulerInfo";
 
 export const ActionsListPage: React.FC = () => {
     const { compositionRoot } = useAppContext();
@@ -105,9 +106,9 @@ export const ActionsListPage: React.FC = () => {
             const id = _.first(ids);
             if (!id) return;
 
-            compositionRoot.actions.execute(id).run(
-                result => {
-                    snackbar.success(i18n.t("Successfully executed the action.\n{{result}}", { result }), {
+            compositionRoot.actions.execute([id]).run(
+                results => {
+                    snackbar.success(i18n.t("Successfully executed the action.\n{{result}}", { result: results[0] }), {
                         autoHideDuration: null,
                     });
 
@@ -188,6 +189,8 @@ export const ActionsListPage: React.FC = () => {
                 onChange={handleTableChange}
                 onActionButtonClick={goToCreateAction}
             />
+            <SchedulerInfo />
+
         </React.Fragment>
     );
 };
