@@ -55,12 +55,12 @@ export const ActionsListPage: React.FC = () => {
                 })
                 .values()
                 .flatten()
-                .value().map(mdValue => mdValue?.displayName || "");
-                return {...row, metadataIds: mdNames}
-            });
+                .value()
+                .map(mdValue => mdValue?.displayName || "");
+            return { ...row, metadataIds: mdNames };
+        });
         console.log(newRows);
     }, [compositionRoot.metadata, rows]);
-
 
     const columns: TableColumn<SyncAction>[] = useMemo(
         () => [
