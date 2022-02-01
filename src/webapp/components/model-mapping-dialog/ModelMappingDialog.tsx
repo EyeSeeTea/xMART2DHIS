@@ -32,9 +32,9 @@ const Container = styled.div`
     margin-bottom: 16px;
 `;
 
-type dhis2DataModel = { id: Dhis2ModelKey; name: string; enableValuesAsColumn: boolean };
+type MappingDataModel = { id: Dhis2ModelKey; name: string; enableValuesAsColumn: boolean };
 
-const dhis2DataModels: dhis2DataModel[] = [
+const dhis2DataModels: MappingDataModel[] = [
     {
         id: "dataValues",
         name: i18n.t("Data Values"),
@@ -65,15 +65,21 @@ const dhis2DataModels: dhis2DataModel[] = [
         name: i18n.t("Enrollments"),
         enableValuesAsColumn: false,
     },
+    {
+        id: "metadata",
+        name: i18n.t("Metadata"),
+        enableValuesAsColumn: false,
+    },
 ];
 
-const metadataModelByData: Record<Dhis2ModelKey, typeof D2Model> = {
+const metadataModelByData: Record<Dhis2ModelKey, typeof D2Model | undefined> = {
     dataValues: DataSetModel,
     events: AllProgramsModel,
     eventValues: AllProgramStagesModel,
     teis: TrackerProgramsModel,
     teiAttributes: TrackerProgramsModel,
     enrollments: TrackerProgramsModel,
+    metadata: undefined,
 };
 
 export interface ModelMappingDialogProps {
@@ -134,6 +140,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
     }, [compositionRoot, snackbar, connectionId]);
 
     useEffect(() => {
+        if (!metadataModel) return;
         setMetadataItems([]);
         setLoadingMetadata(true);
         compositionRoot.metadata
@@ -189,6 +196,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
 
     const handleMetadataItemChange = useCallback(
         (metadataId?: string) => {
+            if (!metadataModel) return;
             const metadataType = metadataModel.getMetadataType();
 
             const id = metadataId !== "" ? metadataId : undefined;
@@ -263,7 +271,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                     />
                 </Container>
 
-                <Container>
+                {metadataModel && <Container>
                     {!loadingMetadata && (
                         <Dropdown
                             label={metadataModel.getMetadataType()}
@@ -274,7 +282,7 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                         />
                     )}
                     {loadingMetadata && <CircularProgress />}
-                </Container>
+                </Container>}
 
                 <Container>
                     <Toggle

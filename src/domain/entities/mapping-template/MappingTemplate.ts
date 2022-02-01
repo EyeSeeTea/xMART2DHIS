@@ -19,7 +19,7 @@ export interface ModelMapping {
     valuesAsColumns?: boolean;
 }
 
-export type Dhis2ModelKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments";
+export type Dhis2ModelKey = "dataValues" | "events" | "eventValues" | "teis" | "teiAttributes" | "enrollments" | "metadata";
 
 export const modelMappingComplexId = (modelMapping: ModelMapping) =>
     `${modelMapping.dhis2Model}-${modelMapping.metadataId ?? ""}`;

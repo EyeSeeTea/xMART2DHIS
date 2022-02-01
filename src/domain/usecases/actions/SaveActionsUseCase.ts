@@ -92,6 +92,7 @@ export class SaveActionUseCase implements UseCase {
                 }, initialXMARTModels);
 
                 const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
+                console.log({ tableFileInfo, xMARTModels });
 
                 return this.fileRepository
                     .uploadFileAsExternal(tableFileInfo)
