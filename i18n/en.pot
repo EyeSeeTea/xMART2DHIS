@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-12-31T11:19:13.075Z\n"
-"PO-Revision-Date: 2021-12-31T11:19:13.075Z\n"
+"POT-Creation-Date: 2022-01-03T10:22:04.228Z\n"
+"PO-Revision-Date: 2022-01-03T10:22:04.228Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -419,6 +419,18 @@ msgstr ""
 msgid "An error has ocurred loading the action"
 msgstr ""
 
+msgid "Start Date"
+msgstr ""
+
+msgid "End Date"
+msgstr ""
+
+msgid "Org Unit Paths"
+msgstr ""
+
+msgid "Model Mappings"
+msgstr ""
+
 msgid "Deleting Actions"
 msgstr ""
 
@@ -445,6 +457,9 @@ msgid "Execute"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
+msgid "And {{overflow}} more..."
 msgstr ""
 
 msgid "Actions are a way to trigger events in your application"

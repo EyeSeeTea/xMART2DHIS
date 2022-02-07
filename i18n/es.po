@@ -419,6 +419,18 @@ msgstr ""
 msgid "An error has ocurred loading the action"
 msgstr ""
 
+msgid "Start Date"
+msgstr ""
+
+msgid "End Date"
+msgstr ""
+
+msgid "Org Unit Paths"
+msgstr ""
+
+msgid "Model Mappings"
+msgstr ""
+
 msgid "Deleting Actions"
 msgstr ""
 
@@ -445,6 +457,9 @@ msgid "Execute"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} actions?"
+msgstr ""
+
+msgid "And {{overflow}} more..."
 msgstr ""
 
 msgid "Actions are a way to trigger events in your application"
