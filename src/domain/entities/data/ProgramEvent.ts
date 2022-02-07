@@ -2,11 +2,11 @@ export interface ProgramEvent {
     event?: string;
     orgUnit: string;
     program: string;
-    status: string;
+    status: "ACTIVE" | "COMPLETED" | "VISITED" | "SCHEDULED" | "OVERDUE" | "SKIPPED";
     eventDate: string;
     coordinate?: {
-        latitude: string;
-        longitude: string;
+        latitude: number;
+        longitude: number;
     };
     attributeOptionCombo?: string;
     attributeCategoryOptions?: string;

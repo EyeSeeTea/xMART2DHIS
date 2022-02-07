@@ -31,3 +31,7 @@ export interface XMartPager {
     pageSize: number;
     total: number;
 }
+
+export function isDataMart(item: any): item is DataMart {
+    return item !== undefined && item.martCode !== undefined && item.dataEndpoint !== undefined;
+}

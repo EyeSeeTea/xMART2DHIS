@@ -3,13 +3,13 @@ import i18n from "../../../locales";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
-import { DataValue, DataValueSet } from "../../entities/data/DataValue";
+import { DataValueSet } from "../../entities/data/DataValue";
 import { ProgramEvent, ProgramEventDataValue } from "../../entities/data/ProgramEvent";
 import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
+import { MetadataPackage } from "../../entities/metadata/Metadata";
 import { TrakedEntityAttribute } from "../../entities/metadata/TrackedEntityAttribute";
-import { IdentifiableObject, MetadataEntities, MetadataPackage } from "../../entities/metadata/Metadata";
 import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
@@ -19,7 +19,7 @@ import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { applyXMartCodeRules, cleanOrgUnitPaths, getIdentifiable } from "../../utils";
+import { applyXMartCodeRules, cleanOrgUnitPaths } from "../../utils";
 
 interface EventValue extends ProgramEventDataValue {
     event: string;
@@ -34,8 +34,20 @@ interface DataByTable {
     data: unknown[];
 }
 
-interface DataValueWithDataSet extends DataValue {
+interface DataValueTableItem {
     dataSet: string;
+    dataSetName?: string;
+    dataElement: string;
+    dataElementName?: string;
+    orgUnit?: string;
+    orgUnitName?: string;
+    period?: string;
+    attributeOptionCombo?: string;
+    attributeOptionComboName?: string;
+    categoryOptionCombo?: string;
+    categoryOptionComboName?: string;
+    comment?: string;
+    value: string;
 }
 
 export class ExecuteActionUseCase {
@@ -99,21 +111,26 @@ export class ExecuteActionUseCase {
                 return Future.joinObj({
                     dataMart: Future.success(dataMart),
                     action: Future.success(action),
-                    metadataInAction: Future.success(metadataInAction),
                     data: this.replaceIdsByCode(events, teis, dataValuesSets, metadataInAction),
                 });
             })
-            .flatMap(({ dataMart, data, action, metadataInAction }) => {
-                const { events, teis, dataValuesSets } = data;
-                return this.sendData(dataMart, events, teis, dataValuesSets, action, metadataInAction);
+            .flatMap(({ dataMart, data, action }) => {
+                const { events, teis, dataValuesSets, metadata } = data;
+                return this.sendData(dataMart, events, teis, dataValuesSets, action, metadata);
             });
     }
+
     private replaceIdsByCode(
         events: ProgramEvent[],
         teis: TrackedEntityInstance[],
         dataValuesSets: DataValueSet[],
         metadataInAction: MetadataPackage
-    ): FutureData<{ events: ProgramEvent[]; teis: TrackedEntityInstance[]; dataValuesSets: DataValueSet[] }> {
+    ): FutureData<{
+        events: ProgramEvent[];
+        teis: TrackedEntityInstance[];
+        dataValuesSets: DataValueSet[];
+        metadata: MetadataMap;
+    }> {
         const idsInEvents = events.reduce<string[]>((acc, event) => {
             const dataElementIds = event.dataValues.map(dv => dv.dataElement);
             const ids: string[] = _.compact([
@@ -143,110 +160,21 @@ export class ExecuteActionUseCase {
 
         const ids = _.uniq([...idsTEIs, ...idsInDataValues, ...idsInEvents]);
 
-        return this.extractMetadata(ids).flatMap(metadataInData => {
-            const eventWithCodes = events.map(event => {
-                const orgUnit = this.getCode(metadataInAction, "organisationUnits", event.orgUnit);
-                const program = this.getCode(metadataInAction, "programs", event.program);
-                const programStage = this.getCode(metadataInData, "programStages", event.programStage);
-
-                const attributeCategoryOptions = this.getCode(
-                    metadataInData,
-                    "categoryOptions",
-                    event.attributeCategoryOptions
-                );
-
-                const attributeOptionCombo = this.getCode(
-                    metadataInData,
-                    "categoryOptionCombos",
-                    event.attributeOptionCombo
-                );
-
-                return {
-                    ...event,
-                    orgUnit,
-                    program,
-                    programStage,
-                    attributeCategoryOptions,
-                    attributeOptionCombo,
-                    dataValues: event.dataValues.map(v => {
-                        const dataElement = this.getCode(metadataInData, "dataElements", v.dataElement);
-                        return { ...v, dataElement };
-                    }),
-                };
-            });
-
-            const dataValuesSetsWithCodes = dataValuesSets.map(dvs => {
-                const dataSet = this.getCode(metadataInAction, "dataSets", dvs.dataSet);
-
-                return {
-                    dataSet,
-                    dataValues: dvs.dataValues.map(dv => {
-                        const orgUnit = this.getCode(metadataInAction, "organisationUnits", dv.orgUnit);
-
-                        const dataElement = this.getCode(metadataInData, "dataElements", dv.dataElement);
-
-                        const categoryOptionCombo = this.getCode(
-                            metadataInData,
-                            "categoryOptionCombos",
-                            dv.categoryOptionCombo
-                        );
-
-                        const attributeOptionCombo = this.getCode(
-                            metadataInData,
-                            "categoryOptionCombos",
-                            dv.attributeOptionCombo
-                        );
-
-                        return {
-                            ...dv,
-                            orgUnit,
-                            dataElement,
-                            categoryOptionCombo,
-                            attributeOptionCombo,
-                        };
-                    }),
-                };
-            });
-
-            const teisWithCodes = teis.map(tei => {
-                return {
-                    ...tei,
-                    attributes: tei.attributes.map(att => {
-                        const attribute = this.getCode(metadataInData, "trackedEntityAttributes", att.attribute);
-                        return { ...att, attribute };
-                    }),
-                    enrollments: tei.enrollments.map(enrollment => {
-                        const orgUnit = this.getCode(metadataInAction, "organisationUnits", enrollment.orgUnit);
-                        const program = this.getCode(metadataInAction, "programs", enrollment.program);
-
-                        return { ...enrollment, orgUnit, program };
-                    }),
-                    programOwners: tei.programOwners.map(owner => {
-                        const program = this.getCode(metadataInAction, "programs", owner.program);
-
-                        return { ...owner, program };
-                    }),
-                };
-            });
-
-            return Future.success({
-                events: eventWithCodes,
-                teis: teisWithCodes,
-                dataValuesSets: dataValuesSetsWithCodes,
-            });
-        });
-    }
-
-    private getCode(metadata: MetadataPackage, key: keyof MetadataEntities, id?: string): string {
-        if (!id) return "";
-
-        const object = metadata[key]?.find(m => m.id === id);
-        return object ? getIdentifiable(object) : id;
+        return this.extractMetadata(ids).map(metadataInData => ({
+            events,
+            teis,
+            dataValuesSets,
+            metadata: new Map([...this.getMetadataPairs(metadataInAction), ...this.getMetadataPairs(metadataInData)]),
+        }));
     }
 
     @cache()
     private extractMetadata(ids: string[]): FutureData<MetadataPackage> {
-        return this.metadataRepository.getMetadataByIds(ids, "id,name,type,code", true);
+        return this.metadataRepository.getMetadataByIds(
+            ids,
+            "id,name,type,code,shortName,formName,created,description",
+            true
+        );
     }
 
     private sendData(
@@ -255,21 +183,19 @@ export class ExecuteActionUseCase {
         teis: TrackedEntityInstance[],
         dataValueSets: DataValueSet[],
         action: SyncAction,
-        metadataInAction: MetadataPackage
+        metadata: MetadataMap
     ): FutureData<string> {
         try {
-            const programs = metadataInAction.programs || [];
-            const programStages = metadataInAction.programStages || [];
-            const dataSets = metadataInAction.dataSets || [];
-
-            const dataValuesByTable = this.getDataValuesByXMARTTable(dataValueSets, action, dataSets);
-            const eventsByTable = this.getEventsByXMARTTable(events, action, programs);
-            const eventsValuesByTable = this.getEventValuesByXMARTTable(events, action, programStages);
-            const teisByTable = this.getTeisByXMARTTable(teis, action, programs);
-            const teiAttributesByTable = this.getTEIAttributesByXMARTTable(teis, action, programs);
-            const enrollmentsByTable = this.getEnrollmentsByXMARTTable(teis, action, programs);
+            const dataValuesByTable = this.getDataValuesByXMARTTable(dataValueSets, action, metadata);
+            const eventsByTable = this.getEventsByXMARTTable(events, action, metadata);
+            const eventsValuesByTable = this.getEventValuesByXMARTTable(events, action, metadata);
+            const teisByTable = this.getTeisByXMARTTable(teis, action, metadata);
+            const teiAttributesByTable = this.getTEIAttributesByXMARTTable(teis, action, metadata);
+            const enrollmentsByTable = this.getEnrollmentsByXMARTTable(teis, action, metadata);
+            const metadataByTable = this.getMetadataByXMARTTable(metadata, action);
 
             const dataByTables = [
+                ...metadataByTable, // Metadata must be sent first
                 ...dataValuesByTable,
                 ...eventsByTable,
                 ...eventsValuesByTable,
@@ -291,19 +217,28 @@ export class ExecuteActionUseCase {
     private getDataValuesByXMARTTable(
         dataValueSets: DataValueSet[],
         action: SyncAction,
-        dataSets: IdentifiableObject[]
+        metadata: MetadataMap
     ): DataByTable[] {
         return dataValueSets.reduce<DataByTable[]>((acc, dataValueSet) => {
-            const dataSetId = this.getMetadataIdByCode(dataSets, dataValueSet.dataSet ?? "");
-            const mapping = this.getModelMapping(action, "dataValues", dataSetId);
+            const mapping = this.getModelMapping(action, "dataValues", dataValueSet.dataSet);
+            const { dataSet = "" } = dataValueSet;
 
-            const dataValuesWithDataSet: DataValueWithDataSet[] = dataValueSet.dataValues.map(dv => ({
-                ...dv,
-                dataSet: dataValueSet.dataSet ?? "",
-            }));
+            const dataValuesWithDataSet: DataValueTableItem[] = dataValueSet.dataValues.map(dataValue => {
+                const { categoryOptionCombo = "", attributeOptionCombo = "", orgUnit = "" } = dataValue;
+
+                return {
+                    ...dataValue,
+                    dataSet,
+                    dataSetName: metadata.get(dataSet)?.name ?? "",
+                    dataElementName: metadata.get(dataValue.dataElement)?.name ?? "",
+                    categoryOptionComboName: metadata.get(categoryOptionCombo)?.name ?? "",
+                    attributeOptionComboName: metadata.get(attributeOptionCombo)?.name ?? "",
+                    orgUnitName: metadata.get(orgUnit)?.name ?? "",
+                };
+            });
 
             const convertDataAsColumns = () =>
-                dataValuesWithDataSet.reduce((acc: any, dataValue: DataValueWithDataSet) => {
+                dataValuesWithDataSet.reduce((acc: any, dataValue: DataValueTableItem) => {
                     const existedDataValue = acc.find(
                         (existed: any) =>
                             existed.dataSet === dataValue.dataSet &&
@@ -311,7 +246,7 @@ export class ExecuteActionUseCase {
                             existed.orgUnit === dataValue.orgUnit
                     );
 
-                    const createColumn = (dataValue: DataValueWithDataSet) => ({
+                    const createColumn = (dataValue: DataValueTableItem) => ({
                         [applyXMartCodeRules(`${dataValue.dataElement}_${dataValue.categoryOptionCombo}`)]:
                             dataValue.value,
                     });
@@ -341,51 +276,66 @@ export class ExecuteActionUseCase {
         }, []);
     }
 
-    private getEventsByXMARTTable(
-        events: ProgramEvent[],
-        action: SyncAction,
-        programs: IdentifiableObject[]
-    ): DataByTable[] {
+    private getEventsByXMARTTable(events: ProgramEvent[], action: SyncAction, metadata: MetadataMap): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
-            const programId = this.getMetadataIdByCode(programs, event.program);
-            const mapping = this.getModelMapping(action, "events", programId);
+            const mapping = this.getModelMapping(action, "events", event.program);
 
-            return this.AddOrEditNewDataByTable(mapping, acc, [event]);
+            const {
+                program = "",
+                programStage = "",
+                orgUnit = "",
+                attributeCategoryOptions = "",
+                attributeOptionCombo = "",
+            } = event;
+
+            return this.AddOrEditNewDataByTable(mapping, acc, [
+                {
+                    ...event,
+                    programName: metadata.get(program)?.name ?? "",
+                    programStageName: metadata.get(programStage)?.name ?? "",
+                    orgUnitName: metadata.get(orgUnit)?.name ?? "",
+                    attributeCategoryOptionsName: metadata.get(attributeCategoryOptions)?.name ?? "",
+                    attributeOptionComboName: metadata.get(attributeOptionCombo)?.name ?? "",
+                },
+            ]);
         }, []);
     }
 
     private getEventValuesByXMARTTable(
         events: ProgramEvent[],
         action: SyncAction,
-        programStages: IdentifiableObject[]
+        metadata: MetadataMap
     ): DataByTable[] {
         return events.reduce<DataByTable[]>((acc, event) => {
-            const programStageId = this.getMetadataIdByCode(programStages, event.programStage ?? "");
             const eventValues = event.dataValues.map(v => ({ ...v, event: event.event } as EventValue));
-            const mapping = this.getModelMapping(action, "eventValues", programStageId);
+            const mapping = this.getModelMapping(action, "eventValues", event.programStage);
 
-            const convertDataAsColumns = () =>
-                eventValues.reduce((acc: any, eventValue: EventValue) => {
-                    const existedEventValue = acc.find((existed: any) => existed.event === eventValue.event);
+            const dataAsColumns = eventValues.reduce((acc: any, eventValue: EventValue) => {
+                const existedEventValue = acc.find((existed: any) => existed.event === eventValue.event);
 
-                    const createColumn = (value: EventValue) => ({
-                        [applyXMartCodeRules(value.dataElement)]: value.value,
-                    });
+                const createColumn = (value: EventValue) => ({
+                    [applyXMartCodeRules(value.dataElement)]: value.value,
+                });
 
-                    return existedEventValue
-                        ? acc.map((ev: any) =>
-                              ev.event === existedEventValue.event ? { ...ev, ...createColumn(eventValue) } : ev
-                          )
-                        : [
-                              ...acc,
-                              {
-                                  event: eventValue.event,
-                                  ...createColumn(eventValue),
-                              },
-                          ];
-                }, []);
+                return existedEventValue
+                    ? acc.map((ev: any) =>
+                          ev.event === existedEventValue.event ? { ...ev, ...createColumn(eventValue) } : ev
+                      )
+                    : [
+                          ...acc,
+                          {
+                              event: eventValue.event,
+                              ...createColumn(eventValue),
+                          },
+                      ];
+            }, []);
 
-            const data = !mapping.valuesAsColumns ? eventValues : convertDataAsColumns();
+            const dataAsRows = eventValues.map(item => ({
+                ...item,
+                dataElementName: metadata.get(item.dataElement)?.name ?? "",
+            }));
+
+            const data = !mapping.valuesAsColumns ? dataAsRows : dataAsColumns;
 
             return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
@@ -394,61 +344,63 @@ export class ExecuteActionUseCase {
     private getTeisByXMARTTable(
         teis: TrackedEntityInstance[],
         action: SyncAction,
-        programs: IdentifiableObject[]
+        metadata: MetadataMap
     ): DataByTable[] {
         return teis.reduce<DataByTable[]>((acc, tei) => {
             const programOwner = _.first(tei.programOwners);
             if (!programOwner) return acc;
 
-            const programId = this.getMetadataIdByCode(programs, programOwner.program);
-            const mapping = this.getModelMapping(action, "teis", programId);
+            const mapping = this.getModelMapping(action, "teis", programOwner.program);
 
-            return this.AddOrEditNewDataByTable(mapping, acc, [tei]);
+            return this.AddOrEditNewDataByTable(mapping, acc, [
+                { ...tei, trackedEntityTypeName: metadata.get(tei.trackedEntityType)?.name ?? "" },
+            ]);
         }, []);
     }
 
     private getTEIAttributesByXMARTTable(
         teis: TrackedEntityInstance[],
         action: SyncAction,
-        programs: IdentifiableObject[]
+        metadata: MetadataMap
     ): DataByTable[] {
         return teis.reduce<DataByTable[]>((acc, tei) => {
             const programOwner = _.first(tei.programOwners);
             if (!programOwner) return acc;
 
-            const programId = this.getMetadataIdByCode(programs, programOwner.program);
-            const mapping = this.getModelMapping(action, "teiAttributes", programId);
+            const mapping = this.getModelMapping(action, "teiAttributes", programOwner.program);
 
             const teiAttributes = tei.attributes.map(
                 att => ({ ...att, trackedEntityInstance: tei.trackedEntityInstance } as TEIAttribute)
             );
 
-            const convertDataAsColumns = () =>
-                teiAttributes.reduce((acc: any, attribute: TEIAttribute) => {
-                    const existedAttByTEI = acc.find(
-                        (existed: any) => existed.event === attribute.trackedEntityInstance
-                    );
+            const dataAsColumns = teiAttributes.reduce((acc: any, attribute: TEIAttribute) => {
+                const existedAttByTEI = acc.find((existed: any) => existed.event === attribute.trackedEntityInstance);
 
-                    const createColumn = (att: TEIAttribute) => ({
-                        [applyXMartCodeRules(att.attribute)]: att.value,
-                    });
+                const createColumn = (att: TEIAttribute) => ({
+                    [applyXMartCodeRules(att.attribute)]: att.value,
+                });
 
-                    return existedAttByTEI
-                        ? acc.map((att: any) =>
-                              att.trackedEntityInstance === attribute.trackedEntityInstance
-                                  ? { ...att, ...createColumn(attribute) }
-                                  : att
-                          )
-                        : [
-                              ...acc,
-                              {
-                                  trackedEntityInstance: attribute.trackedEntityInstance,
-                                  ...createColumn(attribute),
-                              },
-                          ];
-                }, []);
+                return existedAttByTEI
+                    ? acc.map((att: any) =>
+                          att.trackedEntityInstance === attribute.trackedEntityInstance
+                              ? { ...att, ...createColumn(attribute) }
+                              : att
+                      )
+                    : [
+                          ...acc,
+                          {
+                              trackedEntityInstance: attribute.trackedEntityInstance,
+                              ...createColumn(attribute),
+                          },
+                      ];
+            }, []);
 
-            const data = !mapping.valuesAsColumns ? teiAttributes : convertDataAsColumns();
+            const dataAsRows = teiAttributes.map(item => ({
+                ...item,
+                attributeName: metadata.get(item.attribute)?.name ?? "",
+            }));
+
+            const data = !mapping.valuesAsColumns ? dataAsRows : dataAsColumns;
 
             return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
@@ -457,16 +409,28 @@ export class ExecuteActionUseCase {
     private getEnrollmentsByXMARTTable(
         teis: TrackedEntityInstance[],
         action: SyncAction,
-        programs: IdentifiableObject[]
+        metadata: MetadataMap
     ): DataByTable[] {
         const enrollments = teis.map(t => t.enrollments).flat();
 
         return enrollments.reduce<DataByTable[]>((acc, enrollment) => {
-            const programId = this.getMetadataIdByCode(programs, enrollment.program);
-            const mapping = this.getModelMapping(action, "enrollments", programId);
+            const mapping = this.getModelMapping(action, "enrollments", enrollment.program);
 
-            return this.AddOrEditNewDataByTable(mapping, acc, [enrollment]);
+            return this.AddOrEditNewDataByTable(mapping, acc, [
+                {
+                    ...enrollment,
+                    programName: metadata.get(enrollment.program)?.name ?? "",
+                    orgUnitName: metadata.get(enrollment.orgUnit)?.name ?? "",
+                },
+            ]);
         }, []);
+    }
+
+    private getMetadataByXMARTTable(metadata: MetadataMap, action: SyncAction): DataByTable[] {
+        const mapping = this.getModelMapping(action, "metadata");
+        const data = Array.from(metadata.values());
+
+        return [{ table: mapping.xMARTTable, data }];
     }
 
     private AddOrEditNewDataByTable(
@@ -485,7 +449,7 @@ export class ExecuteActionUseCase {
             : [...dataByTables, { table: modelMapping.xMARTTable, data: newData }];
     }
 
-    private getModelMapping(action: SyncAction, dhis2Model: string, metadataId: string): ModelMapping {
+    private getModelMapping(action: SyncAction, dhis2Model: string, metadataId?: string): ModelMapping {
         const newMapping =
             action.modelMappings.find(
                 modelMapping => modelMapping.dhis2Model === dhis2Model && modelMapping.metadataId === metadataId
@@ -516,8 +480,27 @@ export class ExecuteActionUseCase {
             .flatMap(() => Future.success(i18n.t(`${tableCode} {{count}} rows`, { count: data.length })));
     }
 
-    private getMetadataIdByCode(items: IdentifiableObject[], code: string) {
-        return items.find(p => p.code === code || p.name === code)?.id ?? "";
+    private getMetadataPairs(metadata: MetadataPackage): MetadataMap {
+        const metadataWithTypes = _.mapValues(
+            metadata,
+            (array, key) =>
+                array?.map(item => ({
+                    id: item.id,
+                    name: item.displayName ?? item.name,
+                    code: item.code,
+                    metadataType: key,
+                    created: item.created,
+                    formName: item.formName,
+                    shortName: item.shortName,
+                    description: item.description,
+                })) ?? []
+        );
+
+        const arrays = _.values(metadataWithTypes);
+        const items = _.flatten(arrays);
+        const pairs: Array<[string, MetadataItem]> = _.compact(items).map(item => [item.id, item]);
+
+        return new Map([...pairs]);
     }
 
     private generateFileInfo(teis: unknown, key: string) {
@@ -530,3 +513,15 @@ export class ExecuteActionUseCase {
         return fileInfo;
     }
 }
+
+type MetadataItem = {
+    id: string;
+    code?: string;
+    name: string;
+    metadataType: string;
+    created?: string;
+    formName?: string;
+    shortName?: string;
+    description?: string;
+};
+type MetadataMap = Map<string, MetadataItem>;

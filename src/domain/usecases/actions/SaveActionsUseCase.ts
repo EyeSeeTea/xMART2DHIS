@@ -83,8 +83,10 @@ export class SaveActionUseCase implements UseCase {
                         dataSets as DataSet[],
                         programs as Program[],
                         programStages as ProgramStage[],
-                        modelMapping
+                        modelMapping,
+                        action.modelMappings.find(m => m.dhis2Model === "metadata")?.xMARTTable
                     );
+
                     return {
                         tables: [...acc.tables, newTableDefinition],
                         fields: [...acc.fields, ...newfieldsDefinition],
@@ -92,7 +94,6 @@ export class SaveActionUseCase implements UseCase {
                 }, initialXMARTModels);
 
                 const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
-                console.log({ tableFileInfo, xMARTModels });
 
                 return this.fileRepository
                     .uploadFileAsExternal(tableFileInfo)
@@ -105,12 +106,15 @@ export class SaveActionUseCase implements UseCase {
         dataSets: DataSet[],
         programs: Program[],
         programStages: ProgramStage[],
-        modelMapping: ModelMapping
+        modelMapping: ModelMapping,
+        refTableMapping: string | undefined
     ): XMartFieldDefinition[] {
         const tableDefinition = xMartSyncTableTemplates[modelMapping.dhis2Model];
-        const defaultFields = tableDefinition.fields.map(field => ({
+        const defaultFields = tableDefinition.fields.map((field, index) => ({
             ...field,
             TABLE_CODE: modelMapping.xMARTTable,
+            FK_TABLE_CODE: field.FK_TABLE_CODE ? refTableMapping : undefined,
+            SEQUENCE: index + 1,
         }));
 
         if (modelMapping.valuesAsColumns && modelMapping.metadataId) {
