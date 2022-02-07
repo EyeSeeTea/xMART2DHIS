@@ -15,7 +15,7 @@ export class AzureMSALRepository implements AzureRepository {
             auth: {
                 clientId: this.clientId,
                 authority: `https://login.microsoftonline.com/${this.tenantId}`,
-                redirectUri: window.location.href.split("/#")[0],
+                redirectUri: window.location.href.split("#")[0],
             },
             cache: { cacheLocation: "localStorage" },
         });

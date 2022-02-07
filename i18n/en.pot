@@ -444,6 +444,11 @@ msgid "Executing the action"
 msgstr ""
 
 msgid ""
+"Successfully executed the action. Summary:\n"
+"{{result}}"
+msgstr ""
+
+msgid ""
 "An error has ocurred executing the action.\n"
 "{{error}}"
 msgstr ""
