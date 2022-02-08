@@ -237,6 +237,12 @@ export class SaveActionUseCase implements UseCase {
                     program => (program as Program).programType === "WITH_REGISTRATION"
                 );
 
+                const metadataErrors = [
+                    action.modelMappings.some(mapping => mapping.dhis2Model === "metadata")
+                        ? null
+                        : i18n.t(`Mapping for metadata table is mandatory`),
+                ];
+
                 const dataValuesErrors = !metadata.dataSets
                     ? []
                     : metadata.dataSets
@@ -334,6 +340,7 @@ export class SaveActionUseCase implements UseCase {
                           .flat();
 
                 const validationErrors = [
+                    ...metadataErrors,
                     ...dataValuesErrors,
                     ...eventsErrors,
                     ...eventValuesErrors,
