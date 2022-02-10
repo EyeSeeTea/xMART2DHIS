@@ -271,18 +271,20 @@ const ModelMappingDialog: React.FC<ModelMappingDialogProps> = ({ modelMapping, c
                     />
                 </Container>
 
-                {metadataModel && <Container>
-                    {!loadingMetadata && (
-                        <Dropdown
-                            label={metadataModel.getMetadataType()}
-                            items={metadataItems}
-                            value={modelMappingState.metadataId ?? ""}
-                            onValueChange={handleMetadataItemChange}
-                            hideEmpty={false}
-                        />
-                    )}
-                    {loadingMetadata && <CircularProgress />}
-                </Container>}
+                {metadataModel && (
+                    <Container>
+                        {!loadingMetadata && (
+                            <Dropdown
+                                label={metadataModel.getMetadataType()}
+                                items={metadataItems}
+                                value={modelMappingState.metadataId ?? ""}
+                                onValueChange={handleMetadataItemChange}
+                                hideEmpty={false}
+                            />
+                        )}
+                        {loadingMetadata && <CircularProgress />}
+                    </Container>
+                )}
 
                 <Container>
                     <Toggle

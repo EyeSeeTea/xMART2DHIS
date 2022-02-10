@@ -21,7 +21,7 @@ import { ConnectionsRepository } from "../../repositories/ConnectionsRepository"
 import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { generateXMartFieldCode } from "../../utils";
+import { generateXMartFieldId, generateXMartFieldName } from "../../utils";
 
 export class SaveActionUseCase implements UseCase {
     constructor(
@@ -148,13 +148,20 @@ export class SaveActionUseCase implements UseCase {
         const fields = dataSet.dataSetElements
             .map(dataElementSet =>
                 dataElementSet.dataElement.categoryCombo.categoryOptionCombos.map(coc => {
-                    const dataElementCode = generateXMartFieldCode(dataElementSet.dataElement);
-                    const cocCode = generateXMartFieldCode(coc);
-                    const field = `${dataElementCode}_${cocCode}`;
+                    const fieldCode = [
+                        generateXMartFieldId(dataElementSet.dataElement),
+                        generateXMartFieldId(coc),
+                    ].join("_");
+
+                    const fieldName = [
+                        generateXMartFieldName(dataElementSet.dataElement),
+                        generateXMartFieldName(coc),
+                    ].join(" ");
+
                     return {
                         TABLE_CODE: tableCode,
-                        CODE: field,
-                        TITLE: field,
+                        CODE: fieldCode,
+                        TITLE: fieldName,
                         FIELD_TYPE_CODE: "TEXT_MAX",
                         IS_REQUIRED: 0,
                         IS_PRIMARY_KEY: 0,
@@ -174,12 +181,13 @@ export class SaveActionUseCase implements UseCase {
         if (!programStage) return [];
 
         const fields = programStage.programStageDataElements.map(stageDataElement => {
-            const field = generateXMartFieldCode(stageDataElement.dataElement);
+            const fieldCode = [generateXMartFieldId(stageDataElement.dataElement)].join("_");
+            const fieldName = [generateXMartFieldName(stageDataElement.dataElement)].join(" ");
 
             return {
                 TABLE_CODE: tableCode,
-                CODE: field,
-                TITLE: field,
+                CODE: fieldCode,
+                TITLE: fieldName,
                 FIELD_TYPE_CODE: "TEXT_MAX",
                 IS_REQUIRED: 0,
                 IS_PRIMARY_KEY: 0,
@@ -195,12 +203,13 @@ export class SaveActionUseCase implements UseCase {
 
         const fields = program.programTrackedEntityAttributes
             .map(programAttribute => {
-                const field = generateXMartFieldCode(programAttribute.trackedEntityAttribute);
+                const fieldCode = [generateXMartFieldId(programAttribute.trackedEntityAttribute)].join("_");
+                const fieldName = [generateXMartFieldName(programAttribute.trackedEntityAttribute)].join(" ");
 
                 return {
                     TABLE_CODE: tableCode,
-                    CODE: field,
-                    TITLE: field,
+                    CODE: fieldCode,
+                    TITLE: fieldName,
                     FIELD_TYPE_CODE: "TEXT_MAX",
                     IS_REQUIRED: 0,
                     IS_PRIMARY_KEY: 0,
