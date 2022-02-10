@@ -57,7 +57,16 @@ export const xMARTTempTableCodes = {
 export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     dataValues: {
         table: { CODE: xMARTTempTableCodes.dataValues, TITLE: "Data Values" },
-        optionalFields: ["dataElement", "attributeOptionCombo", "categoryOptionCombo", "value", "created"],
+        optionalFields: [
+            "dataElement",
+            "dataElementName",
+            "attributeOptionCombo",
+            "attributeOptionComboName",
+            "categoryOptionCombo",
+            "categoryOptionComboName",
+            "value",
+            "created",
+        ],
         fields: [
             {
                 TABLE_CODE: xMARTTempTableCodes.dataValues,
@@ -321,7 +330,7 @@ export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     },
     eventValues: {
         table: { CODE: xMARTTempTableCodes.eventValues, TITLE: "Event Values" },
-        optionalFields: ["dataElement", "value", "created"],
+        optionalFields: ["dataElement", "dataElementName", "value", "created"],
         fields: [
             {
                 TABLE_CODE: "",
@@ -414,7 +423,7 @@ export const xMartSyncTableTemplates: Record<Dhis2ModelKey, xMartTable> = {
     },
     teiAttributes: {
         table: { CODE: xMARTTempTableCodes.teiAttributes, TITLE: "TEI Attributes" },
-        optionalFields: ["attribute", "displayName", "value", "created"],
+        optionalFields: ["attribute", "attributeName", "displayName", "value", "created"],
         fields: [
             {
                 TABLE_CODE: "",
