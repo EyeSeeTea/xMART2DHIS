@@ -57,15 +57,15 @@ export class SaveActionUseCase implements UseCase {
                 return Future.joinObj({
                     dataSets: this.extractMetadata(
                         metadata.dataSets?.map(ds => ds.id) || [],
-                        "id,name,code,displayName,dataSetElements[dataElement[id,name,code,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
+                        "id,name,code,displayName,dataSetElements[dataElement[id,name,code,formName,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
                     ).map(m => m.dataSets || []),
                     programs: this.extractMetadata(
                         metadata.programs?.map(p => p.id) || [],
-                        "id,name,code,displayName,programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,displayName]]"
+                        "id,name,code,displayName,programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,formName,displayName]]"
                     ).map(m => m.programs || []),
                     programStages: this.extractMetadata(
                         metadata.programStages?.map(ps => ps.id) || [],
-                        "id,name,code,displayName,programStageDataElements[dataElement[id,name,code,displayName]]"
+                        "id,name,code,displayName,programStageDataElements[dataElement[id,name,code,formName,displayName]]"
                     ).map(m => m.programStages || []),
                 });
             })
