@@ -237,40 +237,40 @@ export class ExecuteActionUseCase {
                 };
             });
 
-            const convertDataAsColumns = () =>
-                dataValuesWithDataSet.reduce((acc: any, dataValue: DataValueTableItem) => {
-                    const existedDataValue = acc.find(
-                        (existed: any) =>
-                            existed.dataSet === dataValue.dataSet &&
-                            existed.period === dataValue.period &&
-                            existed.orgUnit === dataValue.orgUnit
-                    );
+            const dataAsColumns = dataValuesWithDataSet.reduce((acc: any, dataValue: DataValueTableItem) => {
+                const existedDataValue = acc.find(
+                    (existed: any) =>
+                        existed.dataSet === dataValue.dataSet &&
+                        existed.period === dataValue.period &&
+                        existed.orgUnit === dataValue.orgUnit
+                );
 
-                    const createColumn = (dataValue: DataValueTableItem) => ({
-                        [applyXMartCodeRules(`${dataValue.dataElement}_${dataValue.categoryOptionCombo}`)]:
-                            dataValue.value,
-                    });
+                const createColumn = (dataValue: DataValueTableItem) => ({
+                    [applyXMartCodeRules(`${dataValue.dataElement}_${dataValue.categoryOptionCombo}`)]: dataValue.value,
+                });
 
-                    return existedDataValue
-                        ? acc.map((dv: any) =>
-                              dv.dataSet === existedDataValue.dataSet &&
-                              dv.period === existedDataValue.period &&
-                              dv.orgUnit === existedDataValue.orgUnit
-                                  ? { ...dv, ...createColumn(dataValue) }
-                                  : dv
-                          )
-                        : [
-                              ...acc,
-                              {
-                                  dataSet: dataValue.dataSet,
-                                  period: dataValue.period,
-                                  orgUnit: dataValue.orgUnit,
-                                  ...createColumn(dataValue),
-                              },
-                          ];
-                }, []);
+                return existedDataValue
+                    ? acc.map((dv: any) =>
+                          dv.dataSet === existedDataValue.dataSet &&
+                          dv.period === existedDataValue.period &&
+                          dv.orgUnit === existedDataValue.orgUnit
+                              ? { ...dv, ...createColumn(dataValue) }
+                              : dv
+                      )
+                    : [
+                          ...acc,
+                          {
+                              dataSet: dataValue.dataSet,
+                              dataSetName: metadata.get(dataValue.dataSet)?.name ?? "",
+                              period: dataValue.period,
+                              orgUnit: dataValue.orgUnit,
+                              orgUnitName: metadata.get(dataValue.orgUnit ?? "")?.name ?? "",
+                              ...createColumn(dataValue),
+                          },
+                      ];
+            }, []);
 
-            const data = !mapping.valuesAsColumns ? dataValuesWithDataSet : convertDataAsColumns();
+            const data = !mapping.valuesAsColumns ? dataValuesWithDataSet : dataAsColumns;
 
             return this.AddOrEditNewDataByTable(mapping, acc, data);
         }, []);
