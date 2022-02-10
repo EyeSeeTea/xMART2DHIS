@@ -50,7 +50,7 @@ export function generateXMartFieldId(object: IdentifiableObject) {
 }
 
 export function generateXMartFieldName(object: IdentifiableObject) {
-    return applyXMartCodeRules(object.formName ?? object.shortName ?? object.name);
+    return object.formName ?? object.shortName ?? object.name;
 }
 
 export function applyXMartCodeRules(value: string) {
