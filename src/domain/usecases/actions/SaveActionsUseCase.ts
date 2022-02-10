@@ -156,7 +156,7 @@ export class SaveActionUseCase implements UseCase {
                     const fieldName = [
                         generateXMartFieldName(dataElementSet.dataElement),
                         generateXMartFieldName(coc),
-                    ].join(" ");
+                    ].join(" - ");
 
                     return {
                         TABLE_CODE: tableCode,
@@ -182,7 +182,7 @@ export class SaveActionUseCase implements UseCase {
 
         const fields = programStage.programStageDataElements.map(stageDataElement => {
             const fieldCode = [generateXMartFieldId(stageDataElement.dataElement)].join("_");
-            const fieldName = [generateXMartFieldName(stageDataElement.dataElement)].join(" ");
+            const fieldName = [generateXMartFieldName(stageDataElement.dataElement)].join(" - ");
 
             return {
                 TABLE_CODE: tableCode,
@@ -204,7 +204,7 @@ export class SaveActionUseCase implements UseCase {
         const fields = program.programTrackedEntityAttributes
             .map(programAttribute => {
                 const fieldCode = [generateXMartFieldId(programAttribute.trackedEntityAttribute)].join("_");
-                const fieldName = [generateXMartFieldName(programAttribute.trackedEntityAttribute)].join(" ");
+                const fieldName = [generateXMartFieldName(programAttribute.trackedEntityAttribute)].join(" - ");
 
                 return {
                     TABLE_CODE: tableCode,
