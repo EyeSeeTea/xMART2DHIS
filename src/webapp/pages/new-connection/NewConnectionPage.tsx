@@ -25,7 +25,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     const navigate = useNavigate();
 
     const { id } = useParams();
-    const location = useLocation();
+    const location = useLocation() as { state?: { connection: DataMart } };
     const isEdit = action === "edit" && id ? true : false;
 
     const goHome = useCallback(() => navigate("/connections"), [navigate]);
@@ -49,9 +49,9 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     });
 
     useEffect(() => {
-        const { connection } = location.state as { connection: DataMart };
+        const { connection } = location.state ?? {};
 
-        if (!isDataMart(connection)) {
+        if (connection && !isDataMart(connection)) {
             throw new Error("Invalid connection");
         } else if (connection) {
             setInitialConnection(connection);
