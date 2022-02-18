@@ -31,7 +31,7 @@ export abstract class D2Model {
     protected static isGlobalMapping = false;
     protected static isSelectable = true;
 
-    public static getApiModel(api: D2Api): InstanceType<typeof Model> {
+    public static getApiModel(api: D2Api) {
         const modelCollection = api.models as {
             [ModelKey in keyof D2ApiDefinition["schemas"]]: Model<
                 D2ApiDefinition,
