@@ -21,7 +21,7 @@ import { ConnectionsRepository } from "../../repositories/ConnectionsRepository"
 import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
-import { generateXMartFieldCode } from "../../utils";
+import { generateXMartFieldId, generateXMartFieldName } from "../../utils";
 
 export class SaveActionUseCase implements UseCase {
     constructor(
@@ -57,15 +57,15 @@ export class SaveActionUseCase implements UseCase {
                 return Future.joinObj({
                     dataSets: this.extractMetadata(
                         metadata.dataSets?.map(ds => ds.id) || [],
-                        "id,name,code,displayName,dataSetElements[dataElement[id,name,code,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
+                        "id,name,code,displayName,dataSetElements[dataElement[id,name,code,formName,displayName,categoryCombo[categoryOptionCombos[id,name,code,displayName]]]"
                     ).map(m => m.dataSets || []),
                     programs: this.extractMetadata(
                         metadata.programs?.map(p => p.id) || [],
-                        "id,name,code,displayName,programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,displayName]]"
+                        "id,name,code,displayName,programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,formName,displayName]]"
                     ).map(m => m.programs || []),
                     programStages: this.extractMetadata(
                         metadata.programStages?.map(ps => ps.id) || [],
-                        "id,name,code,displayName,programStageDataElements[dataElement[id,name,code,displayName]]"
+                        "id,name,code,displayName,programStageDataElements[dataElement[id,name,code,formName,displayName]]"
                     ).map(m => m.programStages || []),
                 });
             })
@@ -83,8 +83,10 @@ export class SaveActionUseCase implements UseCase {
                         dataSets as DataSet[],
                         programs as Program[],
                         programStages as ProgramStage[],
-                        modelMapping
+                        modelMapping,
+                        action.modelMappings.find(m => m.dhis2Model === "metadata")?.xMARTTable
                     );
+
                     return {
                         tables: [...acc.tables, newTableDefinition],
                         fields: [...acc.fields, ...newfieldsDefinition],
@@ -104,12 +106,15 @@ export class SaveActionUseCase implements UseCase {
         dataSets: DataSet[],
         programs: Program[],
         programStages: ProgramStage[],
-        modelMapping: ModelMapping
+        modelMapping: ModelMapping,
+        refTableMapping: string | undefined
     ): XMartFieldDefinition[] {
         const tableDefinition = xMartSyncTableTemplates[modelMapping.dhis2Model];
-        const defaultFields = tableDefinition.fields.map(field => ({
+        const defaultFields = tableDefinition.fields.map((field, index) => ({
             ...field,
             TABLE_CODE: modelMapping.xMARTTable,
+            FK_TABLE_CODE: field.FK_TABLE_CODE ? refTableMapping : undefined,
+            SEQUENCE: index + 1,
         }));
 
         if (modelMapping.valuesAsColumns && modelMapping.metadataId) {
@@ -143,13 +148,20 @@ export class SaveActionUseCase implements UseCase {
         const fields = dataSet.dataSetElements
             .map(dataElementSet =>
                 dataElementSet.dataElement.categoryCombo.categoryOptionCombos.map(coc => {
-                    const dataElementCode = generateXMartFieldCode(dataElementSet.dataElement);
-                    const cocCode = generateXMartFieldCode(coc);
-                    const field = `${dataElementCode}_${cocCode}`;
+                    const fieldCode = [
+                        generateXMartFieldId(dataElementSet.dataElement),
+                        generateXMartFieldId(coc),
+                    ].join("_");
+
+                    const fieldName = [
+                        generateXMartFieldName(dataElementSet.dataElement),
+                        generateXMartFieldName(coc),
+                    ].join(" - ");
+
                     return {
                         TABLE_CODE: tableCode,
-                        CODE: field,
-                        TITLE: field,
+                        CODE: fieldCode,
+                        TITLE: fieldName,
                         FIELD_TYPE_CODE: "TEXT_MAX",
                         IS_REQUIRED: 0,
                         IS_PRIMARY_KEY: 0,
@@ -169,12 +181,13 @@ export class SaveActionUseCase implements UseCase {
         if (!programStage) return [];
 
         const fields = programStage.programStageDataElements.map(stageDataElement => {
-            const field = generateXMartFieldCode(stageDataElement.dataElement);
+            const fieldCode = [generateXMartFieldId(stageDataElement.dataElement)].join("_");
+            const fieldName = [generateXMartFieldName(stageDataElement.dataElement)].join(" - ");
 
             return {
                 TABLE_CODE: tableCode,
-                CODE: field,
-                TITLE: field,
+                CODE: fieldCode,
+                TITLE: fieldName,
                 FIELD_TYPE_CODE: "TEXT_MAX",
                 IS_REQUIRED: 0,
                 IS_PRIMARY_KEY: 0,
@@ -190,12 +203,13 @@ export class SaveActionUseCase implements UseCase {
 
         const fields = program.programTrackedEntityAttributes
             .map(programAttribute => {
-                const field = generateXMartFieldCode(programAttribute.trackedEntityAttribute);
+                const fieldCode = [generateXMartFieldId(programAttribute.trackedEntityAttribute)].join("_");
+                const fieldName = [generateXMartFieldName(programAttribute.trackedEntityAttribute)].join(" - ");
 
                 return {
                     TABLE_CODE: tableCode,
-                    CODE: field,
-                    TITLE: field,
+                    CODE: fieldCode,
+                    TITLE: fieldName,
                     FIELD_TYPE_CODE: "TEXT_MAX",
                     IS_REQUIRED: 0,
                     IS_PRIMARY_KEY: 0,
@@ -231,6 +245,12 @@ export class SaveActionUseCase implements UseCase {
                 const trackerPrograms = metadata.programs?.filter(
                     program => (program as Program).programType === "WITH_REGISTRATION"
                 );
+
+                const metadataErrors = [
+                    action.modelMappings.some(mapping => mapping.dhis2Model === "metadata")
+                        ? null
+                        : i18n.t(`Mapping for metadata table is mandatory`),
+                ];
 
                 const dataValuesErrors = !metadata.dataSets
                     ? []
@@ -329,6 +349,7 @@ export class SaveActionUseCase implements UseCase {
                           .flat();
 
                 const validationErrors = [
+                    ...metadataErrors,
                     ...dataValuesErrors,
                     ...eventsErrors,
                     ...eventValuesErrors,

@@ -53,4 +53,8 @@ export interface IdentifiableObject {
     name: string;
     code?: string;
     displayName?: string;
+    description?: string;
+    created?: string;
+    formName?: string;
+    shortName?: string;
 }

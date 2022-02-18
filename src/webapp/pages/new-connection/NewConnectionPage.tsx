@@ -8,7 +8,7 @@ import { Form } from "react-final-form";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Future } from "../../../domain/entities/Future";
-import { DataMart } from "../../../domain/entities/xmart/DataMart";
+import { DataMart, isDataMart } from "../../../domain/entities/xmart/DataMart";
 import i18n from "../../../locales";
 import { generateUid } from "../../../utils/uid";
 import {
@@ -25,7 +25,7 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     const navigate = useNavigate();
 
     const { id } = useParams();
-    const location = useLocation();
+    const location = useLocation() as { state?: { connection: DataMart } };
     const isEdit = action === "edit" && id ? true : false;
 
     const goHome = useCallback(() => navigate("/connections"), [navigate]);
@@ -49,8 +49,12 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
     });
 
     useEffect(() => {
-        if (location.state?.connection) {
-            setInitialConnection(location.state?.connection);
+        const { connection } = location.state ?? {};
+
+        if (connection && !isDataMart(connection)) {
+            throw new Error("Invalid connection");
+        } else if (connection) {
+            setInitialConnection(connection);
         } else if (isEdit && id) {
             compositionRoot.connection.getById(id).run(
                 result => setInitialConnection(result),
