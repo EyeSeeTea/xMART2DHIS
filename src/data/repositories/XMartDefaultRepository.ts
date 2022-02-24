@@ -104,6 +104,7 @@ export class XMartDefaultRepository implements XMartRepository {
         params: Record<string, string | number | boolean>
     ): FutureData<number> {
         const { martCode, environment } = mart;
+
         const startParams = queryString.stringify({
             martCode,
             originCode: pipeline,

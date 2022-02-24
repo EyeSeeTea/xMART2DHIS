@@ -77,7 +77,9 @@ export class EventsD2ApiRepository implements EventsRepository {
                     page,
                     orgUnit,
                     startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
-                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
+                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,   
+                    // @ts-ignore FIXME: Add property in d2-api
+                    fields: ":all",
                 })
             );
         };
@@ -124,7 +126,9 @@ export class EventsD2ApiRepository implements EventsRepository {
                     program,
                     orgUnit,
                     startDate: period !== "ALL" ? start.format("YYYY-MM-DD") : undefined,
-                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,
+                    endDate: period !== "ALL" ? end.format("YYYY-MM-DD") : undefined,   
+                    // @ts-ignore FIXME: Add property in d2-api
+                    fields: ":all",
                 })
             );
         };
