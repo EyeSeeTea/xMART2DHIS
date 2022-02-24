@@ -10,7 +10,7 @@ export interface XMartRepository {
     runPipeline(
         mart: DataMart,
         pipeline: string,
-        params: Record<string, string | number | boolean>
+        params: Record<string, string | number | boolean | FormData>
     ): FutureData<number>;
 }
 

@@ -95,9 +95,11 @@ export class SaveActionUseCase implements UseCase {
 
                 const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
 
+                const formData = new FormData()
+                formData.append('file', tableFileInfo.data);
                 return this.fileRepository
                     .uploadFileAsExternal(tableFileInfo)
-                    .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { url }))
+                    .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { formData, url }))
                     .map(() => undefined);
             });
     }

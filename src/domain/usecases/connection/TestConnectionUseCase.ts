@@ -32,12 +32,13 @@ export class TestConnectionUseCase implements UseCase {
 
         const value = JSON.stringify(pipelines);
         const data = new Blob([value], { type: "application/json" });
-
+        const formData = new FormData()
+        formData.append('file', data);
         return this.fileRepository
             .uploadFileAsExternal({ name: "xMART2DHIS Test Connection", data })
             .flatMap(({ url, id }) =>
                 Future.joinObj({
-                    result: this.xMartRepository.runPipeline(connection, "LOAD_PIPELINE", { url }),
+                    result: this.xMartRepository.runPipeline(connection, "LOAD_PIPELINE", { formData, url }),
                     id: Future.success(id),
                 })
             )

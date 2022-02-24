@@ -472,10 +472,12 @@ export class ExecuteActionUseCase {
 
         const fileInfo = this.generateFileInfo(data, key);
 
+        const formData = new FormData()
+        formData.append('file', fileInfo.data);
         return this.fileRepository
             .uploadFileAsExternal(fileInfo)
             .flatMap(({ url }) => {
-                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", { url, table: tableCode });
+                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", { formData, table: tableCode, url });
             })
             .flatMap(() => Future.success(i18n.t(`${tableCode} {{count}} rows`, { count: data.length })));
     }
