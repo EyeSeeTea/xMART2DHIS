@@ -2,17 +2,24 @@
 # yarn lockfile v1
 
 
-"@azure/msal-browser@2.21.0":
-  version "2.21.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-2.21.0.tgz#2ebe4b0874a61d64009419d4cfef1f6bb5e226b3"
-  integrity sha512-y+oAUJJ0m7gRUT505iGT4SDXktrRzOE3HZC0+nQyHDI+3O7BKK5NjQUwD/4V8FNNyrhxEtLk99iwJEo61epinQ==
+"@azure/msal-browser@^2.22.0":
+  version "2.22.0"
+  resolved "https://registry.npmjs.org/@azure/msal-browser/-/msal-browser-2.22.0.tgz#acb3ef455d8ca7b143c7fde0a638097add11a218"
+  integrity sha512-ZpnbnzjYGRGHjWDPOLjSp47CQvhK927+W9avtLoNNCMudqs2dBfwj76lnJwObDE7TAKmCUueTiieglBiPb1mgQ==
   dependencies:
-    "@azure/msal-common" "^6.0.0"
+    "@azure/msal-common" "^6.1.0"
 
 "@azure/msal-common@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-6.0.0.tgz#9a60c27967ae6f6678015eb6dfb0ea7cc999eb3b"
   integrity sha512-Vva3snqmWPHJNDCBb4lz3D0rvZsi/0QikAxHvVFNwtNg5pP4NZE4U34tNiXN+m9KhlQFrZBPkE5rk7dIEOGcWw==
+  dependencies:
+    debug "^4.1.1"
+
+"@azure/msal-common@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.npmjs.org/@azure/msal-common/-/msal-common-6.1.0.tgz#00b0c625d10f4c8e48e7b48a353f7d8d20a5ceca"
+  integrity sha512-IGjAHttOgKDPQr0Qxx1NjABR635ZNuN7LHjxI0Y7SEA2thcaRGTccy+oaXTFabM/rZLt4F2VrPKUX4BnR9hW9g==
   dependencies:
     debug "^4.1.1"
 
@@ -8274,6 +8281,11 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
+filter-obj@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/filter-obj/-/filter-obj-1.1.0.tgz#9b311112bc6c6127a16e016c6c5d7f19e0805c5b"
+  integrity sha1-mzERErxsYSehbgFsbF1/GeCAXFs=
+
 final-form@^4.20.2:
   version "4.20.6"
   resolved "https://registry.yarnpkg.com/final-form/-/final-form-4.20.6.tgz#da42f3741db068c0c875e18950a2c4a9a148c63e"
@@ -13644,6 +13656,16 @@ query-string@^4.1.0:
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
 
+query-string@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.npmjs.org/query-string/-/query-string-7.1.1.tgz#754620669db978625a90f635f12617c271a088e1"
+  integrity sha512-MplouLRDHBZSG9z7fpuAAcI7aAYjDLhtsiVZsevsfaHWDS2IDdORKbSd1kWUA+V4zyva/HZoSfpwnYMMQDhb0w==
+  dependencies:
+    decode-uri-component "^0.2.0"
+    filter-obj "^1.1.0"
+    split-on-first "^1.0.0"
+    strict-uri-encode "^2.0.0"
+
 querystring-es3@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring-es3/-/querystring-es3-0.2.1.tgz#9ec61f79049875707d69414596fd907a4d711e73"
@@ -15089,6 +15111,11 @@ spdy@^4.0.2:
     select-hose "^2.0.0"
     spdy-transport "^3.0.0"
 
+split-on-first@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/split-on-first/-/split-on-first-1.1.0.tgz#f610afeee3b12bce1d0c30425e76398b78249a5f"
+  integrity sha512-43ZssAJaMusuKWL8sKUBQXHWOpq8d6CfN/u1p4gUzfJkM05C8rxTmYrkIPTXapZpORA6LkkzcUulJ8FqA7Uudw==
+
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/split-string/-/split-string-3.1.0.tgz#7cb09dda3a86585705c64b39a6466038682e8fe2"
@@ -15212,6 +15239,11 @@ strict-uri-encode@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/strict-uri-encode/-/strict-uri-encode-1.1.0.tgz#279b225df1d582b1f54e65addd4352e18faa0713"
   integrity sha1-J5siXfHVgrH1TmWt3UNS4Y+qBxM=
+
+strict-uri-encode@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/strict-uri-encode/-/strict-uri-encode-2.0.0.tgz#b9c7330c7042862f6b142dc274bbcc5866ce3546"
+  integrity sha1-ucczDHBChi9rFC3CdLvMWGbONUY=
 
 string-length@^4.0.1:
   version "4.0.2"

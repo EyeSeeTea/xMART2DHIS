@@ -1,5 +1,6 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
+import queryString from "query-string";
 import { Future, FutureData } from "../../domain/entities/Future";
 import {
     DataMart,
@@ -103,27 +104,21 @@ export class XMartDefaultRepository implements XMartRepository {
         params: Record<string, string | number | boolean>
     ): FutureData<number> {
         const { martCode, environment } = mart;
-        const body = JSON.stringify(
-            {
-                martCode,
-                originCode: pipeline,
-                inputValues: params,
-                comment: `[xMART2DHIS] Automated run of ${pipeline} in ${martCode}`,
-            },
-            null,
-            4
-        );
+        const startParams = queryString.stringify({
+            martCode,
+            originCode: pipeline,
+            comment: `[xMART2DHIS] Automated run of ${pipeline} in ${martCode}`,
+            ...params,
+        });
 
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(environment),
             token: this.getAPIToken(environment),
         })
-            .flatMap(({ endpoint, token }) =>
-                futureFetch<XMartAPIBatchStartResponse>("post", joinUrl(endpoint, `/origin/start`), {
-                    body,
-                    bearer: token,
-                })
-            )
+            .flatMap(({ endpoint, token }) => {
+                const url = joinUrl(endpoint, `/origin/start`) + "?" + startParams;
+                return futureFetch<XMartAPIBatchStartResponse>("post", url, { bearer: token });
+            })
             .flatMap(response => {
                 const { BatchID, ErrorMessage } = response;
 
