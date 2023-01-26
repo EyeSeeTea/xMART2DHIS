@@ -21,7 +21,7 @@ export class FileD2ApiRepository implements FileRepository {
                     sharing: apiToFuture(
                         this.api.sharing.post(
                             { id, type: "document" },
-                            { publicAccess: "--------", externalAccess: true }
+                            { publicAccess: "rw------", externalAccess: true }
                         )
                     ),
                 });
