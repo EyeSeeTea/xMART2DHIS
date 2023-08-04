@@ -19,7 +19,7 @@ export interface DataDimensionItem {
 
 export type MetadataItem = Ref & { [key: string]: any | undefined };
 
-export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject;
+export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject | DataElement;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
@@ -30,6 +30,8 @@ export type MetadataEntities = {
     dataElements: IdentifiableObject[];
     trackedEntityAttributes: IdentifiableObject[];
     programStages: IdentifiableObject[];
+    optionSets: OptionSet[];
+    options: IdentifiableObject[];
 };
 
 export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEntity[]>>;
@@ -43,4 +45,12 @@ export interface IdentifiableObject {
     created?: string;
     formName?: string;
     shortName?: string;
+}
+
+export interface DataElement extends IdentifiableObject {
+    optionSet: OptionSet;
+}
+
+export interface OptionSet extends IdentifiableObject {
+    options: IdentifiableObject[];
 }
