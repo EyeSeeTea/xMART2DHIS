@@ -1,4 +1,3 @@
-import { Ref } from "@eyeseetea/d2-api";
 import { IdentifiableObject } from "./Metadata";
 import { Id } from "./Ref";
 
