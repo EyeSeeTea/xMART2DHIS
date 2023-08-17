@@ -166,7 +166,7 @@ export class ExecuteActionUseCase {
             .flatMap(metadataInData => {
                 const { dataElements } = metadataInData;
 
-                const optionSets = dataElements?.map(de => (de as DataElement).optionSet);
+                const optionSets = _.compact(dataElements?.map(de => (de as DataElement).optionSet));
 
                 const optionSetIds = optionSets?.map(optionSet => optionSet.id) || [];
                 const optionids = optionSets?.map(optionSet => optionSet.options.map(o => o.id)).flat() || [];
