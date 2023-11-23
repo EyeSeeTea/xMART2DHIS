@@ -5,12 +5,6 @@ import { Id, Ref } from "./Ref";
 
 export type MetadataModel = keyof MetadataEntities;
 
-export const displayName: Record<string, string> = {
-    categoryOptionCombos: "Category option combo",
-    categoryOptions: "Category Options",
-    optionSets: "Option Sets",
-    organisationUnits: "Organisation Units",
-};
 export type MetadataPayload = Record<string, MetadataItem[]>;
 
 export interface Visualization extends MetadataItem {
@@ -25,15 +19,7 @@ export interface DataDimensionItem {
 
 export type MetadataItem = Ref & { [key: string]: any | undefined };
 
-export function isValidModel(model: string): model is MetadataModel {
-    return ["categoryOptions", "categoryOptionCombos", "organisationUnits", "optionSets"].includes(model);
-}
-
-export function isValidMetadataItem(item: any): item is MetadataItem {
-    return item.id;
-}
-
-export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject;
+export type MetadataEntity = OrganisationUnit | Program | DataSet | IdentifiableObject | DataElement;
 
 export type MetadataEntities = {
     organisationUnits: OrganisationUnit[];
@@ -44,6 +30,8 @@ export type MetadataEntities = {
     dataElements: IdentifiableObject[];
     trackedEntityAttributes: IdentifiableObject[];
     programStages: IdentifiableObject[];
+    optionSets: OptionSet[];
+    options: IdentifiableObject[];
 };
 
 export type MetadataPackage = Partial<Record<keyof MetadataEntities, MetadataEntity[]>>;
@@ -57,4 +45,12 @@ export interface IdentifiableObject {
     created?: string;
     formName?: string;
     shortName?: string;
+}
+
+export interface DataElement extends IdentifiableObject {
+    optionSet: OptionSet;
+}
+
+export interface OptionSet extends IdentifiableObject {
+    options: IdentifiableObject[];
 }
