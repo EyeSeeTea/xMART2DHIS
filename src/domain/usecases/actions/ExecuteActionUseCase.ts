@@ -8,7 +8,7 @@ import { ProgramEvent, ProgramEventDataValue } from "../../entities/data/Program
 import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance";
 import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
-import { MetadataPackage } from "../../entities/metadata/Metadata";
+import { DataElement, MetadataPackage } from "../../entities/metadata/Metadata";
 import { TrakedEntityAttribute } from "../../entities/metadata/TrackedEntityAttribute";
 import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
@@ -49,6 +49,8 @@ interface DataValueTableItem {
     comment?: string;
     value: string;
 }
+
+const defaultExtractMetadataFields = "id,name,type,code,shortName,formName,created,description";
 
 export class ExecuteActionUseCase {
     constructor(
@@ -160,21 +162,38 @@ export class ExecuteActionUseCase {
 
         const ids = _.uniq([...idsTEIs, ...idsInDataValues, ...idsInEvents]);
 
-        return this.extractMetadata(ids).map(metadataInData => ({
-            events,
-            teis,
-            dataValuesSets,
-            metadata: new Map([...this.getMetadataPairs(metadataInAction), ...this.getMetadataPairs(metadataInData)]),
-        }));
+        return this.extractMetadata(ids, `${defaultExtractMetadataFields},optionSet[id,options]`)
+            .flatMap(metadataInData => {
+                const { dataElements } = metadataInData;
+
+                const optionSets = _.compact(dataElements?.map(de => (de as DataElement).optionSet));
+
+                const optionSetIds = optionSets?.map(optionSet => optionSet.id) || [];
+                const optionids = optionSets?.map(optionSet => optionSet.options.map(o => o.id)).flat() || [];
+
+                const ids = [...optionSetIds, ...optionids];
+
+                return ids.length === 0
+                    ? Future.success(metadataInData)
+                    : this.extractMetadata(ids).map(optionSetsAndOptions => ({
+                          ...metadataInData,
+                          ...optionSetsAndOptions,
+                      }));
+            })
+            .map(metadataInData => ({
+                events,
+                teis,
+                dataValuesSets,
+                metadata: new Map([
+                    ...this.getMetadataPairs(metadataInAction),
+                    ...this.getMetadataPairs(metadataInData),
+                ]),
+            }));
     }
 
     @cache()
-    private extractMetadata(ids: string[]): FutureData<MetadataPackage> {
-        return this.metadataRepository.getMetadataByIds(
-            ids,
-            "id,name,type,code,shortName,formName,created,description",
-            true
-        );
+    private extractMetadata(ids: string[], fields?: string): FutureData<MetadataPackage> {
+        return this.metadataRepository.getMetadataByIds(ids, fields || defaultExtractMetadataFields, true);
     }
 
     private sendData(
