@@ -222,6 +222,12 @@ msgstr "Añadir"
 msgid "List"
 msgstr "Listar"
 
+msgid "Custom code"
+msgstr ""
+
+msgid "Custom Code"
+msgstr ""
+
 msgid "<No value>"
 msgstr ""
 
@@ -390,6 +396,9 @@ msgid "Create pipeline"
 msgstr ""
 
 msgid "Configure pipeline"
+msgstr ""
+
+msgid "Custom Action"
 msgstr ""
 
 msgid "Actions"
