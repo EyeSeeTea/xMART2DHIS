@@ -393,7 +393,7 @@ msgid "Configure pipeline"
 msgstr ""
 
 msgid "Actions"
-msgstr ""
+msgstr "Comportamiento"
 
 msgid "New connection"
 msgstr ""
