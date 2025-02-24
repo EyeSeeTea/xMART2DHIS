@@ -17,7 +17,7 @@ import { Router } from "../Router";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
-import {Feedback} from "@eyeseetea/feedback-component";
+import { Feedback } from "@eyeseetea/feedback-component";
 
 const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     const { baseUrl } = useConfig();
