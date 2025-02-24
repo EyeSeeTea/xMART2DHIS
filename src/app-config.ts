@@ -1,4 +1,4 @@
-import { AppConfig } from "./webapp/pages/app/AppConfig";
+import {FeedbackOptions} from "@eyeseetea/feedback-component";
 
 export const appConfig: AppConfig = {
     appKey: "xMART2DHIS",
@@ -21,3 +21,11 @@ export const appConfig: AppConfig = {
         },
     },
 };
+
+type AppConfig = {
+    appKey: string;
+    appearance: {
+        showShareButton: boolean;
+    };
+    feedback: FeedbackOptions;
+}
