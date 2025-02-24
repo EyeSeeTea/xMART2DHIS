@@ -22,7 +22,6 @@ import { Feedback } from "@eyeseetea/feedback-component";
 const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
     const { baseUrl } = useConfig();
     const [showShareButton, setShowShareButton] = useState(false);
-    const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(true);
     const [appContext, setAppContext] = useState<AppContextState | null>(null);
 
@@ -39,7 +38,6 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
             setShowShareButton(isShareButtonVisible);
-            setUsername(currentUser.username);
             setLoading(false);
         }
         setup();
@@ -62,7 +60,9 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
                             </div>
 
                             <Share visible={showShareButton} />
-                            <Feedback options={appConfig.feedback} username={username} />
+                            {appContext && (
+                                <Feedback options={appConfig.feedback} username={appContext.currentUser.username} />
+                            )}
                         </LoadingProvider>
                     </SnackbarProvider>
                 </OldMuiThemeProvider>
