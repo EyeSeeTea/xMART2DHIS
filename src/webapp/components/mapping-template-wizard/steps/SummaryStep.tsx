@@ -3,7 +3,7 @@ import { Button, makeStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { MappingTemplate } from "../../../../domain/entities/mapping-template/MappingTemplate";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { useAppContext } from "../../../contexts/app-context";
 import { MappingTemplateWizardStepProps } from "../MappingTemplateWizard";
 

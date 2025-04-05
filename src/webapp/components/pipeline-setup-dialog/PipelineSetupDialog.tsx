@@ -2,7 +2,7 @@ import { ConfirmationDialog, Wizard } from "@eyeseetea/d2-ui-components";
 import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { PipelineWizardSteps } from "./steps";
 
 export interface PipelineSetupDialogProps {

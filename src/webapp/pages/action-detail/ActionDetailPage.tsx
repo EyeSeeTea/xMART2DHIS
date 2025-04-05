@@ -2,7 +2,7 @@ import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import ActionWizard from "../../components/action-wizard/ActionWizard";
 import { useAppContext } from "../../contexts/app-context";
 

@@ -5,7 +5,7 @@ import { ProgramEvent } from "../../domain/entities/data/ProgramEvent";
 import { SyncResult } from "../../domain/entities/data/SyncResult";
 import { EventsRepository, GetEventsFilters, SaveEventsParams } from "../../domain/repositories/EventsRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
