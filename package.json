@@ -20,7 +20,7 @@
         "@dhis2/ui": "7.15.1",
         "@eyeseetea/d2-api": "1.11.0",
         "@eyeseetea/d2-ui-components": "2.6.11",
-        "@eyeseetea/feedback-component": "0.1.2",
+        "@eyeseetea/feedback-component": "0.1.3-beta.3",
         "@material-ui/core": "4.12.3",
         "@material-ui/icons": "4.11.2",
         "@material-ui/lab": "4.0.0-alpha.60",
