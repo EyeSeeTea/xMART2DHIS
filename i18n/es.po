@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2022-02-08T07:04:47.001Z\n"
+"POT-Creation-Date: 2025-04-07T11:54:54.589Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,9 +33,6 @@ msgid "Field {{field}} cannot be blank"
 msgstr ""
 
 msgid "You need to select at least one {{field}}"
-msgstr ""
-
-msgid "Field {{field}} needs to be a valid url"
 msgstr ""
 
 msgid "Field {{field}} is not valid"
