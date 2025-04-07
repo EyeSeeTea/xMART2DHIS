@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { cache } from "../../../utils/cache";
 import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";

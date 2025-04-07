@@ -1,5 +1,5 @@
 import { WizardStep } from "@eyeseetea/d2-ui-components";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
 import { Step1 } from "./Step1";
 import { Step2 } from "./Step2";

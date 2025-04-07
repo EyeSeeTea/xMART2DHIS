@@ -6,7 +6,7 @@ import {
     InputFieldFF,
     SingleSelectFieldFF,
 } from "@dhis2/ui";
-import i18n from "@eyeseetea/d2-ui-components/locales";
+import i18n from "../../../utils/i18n";
 import _ from "lodash";
 import React from "react";
 import { DataMart, DataMartEnvironment } from "../../../domain/entities/xmart/DataMart";

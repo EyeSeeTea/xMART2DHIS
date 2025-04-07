@@ -16,7 +16,7 @@ import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 import { useCallback } from "react";
 import ReactJson from "react-json-view";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { SyncResult, SyncStats } from "../../../domain/entities/data/SyncResult";
 
 const useStyles = makeStyles(theme => ({

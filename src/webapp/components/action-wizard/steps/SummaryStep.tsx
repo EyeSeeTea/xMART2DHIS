@@ -8,7 +8,7 @@ import { availablePeriods } from "../../../../domain/entities/metadata/DataSyncP
 import { MetadataEntities, MetadataPackage } from "../../../../domain/entities/metadata/Metadata";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import { cleanOrgUnitPaths } from "../../../../domain/utils";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { useAppContext } from "../../../contexts/app-context";
 import { ActionWizardStepProps } from "../ActionWizard";
 

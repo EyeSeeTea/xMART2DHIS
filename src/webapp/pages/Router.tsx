@@ -1,7 +1,7 @@
 import React from "react";
 import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 import { AzureBadge } from "../components/azure-badge/AzureBadge";
 import { PageHeader } from "../components/page-header/PageHeader";
 import { ActionDetailPage } from "./action-detail/ActionDetailPage";
