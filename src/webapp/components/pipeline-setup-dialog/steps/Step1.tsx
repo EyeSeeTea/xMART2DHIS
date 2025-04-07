@@ -1,6 +1,6 @@
 import React from "react";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import step1Image from "../assets/step1.png";
 import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
 

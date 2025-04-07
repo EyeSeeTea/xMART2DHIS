@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 

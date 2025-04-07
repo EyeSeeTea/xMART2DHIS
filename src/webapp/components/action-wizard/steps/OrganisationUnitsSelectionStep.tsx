@@ -4,7 +4,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { useAppContext } from "../../../contexts/app-context";
 import { ActionWizardStepProps } from "../ActionWizard";
 

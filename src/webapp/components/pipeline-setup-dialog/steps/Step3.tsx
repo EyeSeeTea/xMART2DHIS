@@ -2,7 +2,7 @@ import React from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
 import { LoadPipeline } from "../../../../data/utils/pipelines/LoadPipeline";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
 
 export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (

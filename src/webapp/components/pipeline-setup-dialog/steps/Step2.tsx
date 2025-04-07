@@ -1,6 +1,6 @@
 import step2Image from "../assets/step2.gif";
 import React from "react";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
 
 export const Step2: React.FC<PipelineSetupDialogProps> = () => (

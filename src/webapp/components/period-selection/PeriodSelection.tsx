@@ -7,7 +7,7 @@ import React, { useCallback, useMemo } from "react";
 import Dropdown from "../dropdown/Dropdown";
 import { Maybe } from "../../../types/utils";
 import { availablePeriods, DataSyncPeriod, PeriodType } from "../../../domain/entities/metadata/DataSyncPeriod";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 
 export interface ObjectWithPeriodInput {
     period: DataSyncPeriod;

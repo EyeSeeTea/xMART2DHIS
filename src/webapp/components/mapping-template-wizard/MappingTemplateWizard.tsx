@@ -4,7 +4,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { GeneralInfoStep } from "./steps/GeneralInfoStep";
 import MappingSelectionStep from "./steps/MappingSelectionStep";
 import { SummaryStep } from "./steps/SummaryStep";

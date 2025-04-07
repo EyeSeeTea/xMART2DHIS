@@ -1,7 +1,7 @@
 import { DialogContent } from "@material-ui/core";
 import { ConfirmationDialog, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useCallback, useEffect, useState } from "react";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { Dropdown } from "../dropdown/Dropdown";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import { useAppContext } from "../../contexts/app-context";

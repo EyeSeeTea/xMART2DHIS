@@ -1,5 +1,5 @@
 import _ from "lodash";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { generateUid } from "../../../utils/uid";
 import { ModelValidation, validateModel, ValidationError } from "../Validations";
 
@@ -37,8 +37,7 @@ export const modelMappingsValidation: ModelValidation = {
         type: "Custom",
         validation: {
             error: "custom_error",
-            getDescription: (field: string) =>
-                i18n.t("Only can exists a mapping model by metadata and dhis2 model", { field }),
+            getDescription: (_: string) => i18n.t("Only can exists a mapping model by metadata and dhis2 model"),
             check: (value?: unknown[]) => {
                 const modelMappings = value as ModelMapping[];
 

@@ -1,5 +1,5 @@
 import { ObjectsTable, TablePagination, TableState, useSnackbar } from "@eyeseetea/d2-ui-components";
-import i18n from "@eyeseetea/d2-ui-components/locales";
+import i18n from "../../../utils/i18n";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";

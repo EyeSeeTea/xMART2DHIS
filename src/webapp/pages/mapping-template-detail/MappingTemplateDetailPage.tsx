@@ -2,7 +2,7 @@ import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import MappingTemplateWizard from "../../components/mapping-template-wizard/MappingTemplateWizard";
 import { useAppContext } from "../../contexts/app-context";
 
