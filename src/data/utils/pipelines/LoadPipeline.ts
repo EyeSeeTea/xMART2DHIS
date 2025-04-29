@@ -6,6 +6,9 @@ export const LoadPipeline = `<XmartPipeline IsStructure="true">
   </Context>
   <Extract>
     <GetWebService Url="\${url}">
+      <Headers>
+        <add Name="from-xmart" Value="true" />
+      </Headers>
       <GetJson OutputTableName="PIPELINE">
         <Path>$</Path>
       </GetJson>
