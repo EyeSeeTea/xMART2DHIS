@@ -16,7 +16,7 @@ import {
     MartSuggestions,
     XMartRepository,
 } from "../../domain/repositories/XMartRepository";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 import { timeout } from "../../utils/futures";
 import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";

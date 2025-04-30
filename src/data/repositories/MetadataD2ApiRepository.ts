@@ -9,7 +9,7 @@ import {
     ListMetadataOptions,
     MetadataRepository,
 } from "../../domain/repositories/MetadataRepository";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 import { D2Api, D2ApiDefinition, D2Model, MetadataResponse, Stats } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";

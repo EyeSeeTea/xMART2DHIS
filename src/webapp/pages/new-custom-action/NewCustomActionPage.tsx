@@ -10,7 +10,7 @@ import { AzureMSALRepository } from "../../../data/repositories/AzureMSALReposit
 import { InstanceD2ApiRepository } from "../../../data/repositories/InstanceD2ApiRepository";
 import { XMartDefaultRepository } from "../../../data/repositories/XMartDefaultRepository";
 import { actionGlobals } from "../../../data/utils/action-types";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 
 export const NewActionPage: React.FC = () => {

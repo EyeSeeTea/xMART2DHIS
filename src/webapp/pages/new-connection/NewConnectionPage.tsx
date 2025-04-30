@@ -9,7 +9,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Future } from "../../../domain/entities/Future";
 import { DataMart, isDataMart } from "../../../domain/entities/xmart/DataMart";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { generateUid } from "../../../utils/uid";
 import {
     PipelineSetupDialog,

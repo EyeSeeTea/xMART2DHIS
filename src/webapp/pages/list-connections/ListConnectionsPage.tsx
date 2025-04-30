@@ -15,7 +15,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isSuperAdmin, User } from "../../../domain/entities/metadata/User";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { generateUid } from "../../../utils/uid";
 import {
     PipelineSetupDialogProps,

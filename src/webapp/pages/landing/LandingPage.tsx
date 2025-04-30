@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { Card, CardGrid } from "../../components/card-grid/CardGrid";
 
 export const LandingPage: React.FC = () => {

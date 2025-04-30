@@ -5,12 +5,18 @@ export const LoadModel = `<XmartPipeline IsStructure="true">
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="\${url}">
+    <GetWebService Url="\${url}?from=xmart">
+      <Headers>
+        <add Name="from-xmart" Value="true" />
+      </Headers>
       <GetJson OutputTableName="tables">
         <Path>tables</Path>
       </GetJson>
     </GetWebService>
-    <GetWebService Url="\${url}">
+    <GetWebService Url="\${url}?from=xmart">
+      <Headers>
+        <add Name="from-xmart" Value="true" />
+      </Headers>
       <GetJson OutputTableName="fields">
         <Path>fields</Path>
       </GetJson>

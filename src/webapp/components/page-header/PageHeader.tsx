@@ -3,7 +3,7 @@ import { Variant } from "@material-ui/core/styles/createTypography";
 import Typography from "@material-ui/core/Typography";
 import { DialogButton } from "@eyeseetea/d2-ui-components";
 import React from "react";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import styled from "styled-components";
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ variant = "h5", title, onBackClick, helpText, children }) => {
