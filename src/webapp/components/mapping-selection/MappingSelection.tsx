@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import React from "react";
 import { Button, Icon } from "@material-ui/core";
 import styled from "styled-components";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import {
     MappingTemplate,
     ModelMapping,

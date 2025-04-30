@@ -4,7 +4,7 @@ import React, { useCallback, useState } from "react";
 import MetadataTable from "../../metadata-table/MetadataTable";
 import { ActionWizardStepProps } from "../ActionWizard";
 import { MetadataType } from "../../../../utils/d2";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { DataSetModel, AllProgramsModel } from "../../../../domain/entities/models/D2Models";
 
 const models = [AllProgramsModel, DataSetModel];

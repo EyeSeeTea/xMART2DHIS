@@ -1,7 +1,7 @@
 import { ConfirmationDialog, ShareUpdate, Sharing, SharingRule } from "@eyeseetea/d2-ui-components";
 import { useCallback, useState } from "react";
 import { NamedRef } from "../../../domain/entities/metadata/Ref";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 

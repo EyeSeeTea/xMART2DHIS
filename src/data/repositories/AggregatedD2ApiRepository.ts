@@ -8,7 +8,7 @@ import {
     SaveAggregatedParams,
 } from "../../domain/repositories/AggregatedRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";

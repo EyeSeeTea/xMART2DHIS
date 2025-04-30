@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SyncAction } from "../../../../domain/entities/actions/SyncAction";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
-import i18n from "../../../../locales";
+import i18n from "../../../../utils/i18n";
 import { Dictionary } from "../../../../types/utils";
 import { useAppContext } from "../../../contexts/app-context";
 import Dropdown from "../../dropdown/Dropdown";

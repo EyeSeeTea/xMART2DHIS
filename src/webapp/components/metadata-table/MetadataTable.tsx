@@ -19,7 +19,7 @@ import { D2Model } from "../../../domain/entities/models/D2Model";
 import { useAppContext } from "../../contexts/app-context";
 import { AllProgramsModel } from "../../../domain/entities/models/D2Models";
 import { ListMetadataOptions } from "../../../domain/repositories/MetadataRepository";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { Dropdown } from "../dropdown/Dropdown";
 
 export interface MetadataTableProps extends Omit<ObjectsTableProps<MetadataType>, "rows" | "columns"> {

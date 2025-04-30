@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-08-15T05:37:40.806Z\n"
-"PO-Revision-Date: 2023-08-15T05:37:40.806Z\n"
+"POT-Creation-Date: 2025-04-30T16:28:50.729Z\n"
+"PO-Revision-Date: 2025-04-30T16:28:50.729Z\n"
 
 msgid "Data values - Create/update"
 msgstr ""
@@ -33,9 +33,6 @@ msgid "Field {{field}} cannot be blank"
 msgstr ""
 
 msgid "You need to select at least one {{field}}"
-msgstr ""
-
-msgid "Field {{field}} needs to be a valid url"
 msgstr ""
 
 msgid "Field {{field}} is not valid"
