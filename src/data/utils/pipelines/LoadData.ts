@@ -6,7 +6,7 @@ export const LoadData = `<XmartPipeline>
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="\${url}">
+    <GetWebService Url="\${url}?from=xmart">
       <Headers>
         <add Name="from-xmart" Value="true" />
       </Headers>
