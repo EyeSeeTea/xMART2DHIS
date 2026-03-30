@@ -242,7 +242,7 @@ function futureFetch<Data>(
         corsProxy?: boolean;
     } = {}
 ): FutureData<Data> {
-    const { body, textResponse = false, params, bearer, corsProxy = process.env.NODE_ENV === "development" } = options;
+    const { body, textResponse = false, params, bearer, corsProxy = import.meta.env.DEV } = options;
     const controller = new AbortController();
     const qs = buildParams(params);
     const url = `${path}${qs ? `?${qs}` : ""}`;

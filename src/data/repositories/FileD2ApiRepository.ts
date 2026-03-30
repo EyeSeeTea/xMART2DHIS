@@ -27,8 +27,8 @@ export class FileD2ApiRepository implements FileRepository {
                 });
             })
             .map(({ id }) => {
-                const isDev = process.env.NODE_ENV === "development";
-                const baseUrl = isDev ? process.env.REACT_APP_DHIS2_BASE_URL : this.api.baseUrl;
+                const isDev = import.meta.env.DEV;
+                const baseUrl = isDev ? import.meta.env.VITE_DHIS2_BASE_URL : this.api.baseUrl;
                 return { id, url: `${baseUrl}/api/documents/${id}/data` };
             });
     }
