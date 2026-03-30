@@ -9,6 +9,7 @@
         "type": "git",
         "url": "git+https://github.com/EyeSeeTea/xMART2DHIS.git"
     },
+    "packageManager": "yarn@4.12.0",
     "dependencies": {
         "@azure/msal-browser": "^2.22.0",
         "@azure/msal-node": "1.5.0",
@@ -116,7 +117,7 @@
         "check-uncommited": "test -z \"$(git status -uno --porcelain)\"",
         "run-ts": "ts-node --files -O '{\"module\":\"commonjs\"}'",
         "build-action-types": "yarn run-ts --files src/scripts/build-action-types.ts",
-        "prepare": "husky install"
+        "prepare": "corepack enable 2>/dev/null || true && husky install"
     },
     "manifest.webapp": {
         "name": "xMART2DHIS",
