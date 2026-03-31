@@ -1,4 +1,4 @@
-import { FilterSingleOperatorBase } from "@eyeseetea/d2-api/api/common";
+import { FilterValueOperator } from "@eyeseetea/d2-api/api/common";
 import { ObjectsTableDetailField, TableColumn } from "@eyeseetea/d2-ui-components";
 import { D2Api, D2ApiDefinition, Model } from "../../../types/d2-api";
 import { d2BaseModelColumns, d2BaseModelDetails, d2BaseModelFields, MetadataType } from "../../../utils/d2";
@@ -6,7 +6,7 @@ import { MetadataEntities } from "../metadata/Metadata";
 
 export interface SearchFilter {
     field: string;
-    operator: FilterSingleOperatorBase;
+    operator: FilterValueOperator;
 }
 
 export abstract class D2Model {
