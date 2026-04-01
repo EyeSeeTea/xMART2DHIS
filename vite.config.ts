@@ -73,4 +73,3 @@ function getProxy(env: Record<string, string>) {
         },
     };
 }
-
