@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { SyncResult, SyncStats, SyncStatus } from "../../domain/entities/data/SyncResult";
 
-type Status = "OK" | "ERROR" | "SUCCESS";
+type Status = "ERROR" | "SUCCESS" | "WARNING";
 
 export interface ImportPostResponse {
     status: Status;

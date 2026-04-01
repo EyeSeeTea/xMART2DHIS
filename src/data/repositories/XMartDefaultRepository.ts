@@ -242,7 +242,7 @@ function futureFetch<Data>(
         corsProxy?: boolean;
     } = {}
 ): FutureData<Data> {
-    const { body, textResponse = false, params, bearer, corsProxy = process.env.NODE_ENV === "development" } = options;
+    const { body, textResponse = false, params, bearer, corsProxy = import.meta.env.DEV } = options;
     const controller = new AbortController();
     const qs = buildParams(params);
     const url = `${path}${qs ? `?${qs}` : ""}`;
@@ -250,7 +250,8 @@ function futureFetch<Data>(
 
     return Future.fromComputation<string, Data>((resolve, reject) => {
         fetch(fetchUrl, {
-            signal: controller.signal,
+            // Evita conflicto entre AbortSignal (DOM vs @types/node) al compilar.
+            signal: controller.signal as unknown as AbortSignal,
             method,
             headers: {
                 "Content-Type": "application/json",
