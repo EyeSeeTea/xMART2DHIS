@@ -250,7 +250,8 @@ function futureFetch<Data>(
 
     return Future.fromComputation<string, Data>((resolve, reject) => {
         fetch(fetchUrl, {
-            signal: controller.signal,
+            // Evita conflicto entre AbortSignal (DOM vs @types/node) al compilar.
+            signal: controller.signal as unknown as AbortSignal,
             method,
             headers: {
                 "Content-Type": "application/json",
