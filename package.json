@@ -131,6 +131,7 @@
     "scripts": {
         "start": "vite --strictPort",
         "prebuild": "yarn localize && yarn test",
+        "postinstall": "yarn localize",
         "build-folder": "rm -rf build/ && d2-manifest package.json manifest.webapp && tsc && vite build --outDir=build && yarn run manifest && cp -r i18n icon.png build",
         "build": "yarn build-folder && rm -f $npm_package_name.zip && cd build && zip --quiet -r ../$npm_package_name.zip *",
         "test": "vitest run --reporter=basic --passWithNoTests",
