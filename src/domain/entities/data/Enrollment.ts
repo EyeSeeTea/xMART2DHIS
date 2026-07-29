@@ -1,18 +1,18 @@
+export const enrollmentStatuses = ["ACTIVE", "COMPLETED", "CANCELLED"] as const;
+
+export type EnrollmentStatus = typeof enrollmentStatuses[number];
+
 export interface Enrollment {
-    storedBy: string;
-    createdAtClient: string;
+    enrollment: string;
     program: string;
-    lastUpdated: string;
-    created: string;
     orgUnit: string;
     trackedEntityInstance: string;
-    enrollment: string;
-    trackedEntityType: string;
-    lastUpdatedAtClient: string;
-    orgUnitName: string;
     enrollmentDate: string;
-    deleted: Boolean;
     incidentDate: string;
-    status: "ACTIVE" | "COMPLETED" | "CANCELED";
-    notes: String[];
+    created: string;
+    createdAtClient: string;
+    lastUpdated: string;
+    status: EnrollmentStatus;
+    followUp: boolean;
+    deleted: boolean;
 }

@@ -1,7 +1,6 @@
 import { Provider } from "@dhis2/app-runtime";
 import i18n from "./utils/i18n";
 import axios from "axios";
-import { init } from "d2";
 import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -13,7 +12,6 @@ import "./webapp/utils/wdyr";
 
 declare global {
     interface Window {
-        $: { feedbackDhis2(d2: object, appKey: string, feedbackOptions: object): void };
         api: D2Api;
     }
 }
@@ -40,11 +38,21 @@ const configI18n = ({ keyUiLocale }: { keyUiLocale: string }) => {
     document.documentElement.setAttribute("dir", isLangRTL(keyUiLocale) ? "rtl" : "ltr");
 };
 
+type ResponseError = { response?: { status?: number } };
+
+function mayCarryAResponse(error: unknown): error is ResponseError {
+    return typeof error === "object" && error !== null;
+}
+
+function isUnauthenticated(error: unknown): boolean {
+    const status = mayCarryAResponse(error) ? error.response?.status : undefined;
+    return status === 401 || status === 403;
+}
+
 async function main() {
     const baseUrl = await getBaseUrl();
 
     try {
-        const d2 = await init({ baseUrl: baseUrl + "/api", schemas: [] });
         const instance = new Instance({ url: baseUrl });
         const api = getD2APiFromInstance(instance);
         if (isDev) window.api = api;
@@ -55,14 +63,14 @@ async function main() {
         ReactDOM.render(
             <React.StrictMode>
                 <Provider config={{ baseUrl, apiVersion: 30 }}>
-                    <App api={api} d2={d2} />
+                    <App api={api} />
                 </Provider>
             </React.StrictMode>,
             document.getElementById("root")
         );
-    } catch (err: any) {
-        console.error(err);
-        const feedback = err.toString().match("Unable to get schemas") ? (
+    } catch (error: unknown) {
+        console.error(error);
+        const feedback = isUnauthenticated(error) ? (
             <h3 style={{ margin: 20 }}>
                 <a rel="noopener noreferrer" target="_blank" href={baseUrl}>
                     Login
@@ -70,7 +78,7 @@ async function main() {
                 {` ${baseUrl}`}
             </h3>
         ) : (
-            <h3>{err.toString()}</h3>
+            <h3>{String(error)}</h3>
         );
         ReactDOM.render(<div>{feedback}</div>, document.getElementById("root"));
     }

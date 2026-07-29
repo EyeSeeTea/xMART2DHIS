@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, makeStyles } from "@material-ui/core";
-import { isCancel } from "@eyeseetea/d2-api";
+import { isCancel } from "../../../types/d2-api";
 import {
     ObjectsTable,
     ObjectsTableDetailField,

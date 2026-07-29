@@ -19,7 +19,7 @@ import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
 import { Feedback } from "@eyeseetea/feedback-component";
 
-const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
+const App = ({ api }: { api: D2Api }) => {
     const { baseUrl } = useConfig();
     const [showShareButton, setShowShareButton] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
             setLoading(false);
         }
         setup();
-    }, [d2, api, baseUrl]);
+    }, [api, baseUrl]);
 
     if (loading || !appContext) return null;
 
@@ -70,7 +70,5 @@ const App = ({ api, d2 }: { api: D2Api; d2: D2 }) => {
         </MsalProvider>
     );
 };
-
-type D2 = object;
 
 export default React.memo(App);

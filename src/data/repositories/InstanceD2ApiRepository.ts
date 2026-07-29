@@ -1,4 +1,3 @@
-import { D2UserSchema, SelectedPick } from "@eyeseetea/d2-api/2.34";
 import { FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/instance/Instance";
 import { User } from "../../domain/entities/metadata/User";
@@ -6,7 +5,7 @@ import { AggregatedRepository } from "../../domain/repositories/AggregatedReposi
 import { EventsRepository } from "../../domain/repositories/EventsRepository";
 import { InstanceRepository } from "../../domain/repositories/InstanceRepository";
 import { MetadataRepository } from "../../domain/repositories/MetadataRepository";
-import { D2Api } from "../../types/d2-api";
+import { D2Api, D2UserSchema, SelectedPick } from "../../types/d2-api";
 import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
@@ -48,13 +47,13 @@ export class InstanceD2ApiRepository implements InstanceRepository {
     }
 
     public async searchUsers(query: string): Promise<UserSearch> {
-        const options = { fields, filter: { displayName: { ilike: query } } };
+        const options = { fields: searchFields, filter: { displayName: { ilike: query } } };
         return this.api.metadata.get({ users: options, userGroups: options }).getData();
     }
 
     @cache()
     public getCurrentUser(): FutureData<User> {
-        return apiToFuture(this.api.currentUser.get({ fields })).map(user => this.mapUser(user));
+        return apiToFuture(this.api.currentUser.get({ fields: userFields })).map(user => this.mapUser(user));
     }
 
     @cache()
@@ -62,48 +61,24 @@ export class InstanceD2ApiRepository implements InstanceRepository {
         return apiToFuture(this.api.system.info).map(({ version }) => version);
     }
     private mapUser(user: D2ApiUser): User {
-        const { userCredentials } = user;
         return {
             id: user.id,
             name: user.displayName,
-            firstName: user.firstName,
-            surname: user.surname,
-            email: user.email,
-            lastUpdated: user.lastUpdated,
-            created: user.created,
+            username: user.username,
+            userRoles: user.userRoles,
             userGroups: user.userGroups,
-            username: user.userCredentials.username,
-            apiUrl: `${this.api.baseUrl}/api/users/${user.id}.json`,
-            userRoles: user.userCredentials.userRoles,
-            lastLogin: userCredentials.lastLogin ? userCredentials.lastLogin : undefined,
-            disabled: user.userCredentials.disabled,
-            organisationUnits: user.organisationUnits,
-            dataViewOrganisationUnits: user.dataViewOrganisationUnits,
-            access: user.access,
-            openId: userCredentials.openId,
         };
     }
 }
-const fields = {
+
+const userFields = {
     id: true,
     displayName: true,
-    name: true,
-    firstName: true,
-    surname: true,
-    email: true,
-    lastUpdated: true,
-    created: true,
+    username: true,
+    userRoles: { id: true, name: true, authorities: true },
     userGroups: { id: true, name: true },
-    userCredentials: {
-        username: true,
-        userRoles: { id: true, name: true, authorities: true },
-        lastLogin: true,
-        disabled: true,
-        openId: true,
-    },
-    organisationUnits: { id: true, name: true },
-    dataViewOrganisationUnits: { id: true, name: true },
-    access: true,
 } as const;
 
-type D2ApiUser = SelectedPick<D2UserSchema, typeof fields>;
+const searchFields = { id: true, name: true } as const;
+
+type D2ApiUser = SelectedPick<D2UserSchema, typeof userFields>;
