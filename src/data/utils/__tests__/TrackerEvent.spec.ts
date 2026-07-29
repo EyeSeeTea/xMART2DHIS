@@ -1,29 +1,22 @@
 import { ProgramEvent } from "../../../domain/entities/data/ProgramEvent";
-import { D2TrackerEvent } from "../../../types/d2-api";
 import { toProgramEvent, toTrackerEvent, TrackerEventResponse } from "../TrackerEvent";
 
 const eventId = "OrGKZQFhLnE";
-const userInfo = { uid: "M5zQapPyTZI", username: "android", firstName: "John", surname: "Traore" };
 
-function givenTrackerEvent(partialEvent: Partial<D2TrackerEvent> = {}): TrackerEventResponse {
+function givenTrackerEvent(partialEvent: Partial<TrackerEventResponse> = {}): TrackerEventResponse {
     return {
         event: eventId,
         status: "COMPLETED",
         program: "eBAyeGv0exc",
         programStage: "Zj7UnCAulEk",
         enrollment: "HuwtGDVMLNv",
-        enrollmentStatus: "ACTIVE",
         orgUnit: "DiszpKrYNg8",
         orgUnitName: "Ngelehun CHC",
         occurredAt: "2026-07-20T00:00:00.000",
         scheduledAt: "2026-07-25T00:00:00.000",
         storedBy: "android",
-        followup: false,
-        deleted: false,
         createdAt: "2026-07-21T09:00:00.000",
         updatedAt: "2026-07-22T09:00:00.000",
-        createdBy: userInfo,
-        updatedBy: userInfo,
         attributeOptionCombo: "HllvX50cXC0",
         attributeCategoryOptions: "xYerKDKCefk",
         dataValues: [
@@ -36,7 +29,6 @@ function givenTrackerEvent(partialEvent: Partial<D2TrackerEvent> = {}): TrackerE
                 providedElsewhere: false,
             },
         ],
-        notes: [],
         ...partialEvent,
     };
 }

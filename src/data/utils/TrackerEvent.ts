@@ -1,5 +1,11 @@
 import { ProgramEvent, ProgramEventDataValue, ProgramEventStatus } from "../../domain/entities/data/ProgramEvent";
-import { D2TrackerEvent, D2TrackerEventToPost, PartialBy } from "../../types/d2-api";
+import {
+    D2TrackerEvent,
+    D2TrackerEventSchema,
+    D2TrackerEventToPost,
+    PartialBy,
+    SelectedPick,
+} from "../../types/d2-api";
 import { generateUid } from "../../utils/uid";
 
 /**
@@ -26,12 +32,30 @@ const trackerStatusByStatus: Readonly<Record<ProgramEventStatus, TrackerEventSta
     SKIPPED: "SKIPPED",
 };
 
-/**
- * d2-api declares every event property as always present, but a 2.42 instance omits these ones:
- * `orgUnitName` is never returned, and events of programs without registration carry no
- * `scheduledAt`, `storedBy` or `enrollment`.
- */
-export type TrackerEventResponse = PartialBy<D2TrackerEvent, "scheduledAt" | "orgUnitName" | "storedBy" | "enrollment">;
+export const trackerEventFields = {
+    event: true,
+    orgUnit: true,
+    orgUnitName: true,
+    program: true,
+    programStage: true,
+    enrollment: true,
+    status: true,
+    occurredAt: true,
+    scheduledAt: true,
+    createdAt: true,
+    updatedAt: true,
+    storedBy: true,
+    geometry: true,
+    attributeOptionCombo: true,
+    attributeCategoryOptions: true,
+    trackedEntity: true,
+    dataValues: true,
+} as const;
+
+export type TrackerEventResponse = PartialBy<
+    SelectedPick<D2TrackerEventSchema, typeof trackerEventFields>,
+    "scheduledAt" | "orgUnitName" | "storedBy" | "enrollment" | "geometry" | "trackedEntity"
+>;
 
 export function toProgramEvent(event: TrackerEventResponse): ProgramEvent {
     const { geometry } = event;
