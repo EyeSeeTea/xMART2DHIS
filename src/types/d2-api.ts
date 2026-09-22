@@ -2,6 +2,7 @@ import { D2Api } from "@eyeseetea/d2-api/2.42";
 import { getMockApiFromClass } from "@eyeseetea/d2-api";
 
 export * from "@eyeseetea/d2-api/2.42";
+export { D2Api };
 
 export type { FilterValueOperator } from "@eyeseetea/d2-api/api/common";
 export type { TrackerPostParams, TrackerPostResponse } from "@eyeseetea/d2-api/api/tracker";
