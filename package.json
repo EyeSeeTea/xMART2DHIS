@@ -55,6 +55,7 @@
     "devDependencies": {
         "@babel/core": "7.16.12",
         "@babel/preset-typescript": "7.16.7",
+        "@johanblumenberg/ts-mockito": "1.0.52",
         "@testing-library/jest-dom": "5.16.1",
         "@testing-library/react": "12.1.2",
         "@types/argparse": "2.0.10",

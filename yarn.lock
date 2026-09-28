@@ -4019,6 +4019,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@johanblumenberg/ts-mockito@npm:1.0.52":
+  version: 1.0.52
+  resolution: "@johanblumenberg/ts-mockito@npm:1.0.52"
+  dependencies:
+    lodash: "npm:^4.17.20"
+  checksum: 10c0/bc9a2ca30264e8aad70483d4eb886443aae2b8dc137859cc436dd9f33059797cbe927f16df4b00bb11c288d18eff7ac895f5545c9b66fadf3908d5c27aa2bf8e
+  languageName: node
+  linkType: hard
+
 "@jridgewell/gen-mapping@npm:^0.3.12, @jridgewell/gen-mapping@npm:^0.3.5":
   version: 0.3.13
   resolution: "@jridgewell/gen-mapping@npm:0.3.13"
@@ -10287,7 +10296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4, lodash@npm:^4.0.0, lodash@npm:^4.17.10, lodash@npm:^4.17.15, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
+"lodash@npm:^4, lodash@npm:^4.0.0, lodash@npm:^4.17.10, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.18.1
   resolution: "lodash@npm:4.18.1"
   checksum: 10c0/757228fc68805c59789e82185135cf85f05d0b2d3d54631d680ca79ec21944ec8314d4533639a14b8bcfbd97a517e78960933041a5af17ecb693ec6eecb99a27
@@ -13920,6 +13929,7 @@ __metadata:
     "@eyeseetea/d2-api": "npm:1.21.0"
     "@eyeseetea/d2-ui-components": "npm:2.11.0"
     "@eyeseetea/feedback-component": "npm:0.3.0"
+    "@johanblumenberg/ts-mockito": "npm:1.0.52"
     "@material-ui/core": "npm:4.12.4"
     "@material-ui/icons": "npm:4.11.3"
     "@material-ui/lab": "npm:4.0.0-alpha.60"
