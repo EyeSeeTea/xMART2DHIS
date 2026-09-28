@@ -5,14 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-28T12:50:50.333Z\n"
-"PO-Revision-Date: 2026-09-28T12:50:50.333Z\n"
-
-msgid "Data values - Create/update"
-msgstr ""
-
-msgid "Events - Create/update"
-msgstr ""
+"POT-Creation-Date: 2026-09-28T12:52:28.410Z\n"
+"PO-Revision-Date: 2026-09-28T12:52:28.411Z\n"
 
 msgid "Unknown model"
 msgstr ""
@@ -219,45 +213,6 @@ msgstr ""
 msgid "<No value>"
 msgstr ""
 
-msgid "Type"
-msgstr ""
-
-msgid "Updated"
-msgstr ""
-
-msgid "Deleted"
-msgstr ""
-
-msgid "Ignored"
-msgstr ""
-
-msgid "Total"
-msgstr ""
-
-msgid "Identifier"
-msgstr ""
-
-msgid "Message"
-msgstr ""
-
-msgid "Import Results"
-msgstr ""
-
-msgid "Ok"
-msgstr ""
-
-msgid "Import"
-msgstr ""
-
-msgid "Status"
-msgstr ""
-
-msgid "Messages"
-msgstr ""
-
-msgid "JSON Response"
-msgstr ""
-
 msgid "Dhis2 Model"
 msgstr ""
 
@@ -286,6 +241,9 @@ msgid "Delete Actions?"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} model mappings?"
+msgstr ""
+
+msgid "Ok"
 msgstr ""
 
 msgid "Import Template"
@@ -459,6 +417,9 @@ msgstr ""
 msgid "List table contents of the connections"
 msgstr ""
 
+msgid "Type"
+msgstr ""
+
 msgid "Connection URL"
 msgstr ""
 
@@ -505,6 +466,9 @@ msgid "Sharing settings"
 msgstr ""
 
 msgid "Help setting up pipeline"
+msgstr ""
+
+msgid "Identifier"
 msgstr ""
 
 msgid "xMART API"

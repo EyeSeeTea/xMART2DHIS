@@ -14,10 +14,8 @@ import { Icon } from "@material-ui/core";
 import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import { MappingTemplate } from "../../../domain/entities/mapping-template/MappingTemplate";
 import i18n from "../../../utils/i18n";
-import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 
 export const MappingTemplateListPage: React.FC = () => {
@@ -30,7 +28,6 @@ export const MappingTemplateListPage: React.FC = () => {
     const [refreshKey, setRefreshKey] = useState(0);
     const [selection, updateSelection] = useState<TableSelection[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);
-    const [results, setResults] = useState<SyncResult[]>();
 
     useEffect(() => {
         compositionRoot.mappingTemplates.list().run(
@@ -120,8 +117,6 @@ export const MappingTemplateListPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
-
             {toDelete.length > 0 && (
                 <ConfirmationDialog
                     isOpen={true}

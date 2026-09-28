@@ -15,9 +15,7 @@ import _ from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncAction } from "../../../domain/entities/actions/SyncAction";
-import { SyncResult } from "../../../domain/entities/data/SyncResult";
 import i18n from "../../../utils/i18n";
-import { ImportSummary } from "../../components/import-summary/ImportSummary";
 import { useAppContext } from "../../contexts/app-context";
 
 export const ActionsListPage: React.FC = () => {
@@ -30,7 +28,6 @@ export const ActionsListPage: React.FC = () => {
     const [refreshKey, setRefreshKey] = useState(0);
     const [selection, updateSelection] = useState<TableSelection[]>([]);
     const [toDelete, setToDelete] = useState<string[]>([]);
-    const [results, setResults] = useState<SyncResult[]>();
 
     useEffect(() => {
         compositionRoot.actions.list().run(
@@ -158,8 +155,6 @@ export const ActionsListPage: React.FC = () => {
 
     return (
         <React.Fragment>
-            {results !== undefined ? <ImportSummary results={results} onClose={() => setResults(undefined)} /> : null}
-
             {toDelete.length > 0 && (
                 <ConfirmationDialog
                     isOpen={true}

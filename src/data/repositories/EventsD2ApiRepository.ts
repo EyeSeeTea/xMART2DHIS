@@ -2,33 +2,18 @@ import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { Instance } from "../../domain/entities/instance/Instance";
 import { ProgramEvent } from "../../domain/entities/data/ProgramEvent";
-import { SyncResult } from "../../domain/entities/data/SyncResult";
-import { EventsRepository, GetEventsFilters, SaveEventsParams } from "../../domain/repositories/EventsRepository";
+import { EventsRepository, GetEventsFilters } from "../../domain/repositories/EventsRepository";
 import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
-import i18n from "../../utils/i18n";
-import { D2Api, TrackerPostParams } from "../../types/d2-api";
+import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
-import { toProgramEvent, toTrackerEvent, trackerEventFields } from "../utils/TrackerEvent";
-import { postTrackerImport } from "../utils/TrackerImport";
+import { toProgramEvent, trackerEventFields } from "../utils/TrackerEvent";
 
 export class EventsD2ApiRepository implements EventsRepository {
     private api: D2Api;
 
     constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
-    }
-
-    public save(events: ProgramEvent[], params: SaveEventsParams = {}): FutureData<SyncResult> {
-        const trackerEvents = events.map(toTrackerEvent);
-
-        return apiToFuture(this.api.tracker.postAsync(buildTrackerPostParams(params), { events: trackerEvents }))
-            .flatMap(({ response }) => apiToFuture(this.api.system.waitFor(response.jobType, response.id)))
-            .flatMap(response => {
-                if (!response) return Future.error<string, SyncResult>("Unknown error saving events");
-
-                return Future.success(postTrackerImport(response, { title: i18n.t("Events - Create/update") }));
-            });
     }
 
     /**
@@ -94,15 +79,4 @@ function buildOccurredDates({ period = "ALL", startDate, endDate }: PeriodFilter
     const { startDate: start, endDate: end } = buildPeriodFromParams({ period, startDate, endDate });
 
     return { occurredAfter: start.format("YYYY-MM-DD"), occurredBefore: end.format("YYYY-MM-DD") };
-}
-
-function buildTrackerPostParams(params: SaveEventsParams): TrackerPostParams {
-    const { idScheme, dataElementIdScheme, orgUnitIdScheme, dryRun } = params;
-
-    return {
-        idScheme,
-        dataElementIdScheme,
-        orgUnitIdScheme,
-        importMode: dryRun ? "VALIDATE" : "COMMIT",
-    };
 }

@@ -1,16 +1,9 @@
 import { ProgramEvent, ProgramEventDataValue, ProgramEventStatus } from "../../domain/entities/data/ProgramEvent";
-import {
-    D2TrackerEvent,
-    D2TrackerEventSchema,
-    D2TrackerEventToPost,
-    PartialBy,
-    SelectedPick,
-} from "../../types/d2-api";
-import { generateUid } from "../../utils/uid";
+import { D2TrackerEvent, D2TrackerEventSchema, PartialBy, SelectedPick } from "../../types/d2-api";
 
 /**
  * The tracker API renamed the event properties that the rest of the app (and the xMART tables)
- * still refer to by their legacy names, so every read and write is translated here.
+ * still refer to by their legacy names, so every read is translated here.
  */
 type TrackerEventStatus = D2TrackerEvent["status"];
 
@@ -19,15 +12,6 @@ const statusByTrackerStatus: Readonly<Record<TrackerEventStatus, ProgramEventSta
     COMPLETED: "COMPLETED",
     VISITED: "VISITED",
     SCHEDULE: "SCHEDULED",
-    OVERDUE: "OVERDUE",
-    SKIPPED: "SKIPPED",
-};
-
-const trackerStatusByStatus: Readonly<Record<ProgramEventStatus, TrackerEventStatus>> = {
-    ACTIVE: "ACTIVE",
-    COMPLETED: "COMPLETED",
-    VISITED: "VISITED",
-    SCHEDULED: "SCHEDULE",
     OVERDUE: "OVERDUE",
     SKIPPED: "SKIPPED",
 };
@@ -93,29 +77,5 @@ export function toProgramEvent(event: TrackerEventResponse): ProgramEvent {
                 providedElsewhere,
             })
         ),
-    };
-}
-
-export function toTrackerEvent(event: ProgramEvent): D2TrackerEventToPost {
-    const { coordinate } = event;
-
-    return {
-        event: event.event ?? generateUid(),
-        orgUnit: event.orgUnit,
-        program: event.program,
-        programStage: event.programStage ?? "",
-        enrollment: event.enrollment,
-        status: trackerStatusByStatus[event.status],
-        occurredAt: event.eventDate,
-        scheduledAt: event.dueDate,
-        geometry: coordinate ? { type: "Point", coordinates: [coordinate.longitude, coordinate.latitude] } : undefined,
-        attributeOptionCombo: event.attributeOptionCombo,
-        attributeCategoryOptions: event.attributeCategoryOptions,
-        trackedEntity: event.trackedEntityInstance,
-        dataValues: event.dataValues.map(({ dataElement, value, providedElsewhere }) => ({
-            dataElement,
-            value: String(value),
-            providedElsewhere,
-        })),
     };
 }

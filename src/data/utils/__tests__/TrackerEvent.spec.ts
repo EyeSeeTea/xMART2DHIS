@@ -1,5 +1,4 @@
-import { ProgramEvent } from "../../../domain/entities/data/ProgramEvent";
-import { toProgramEvent, toTrackerEvent, TrackerEventResponse } from "../TrackerEvent";
+import { toProgramEvent, TrackerEventResponse } from "../TrackerEvent";
 
 const eventId = "OrGKZQFhLnE";
 
@@ -29,19 +28,6 @@ function givenTrackerEvent(partialEvent: Partial<TrackerEventResponse> = {}): Tr
                 providedElsewhere: false,
             },
         ],
-        ...partialEvent,
-    };
-}
-
-function givenProgramEvent(partialEvent: Partial<ProgramEvent> = {}): ProgramEvent {
-    return {
-        event: eventId,
-        orgUnit: "DiszpKrYNg8",
-        program: "eBAyeGv0exc",
-        programStage: "Zj7UnCAulEk",
-        status: "ACTIVE",
-        eventDate: "2026-07-20T00:00:00.000",
-        dataValues: [{ dataElement: "qrur9Dvnyt5", value: 42 }],
         ...partialEvent,
     };
 }
@@ -116,60 +102,5 @@ describe("toProgramEvent", () => {
         expect(toProgramEvent(givenTrackerEvent({ trackedEntity: "uhubxsfLanZ" })).trackedEntityInstance).toBe(
             "uhubxsfLanZ"
         );
-    });
-});
-
-describe("toTrackerEvent", () => {
-    it("renames the legacy properties to the tracker names", () => {
-        const event = givenProgramEvent({
-            dueDate: "2026-07-25T00:00:00.000",
-            enrollment: "HuwtGDVMLNv",
-            attributeOptionCombo: "HllvX50cXC0",
-            attributeCategoryOptions: "xYerKDKCefk",
-            trackedEntityInstance: "uhubxsfLanZ",
-        });
-
-        expect(toTrackerEvent(event)).toEqual({
-            event: eventId,
-            orgUnit: "DiszpKrYNg8",
-            program: "eBAyeGv0exc",
-            programStage: "Zj7UnCAulEk",
-            enrollment: "HuwtGDVMLNv",
-            status: "ACTIVE",
-            occurredAt: "2026-07-20T00:00:00.000",
-            scheduledAt: "2026-07-25T00:00:00.000",
-            geometry: undefined,
-            attributeOptionCombo: "HllvX50cXC0",
-            attributeCategoryOptions: "xYerKDKCefk",
-            trackedEntity: "uhubxsfLanZ",
-            dataValues: [{ dataElement: "qrur9Dvnyt5", value: "42", providedElsewhere: undefined }],
-        });
-    });
-
-    it("translates the legacy SCHEDULED status to the tracker SCHEDULE value", () => {
-        expect(toTrackerEvent(givenProgramEvent({ status: "SCHEDULED" })).status).toBe("SCHEDULE");
-    });
-
-    it("serialises non-string data values, which the tracker importer rejects", () => {
-        const event = givenProgramEvent({
-            dataValues: [
-                { dataElement: "qrur9Dvnyt5", value: 42 },
-                { dataElement: "oZg33kd9taw", value: true },
-            ],
-        });
-
-        expect(toTrackerEvent(event).dataValues.map(({ value }) => value)).toEqual(["42", "true"]);
-    });
-
-    it("converts latitude and longitude into a point geometry", () => {
-        const event = givenProgramEvent({ coordinate: { latitude: 8.4657, longitude: -13.2317 } });
-
-        expect(toTrackerEvent(event).geometry).toEqual({ type: "Point", coordinates: [-13.2317, 8.4657] });
-    });
-
-    it("generates an identifier for new events, which the tracker importer requires", () => {
-        const { event: _event, ...newEvent } = givenProgramEvent();
-
-        expect(toTrackerEvent(newEvent).event).toMatch(/^[a-zA-Z][a-zA-Z0-9]{10}$/);
     });
 });
