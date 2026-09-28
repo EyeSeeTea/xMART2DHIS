@@ -8,6 +8,7 @@ import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
 import { toProgramEvent, trackerEventFields } from "../utils/TrackerEvent";
+import { isLastTrackerPage } from "../utils/TrackerPager";
 
 export class EventsD2ApiRepository implements EventsRepository {
     private api: D2Api;
@@ -45,11 +46,8 @@ export class EventsD2ApiRepository implements EventsRepository {
             this.api.tracker.events.get({ ...params, fields: trackerEventFields, page, pageSize })
         ).flatMap(({ instances, pager }) => {
             const events = instances.map(toProgramEvent);
-            /* A full page without a link is ambiguous, so it is followed as well: an instance
-               that did not link pages would otherwise be traversed no further than its first. */
-            const isLastPage = !hasNextPage(pager) && instances.length < pageSize;
 
-            return isLastPage
+            return isLastTrackerPage({ pager, itemsInPage: instances.length, pageSize })
                 ? Future.success(events)
                 : this.getAllPages(params, page + 1).map(nextEvents => [...events, ...nextEvents]);
         });
@@ -59,10 +57,6 @@ export class EventsD2ApiRepository implements EventsRepository {
 const pageSize = 250;
 
 const maxConcurrency = 4;
-
-function hasNextPage(pager: unknown): boolean {
-    return typeof pager === "object" && pager !== null && "nextPage" in pager;
-}
 
 type EventsQuery = Readonly<{
     program: string;

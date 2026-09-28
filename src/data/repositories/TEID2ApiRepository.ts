@@ -7,6 +7,7 @@ import { buildPeriodFromParams, cleanOrgUnitPaths } from "../../domain/utils";
 import { D2Api } from "../../types/d2-api";
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { apiToFuture } from "../../utils/futures";
+import { isLastTrackerPage } from "../utils/TrackerPager";
 import { D2TrackerTrackedEntity, toTrackedEntityInstance } from "../utils/TrackerTrackedEntity";
 
 export class TEID2ApiRepository implements TEIRepository {
@@ -32,7 +33,6 @@ export class TEID2ApiRepository implements TEIRepository {
             .map(result => _.flatten(result));
     }
 
-    /* Traversed by the nextPage link, as the events endpoint is: see EventsD2ApiRepository. */
     private getAllPages(params: TrackedEntitiesQuery, page = 1): FutureData<TrackedEntityInstance[]> {
         return apiToFuture(
             this.api.get<TrackedEntitiesResponse>("/tracker/trackedEntities", {
@@ -44,9 +44,8 @@ export class TEID2ApiRepository implements TEIRepository {
             })
         ).flatMap(({ trackedEntities, pager }) => {
             const teis = trackedEntities.map(toTrackedEntityInstance);
-            const isLastPage = !pager?.nextPage && trackedEntities.length < pageSize;
 
-            return isLastPage
+            return isLastTrackerPage({ pager, itemsInPage: trackedEntities.length, pageSize })
                 ? Future.success(teis)
                 : this.getAllPages(params, page + 1).map(nextTeis => [...teis, ...nextTeis]);
         });
