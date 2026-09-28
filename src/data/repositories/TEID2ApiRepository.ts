@@ -26,7 +26,7 @@ export class TEID2ApiRepository implements TEIRepository {
         const dates = buildEnrolledDates({ period, startDate, endDate });
 
         return Future.sequential(
-            programIds.map(program => this.getAllPages({ ...dates, program, orgUnits: orgUnits.join(";") }))
+            programIds.map(program => this.getAllPages({ ...dates, program, orgUnits: orgUnits.join(",") }))
         )
             .flatMapError(() => Future.error("An error has occurred rerieving TEIs"))
             .map(result => _.flatten(result));

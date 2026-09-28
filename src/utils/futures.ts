@@ -8,7 +8,7 @@ export function apiToFuture<Data>(res: CancelableResponse<Data>): FutureData<Dat
             .catch(err => {
                 reject(err.response?.data ? err.response.data.message : err ? err.message : "Unknown error");
             });
-        return res.cancel;
+        return () => res.cancel();
     });
 }
 

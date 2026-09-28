@@ -1,5 +1,4 @@
 import { D2Api } from "@eyeseetea/d2-api/2.42";
-import { getMockApiFromClass } from "@eyeseetea/d2-api";
 
 export * from "@eyeseetea/d2-api/2.42";
 export { D2Api };
@@ -11,4 +10,8 @@ export type { CancelableResponse } from "@eyeseetea/d2-api/repositories/Cancelab
 export type { PartialBy } from "@eyeseetea/d2-api/utils/types";
 export { isCancel } from "@eyeseetea/d2-api";
 
-export const getMockApi = getMockApiFromClass(D2Api);
+/* The mock adapter is axios-only, and d2-api defaults to the fetch backend. */
+export function getMockApi() {
+    const api = new D2Api({ backend: "xhr" });
+    return { api, mock: api.getMockAdapter() };
+}
