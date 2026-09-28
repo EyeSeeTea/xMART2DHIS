@@ -147,7 +147,6 @@
         "manifest": "d2-manifest package.json build/manifest.webapp",
         "check-uncommited": "test -z \"$(git status -uno --porcelain)\"",
         "run-ts": "ts-node --files -O '{\"module\":\"commonjs\"}'",
-        "build-action-types": "yarn run-ts --files src/scripts/build-action-types.ts",
         "prepare": "corepack enable 2>/dev/null || true && husky install"
     },
     "manifest.webapp": {
