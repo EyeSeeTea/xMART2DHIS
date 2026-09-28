@@ -9,6 +9,7 @@ import { TrackedEntityInstance } from "../../entities/data/TrackedEntityInstance
 import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
 import { DataElement, MetadataPackage } from "../../entities/metadata/Metadata";
+import { isTrackerProgram } from "../../entities/metadata/Program";
 import { TrakedEntityAttribute } from "../../entities/metadata/TrackedEntityAttribute";
 import { DataMart } from "../../entities/xmart/DataMart";
 import { ActionRepository } from "../../repositories/ActionRepository";
@@ -95,7 +96,15 @@ export class ExecuteActionUseCase {
                     action: Future.success(action),
                     metadataInAction: Future.success(metadataInAction),
                     events: this.eventsRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
-                    teis: this.teiRepository.get({ orgUnitPaths, programIds, period, startDate, endDate }),
+                    teis: this.getTrackerProgramIds(programIds).flatMap(trackerProgramIds =>
+                        this.teiRepository.get({
+                            orgUnitPaths,
+                            programIds: trackerProgramIds,
+                            period,
+                            startDate,
+                            endDate,
+                        })
+                    ),
                     dataValuesSets: Future.sequential(
                         dataSetIds.map(dataSetId =>
                             this.aggregatedRespository.get({
@@ -189,6 +198,16 @@ export class ExecuteActionUseCase {
                     ...this.getMetadataPairs(metadataInData),
                 ]),
             }));
+    }
+
+    /* The tracker API rejects event programs. programType is fetched apart from
+       metadataInAction, as that package is sent to xMART. */
+    private getTrackerProgramIds(programIds: string[]): FutureData<string[]> {
+        if (programIds.length === 0) return Future.success([]);
+
+        return this.metadataRepository
+            .getMetadataByIds(programIds, "id,programType")
+            .map(({ programs = [] }) => programs.filter(isTrackerProgram).map(program => program.id));
     }
 
     @cache()
