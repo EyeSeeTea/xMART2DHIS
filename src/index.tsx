@@ -20,7 +20,7 @@ const isDev = import.meta.env.DEV;
 
 async function getBaseUrl() {
     if (isDev) {
-        return "/dhis2"; // See src/setupProxy.js
+        return "/dhis2"; // Proxied by the dev server, see getProxy in vite.config.ts
     } else {
         const { data: manifest } = await axios.get<any>("manifest.webapp");
         return manifest.activities.dhis.href;
