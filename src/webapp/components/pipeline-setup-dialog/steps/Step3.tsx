@@ -22,7 +22,10 @@ export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (
             startingLineNumber={1}
             wrapLines
             codeBlock
-            theme={dracula}
+            theme={{ ...dracula, mode: "dark" }}
+            copied={false}
+            wrapLongLines={false}
+            onCopy={() => undefined}
             customStyle={{
                 height: "400px",
                 overflow: "auto",
