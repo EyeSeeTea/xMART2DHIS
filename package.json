@@ -36,14 +36,14 @@
         "postcss-rtl": "2.0.0",
         "purify-ts": "1.1.0",
         "purify-ts-extra-codec": "0.6.0",
-        "query-string": "^7.1.1",
+        "query-string": "^9.5.0",
         "react": "17.0.2",
         "react-code-blocks": "0.1.0",
         "react-dom": "17.0.2",
         "react-final-form": "6.5.8",
         "react-router-dom": "6.30.6",
         "rxjs": "6.6.3",
-        "styled-components": "6.3.12",
+        "styled-components": "6.5.3",
         "styled-jsx": "^5.1.7",
         "use-deep-compare-effect": "1.8.1"
     },
@@ -91,7 +91,9 @@
         "@types/react": "17.0.38",
         "lodash": "^4.18.0",
         "i18next-conv/node-gettext": "^3.0.1",
-        "react-linkify/linkify-it": "^5.0.2"
+        "react-linkify/linkify-it": "^5.0.2",
+        "refractor/prismjs": "^1.30.0",
+        "@eyeseetea/d2-ui-components/moment": "^2.31.0"
     },
     "scripts": {
         "start": "vite --strictPort",
