@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
-/* react-script automatically executes src/setupProxy.js on init. Tasks:
+/* CRA react-script automatically executes src/setupProxy.js on init. Tasks:
 
     - Proxy requests from /dhis2/xyz to $REACT_APP_DHIS2_BASE_URL/xyz. Reason: Avoid problems with
       CORS and cross-domain cookies, as the app connects only to the local development server.
@@ -12,9 +12,9 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const redirectPaths = ["/dhis-web-pivot", "/dhis-web-data-visualizer"];
 
-const dhis2UrlVar = "REACT_APP_DHIS2_BASE_URL";
-const dhis2AuthVar = "REACT_APP_DHIS2_AUTH";
-const proxyLogLevel = "REACT_APP_PROXY_LOG_LEVEL";
+const dhis2UrlVar = "VITE_DHIS2_BASE_URL";
+const dhis2AuthVar = "VITE_DHIS2_AUTH";
+const proxyLogLevel = "VITE_PROXY_LOG_LEVEL";
 
 module.exports = function (app) {
     const targetUrl = process.env[dhis2UrlVar];
