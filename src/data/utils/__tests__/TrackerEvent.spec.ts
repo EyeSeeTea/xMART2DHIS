@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { toProgramEvent, TrackerEventResponse } from "../TrackerEvent";
 
 const eventId = "OrGKZQFhLnE";

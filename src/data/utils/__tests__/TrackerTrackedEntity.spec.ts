@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { D2TrackerTrackedEntity, toTrackedEntityInstance } from "../TrackerTrackedEntity";
 
 const teiId = "PQfMcpmXeFE";
