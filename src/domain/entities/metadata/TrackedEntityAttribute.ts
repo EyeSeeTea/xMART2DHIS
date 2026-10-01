@@ -1,10 +1,9 @@
 export interface TrakedEntityAttribute {
-    lastUpdated: string;
-    storedBy: string;
+    attribute: string;
     code?: string;
     displayName: string;
-    created: string;
-    valueType: string;
-    attribute: string;
     value: string;
+    valueType: string;
+    created: string;
+    lastUpdated: string;
 }

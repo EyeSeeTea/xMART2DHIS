@@ -1,0 +1,4 @@
+/* The d2 header bar renders a div that overflows its container without this */
+.headerBarWrapper :global(div:first-of-type) {
+    box-sizing: border-box;
+}

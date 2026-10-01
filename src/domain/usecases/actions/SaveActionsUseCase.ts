@@ -8,7 +8,7 @@ import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
 import { DataSet } from "../../entities/metadata/DataSet";
 import { MetadataPackage } from "../../entities/metadata/Metadata";
-import { Program, ProgramStage } from "../../entities/metadata/Program";
+import { isTrackerProgram, Program, ProgramStage } from "../../entities/metadata/Program";
 import { DataMart } from "../../entities/xmart/DataMart";
 import {
     XMartFieldDefinition,
@@ -242,9 +242,7 @@ export class SaveActionUseCase implements UseCase {
         return this.metadataRepository
             .getMetadataByIds(action.metadataIds, "id,programType,displayName,programStages[id,displayName]")
             .flatMap(metadata => {
-                const trackerPrograms = metadata.programs?.filter(
-                    program => (program as Program).programType === "WITH_REGISTRATION"
-                );
+                const trackerPrograms = metadata.programs?.filter(isTrackerProgram);
 
                 const metadataErrors = [
                     action.modelMappings.some(mapping => mapping.dhis2Model === "metadata")

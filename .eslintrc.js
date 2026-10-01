@@ -1,7 +1,7 @@
 /** @format */
 
 module.exports = {
-    extends: ["react-app", "eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+    extends: ["react-app", "eslint:recommended", "plugin:@typescript-eslint/recommended"],
     parser: "@typescript-eslint/parser",
     rules: {
         "no-console": ["warn", { allow: ["debug", "warn", "error"] }],
@@ -38,7 +38,7 @@ module.exports = {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn",
     },
-    plugins: ["@typescript-eslint", "react-hooks", "unused-imports"],
+    plugins: ["@typescript-eslint", "unused-imports"],
     settings: {
         react: {
             pragma: "React",

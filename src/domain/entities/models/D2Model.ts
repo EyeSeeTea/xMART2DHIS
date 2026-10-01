@@ -1,6 +1,5 @@
-import { FilterValueOperator } from "@eyeseetea/d2-api/api/common";
 import { ObjectsTableDetailField, TableColumn } from "@eyeseetea/d2-ui-components";
-import { D2Api, D2ApiDefinition, Model } from "../../../types/d2-api";
+import { D2Api, D2ApiDefinition, FilterValueOperator, Model } from "../../../types/d2-api";
 import { d2BaseModelColumns, d2BaseModelDetails, d2BaseModelFields, MetadataType } from "../../../utils/d2";
 import { MetadataEntities } from "../metadata/Metadata";
 

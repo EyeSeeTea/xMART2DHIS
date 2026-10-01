@@ -1,21 +1,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2025-04-07T11:54:54.589Z\n"
+"POT-Creation-Date: 2026-09-28T12:52:28.410Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-
-msgid "Data values - Create/update"
-msgstr ""
-
-msgid "Events - Create/update"
-msgstr ""
-
-msgid "Event"
-msgstr ""
 
 msgid "Unknown model"
 msgstr ""
@@ -222,45 +213,6 @@ msgstr "Listar"
 msgid "<No value>"
 msgstr ""
 
-msgid "Type"
-msgstr ""
-
-msgid "Updated"
-msgstr ""
-
-msgid "Deleted"
-msgstr ""
-
-msgid "Ignored"
-msgstr ""
-
-msgid "Total"
-msgstr ""
-
-msgid "Identifier"
-msgstr ""
-
-msgid "Message"
-msgstr ""
-
-msgid "Import Results"
-msgstr ""
-
-msgid "Ok"
-msgstr ""
-
-msgid "Import"
-msgstr ""
-
-msgid "Status"
-msgstr ""
-
-msgid "Messages"
-msgstr ""
-
-msgid "JSON Response"
-msgstr ""
-
 msgid "Dhis2 Model"
 msgstr ""
 
@@ -289,6 +241,9 @@ msgid "Delete Actions?"
 msgstr ""
 
 msgid "Are you sure you want to delete {{total}} model mappings?"
+msgstr ""
+
+msgid "Ok"
 msgstr ""
 
 msgid "Import Template"
@@ -462,6 +417,9 @@ msgstr ""
 msgid "List table contents of the connections"
 msgstr ""
 
+msgid "Type"
+msgstr ""
+
 msgid "Connection URL"
 msgstr ""
 
@@ -510,10 +468,7 @@ msgstr ""
 msgid "Help setting up pipeline"
 msgstr ""
 
-msgid "Run"
-msgstr ""
-
-msgid "Running actions..."
+msgid "Identifier"
 msgstr ""
 
 msgid "xMART API"
