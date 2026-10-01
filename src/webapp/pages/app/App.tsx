@@ -1,6 +1,5 @@
 import { MsalProvider } from "@azure/msal-react";
 import { useConfig } from "@dhis2/app-runtime";
-import { HeaderBar } from "@dhis2/ui";
 import { LoadingProvider, SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import _ from "lodash";
@@ -15,6 +14,7 @@ import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
 import "./App.css";
+import { HeaderBar } from "./header-bar/HeaderBar";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
 import { Feedback } from "@eyeseetea/feedback-component";
