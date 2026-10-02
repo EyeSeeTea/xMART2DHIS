@@ -1,7 +1,7 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { UserConfig, defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
-import nodePolyfills from "vite-plugin-node-stdlib-browser";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import * as path from "path";
 
 const redirectPaths = ["/dhis-web-pivot", "/dhis-web-data-visualizer"];
@@ -11,11 +11,17 @@ export default ({ mode }): UserConfig => {
 
     return defineConfig({
         base: "", // Rutas relativas (útil para empaquetado DHIS2 ZIP)
-        plugins: [nodePolyfills(), react()],
+        plugins: [
+            // md5.js (src/utils/uid.ts) uses Buffer, so the browser build needs
+            // Node stdlib shims. Replaces vite-plugin-node-stdlib-browser, which
+            // only supports Vite <= 4.
+            nodePolyfills(),
+            react(),
+        ],
         test: {
             environment: "jsdom",
             include: ["**/*.{spec,test}.{ts,tsx}"],
-            setupFiles: "./src/tests/setup.js",
+            setupFiles: "./src/tests/setup.ts",
             exclude: ["node_modules", "src/tests/playwright"],
             globals: true,
         },

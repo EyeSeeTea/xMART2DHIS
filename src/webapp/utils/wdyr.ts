@@ -12,7 +12,6 @@ if (import.meta.env.DEV) {
             });
         })
         .catch(err => {
-            // eslint-disable-next-line no-console
             console.warn("WDYR no disponible:", err);
         });
 }
