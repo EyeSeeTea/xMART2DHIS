@@ -15,7 +15,9 @@ export class AzureMSALRepository implements AzureRepository {
             auth: {
                 clientId: this.clientId,
                 authority: `https://login.microsoftonline.com/${this.tenantId}`,
-                redirectUri: window.location.href.split("#")[0],
+                // Without the query string: the DHIS2 2.42+ global shell adds ?redirect=false,
+                // and Azure only accepts the redirect URIs registered without it.
+                redirectUri: window.location.origin + window.location.pathname,
             },
             cache: { cacheLocation: "localStorage" },
         });
@@ -33,10 +35,7 @@ export class AzureMSALRepository implements AzureRepository {
         };
 
         return Future.fromPromise(client.acquireTokenSilent(request))
-            .flatMapError(error => {
-                const redirect = Future.fromPromise(client.acquireTokenRedirect(request));
-                return redirect.flatMap(() => Future.error(error));
-            })
+            .flatMapError(() => Future.fromPromise(client.acquireTokenPopup(request)))
             .bimap(
                 ({ accessToken }) => accessToken,
                 error => String(error)

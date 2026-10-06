@@ -10,7 +10,9 @@ export const AzureBadge: React.FC = () => {
     const { instance, accounts } = useMsal();
 
     const login = useCallback(() => {
-        if (!isAuthenticated) instance.loginRedirect();
+        // A popup instead of a redirect: MSAL does not allow redirects inside an iframe,
+        // which is how the DHIS2 2.42+ global shell loads the app.
+        if (!isAuthenticated) instance.loginPopup().catch(console.error);
     }, [isAuthenticated, instance]);
 
     return (
