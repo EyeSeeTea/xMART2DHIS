@@ -85,4 +85,10 @@ async function main() {
     }
 }
 
-main();
+// The Microsoft login popup comes back to this page, and the opener reads the response from its
+// URL. Booting the app here would consume that response before the opener gets it.
+function isMsalPopup(): boolean {
+    return !!window.opener && window.opener !== window && window.name.startsWith("msal.");
+}
+
+if (!isMsalPopup()) main();
