@@ -1,0 +1,14 @@
+{
+    "BatchID": 911625,
+    "ProcessStepCode": "COMPLETED",
+    "ProcessResultCode": "SUCCESS",
+    "MartCode": "TRAINING_EYESEETEA",
+    "OriginCode": "LOAD_DATA_V2",
+    "PipelineCode": "LOAD_DATA_V2",
+    "OriginTitle": "LOAD_DATA_V2",
+    "ProcessStepTitle": "Completed",
+    "ProcessResultTitle": "Completed",
+    "TotalChanged": 2,
+    "HasWarnings": false,
+    "HasErrors": false
+}

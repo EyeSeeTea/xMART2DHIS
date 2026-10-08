@@ -32,22 +32,31 @@ Constraints: the project's own `Future` (`.est_ai/rules/project/async.md`), Reac
 - Pipelines of this version and of previous versions coexist in a mart.
 
 **Non-Goals:**
-- Changing how use cases build the JSON (tables/fields model, data rows, pipeline definitions).
+- Changing what the use cases gather for xMART (the tables/fields model, the data rows).
 - Polling changes beyond reading the result (interval, retries).
 - Replacing `ts-mockito` in the existing test.
 - Creating or publishing pipelines through xMART's undocumented internal API.
 
 ## Decisions
 
-### 1. The file travels as an optional argument of `runPipeline`
+### 1. The xMART port expresses what the app needs, not how xMART does it
 
-`XMartRepository.runPipeline(mart, pipeline, params, file?: FileInfo)`. When `file` is present, `XMartDefaultRepository` builds a `FormData` with it in the `file` field and posts it to `/origin/start`; the other inputs stay in the query string, as today.
+`XMartRepository` gets three operations in domain language, and loses `runPipeline`:
 
-- Reuses the domain's `FileInfo` (`name`, `data: Blob`); its optional `id` is ignored.
-- Alternative: a separate `uploadFile` step returning a handle. Rejected: xMART only takes the file in the same request that starts the run, so there is nothing to hold between two calls.
+- `loadModel(mart, model: XMartLoadModelData)`: create or update the mart's tables and fields.
+- `loadData(mart, table, rows)`: load rows into a table of the mart.
+- `checkConnection(mart)`: check that the mart is ready to receive the app's data.
+
+Each returns the batch id (`FutureData<number>`), as `runPipeline` does today. How each is done is the adapter's business: `XMartDefaultRepository` picks the pipeline (`LOAD_MODEL_V2`, `LOAD_DATA_V2`, `LOAD_PIPELINE_V2`), serialises the payload to JSON, sends it as a multipart file to `/origin/start` and polls the batch (a private `startPipeline`). `checkConnection` runs `LOAD_PIPELINE_V2` with the definitions of the app's pipelines, so it also registers and updates them.
+
+- Why: today `runPipeline(mart, pipeline, params)` is xMART's transport as is (pipeline code, loose inputs, a URL, now a file), so the use cases know pipeline codes, the file format (`JSON.stringify`) and even the pipeline XML (`TestConnectionUseCase` imports them from `data/`). Any change on xMART's side reaches the domain, as the move to `_V2` shows. With intent operations, if xMART offered a plain REST API for tables and rows, only the adapter would change. (*Clean Architecture code smells* → implicit infrastructure coupling in the domain.)
+- No pipeline-specific operation such as `registerPipelines`: pipelines are xMART's mechanism, not something the app needs; with another API that operation would be meaningless. Test connection's intent is "is this mart ready?".
+- The file sent to xMART (`PipelineFile`: `name`, `content`) is a type of the data layer; the `Blob` is built there, so `domain/` depends on no platform type. The legacy `FileInfo` (`data: Blob`) is not reused.
+- Transition: the public `runPipeline` stays in the port while the use cases still send a URL, and is removed once the three use cases move to the new operations (tasks, group 5).
+- Alternative: keep a generic `runPipeline(mart, pipeline, params, file)` in the port. Rejected for the reasons above.
 - Alternative: keep `FileRepository` with an xMART implementation. Rejected: the file is no longer stored anywhere; it is part of the run request.
 
-**Data flow (running an action):** `ExecuteActionUseCase.sendDataByTable` serialises the rows into a `FileInfo` (domain) → `XMartRepository.runPipeline(mart, "LOAD_DATA_V2", { table }, file)` (domain interface) → `XMartDefaultRepository` gets the API token from `AzureRepository`, posts `multipart/form-data` to `/origin/start`, polls `/batch/{id}/status` until `COMPLETED` and checks `ProcessResultCode` (data) → `FutureData<number>` back to the use case → the page shows the summary or the error (presentation, unchanged). Saving an action (`LOAD_MODEL_V2`) and Test connection (`LOAD_PIPELINE_V2`) follow the same path with their own file and no params.
+**Data flow (running an action):** `ExecuteActionUseCase` gathers the rows of each table (domain) → `XMartRepository.loadData(mart, table, rows)` (domain port) → `XMartDefaultRepository` serialises the rows to a JSON file, gets the API token from `AzureRepository`, posts `multipart/form-data` to `/origin/start` with `originCode=LOAD_DATA_V2` and `table`, polls `/batch/{id}/status` until `COMPLETED` and checks `ProcessResultCode` (data) → `FutureData<number>` back to the use case → the page shows the summary or the error (presentation, unchanged). Saving an action (`loadModel`) and Test connection (`checkConnection`) follow the same path.
 
 ### 2. `futureFetch` accepts `FormData` and lets the browser set the content type
 
@@ -63,7 +72,7 @@ The app uses `LOAD_PIPELINE_V2`, `LOAD_MODEL_V2` and `LOAD_DATA_V2`, and never t
 - Detection becomes the case the app already handles: if `LOAD_PIPELINE_V2` does not exist, xMART answers `Origin code 'LOAD_PIPELINE_V2' does not exists` (decision 6).
 - Rollback is free: the previous pipelines stay in the mart.
 - **Rule:** the suffix changes only when the pipelines' contract changes (inputs, or the shape of the file), because that would break other installations sharing the mart. Compatible fixes (like decision 4's `FIELD_TYPE_CODE`) keep the suffix and reach every mart on the next Test connection.
-- The pipeline codes live in one place in the data layer (with the XML), so the use cases and the setup dialog do not repeat them.
+- The pipeline codes and their XML live only in the data layer; the use cases never name them (decision 1), and the setup dialog takes `LOAD_PIPELINE_V2` and its XML from there.
 - Alternative: reuse the current names. Rejected for the reason above.
 - Alternative: a prefix (`X2D_LOAD_DATA_V2`). Rejected: further from the names users already know.
 
@@ -79,17 +88,17 @@ New XML in `src/data/utils/pipelines/`, as validated in the proof of concept:
 
 ### 5. Success means `ProcessResultCode == "SUCCESS"`
 
-`getBatchStatusPolling` keeps polling until `COMPLETED` (or `maxRetries`). `runPipeline` then returns the batch id only for `SUCCESS`; any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`. Reaching `maxRetries` without completion is also an error (today it is reported as success).
+`getBatchStatusPolling` keeps polling until `COMPLETED` (or `maxRetries`). Every load (`loadModel`, `loadData`, `checkConnection`) then returns the batch id only for `SUCCESS`; any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`. Reaching `maxRetries` without completion is also an error (today it is reported as success).
 
-### 6. Setup-required error instead of matching xMART strings in the pages
+### 6. "The mart needs setting up": a domain error, not xMART strings in the pages
 
-The repository maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (`Origin code 'LOAD_PIPELINE_V2' does not exists`, `Sequence contains no elements`) to one domain error, and both pages open `PipelineSetupDialog` on that error. The dialog shows `LOAD_PIPELINE_V2` as the code and its XML.
+`checkConnection` maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (`Origin code 'LOAD_PIPELINE_V2' does not exists`, `Sequence contains no elements`) to one domain error, *the mart needs setting up*, which names no pipeline. Both pages open `PipelineSetupDialog` on that error; the dialog shows the steps and the XML of `LOAD_PIPELINE_V2`, taken from the data layer.
 
 - Alternative: keep matching the strings in each page. Rejected: duplicated in two pages and tied to xMART's wording.
 
 ### 7. Remove `FileRepository` and `FileD2ApiRepository`
 
-Nothing else uses them once the three use cases stop. `compositionRoot.ts` stops building `FileD2ApiRepository`; the use case constructors lose the `fileRepository` argument.
+Nothing else uses them once the three use cases stop. `compositionRoot.ts` stops building `FileD2ApiRepository`; the use case constructors lose the `fileRepository` argument. The public `runPipeline` leaves the port at the same time (decision 1).
 
 ## Risks / Trade-offs
 
