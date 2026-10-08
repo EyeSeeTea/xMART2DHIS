@@ -11,18 +11,18 @@ context: |
   Note: DEVELOPMENT.md is the project overview (written for people; agents read it too); it
   is distinct from the behavioral capability specs under openspec/specs/.
 
-rules:
-  project:
-    - "Specs first: before modifying any behavior, check openspec/specs/ for existing specs. If behavior is unclear, read the spec. If no spec exists for a capability the change touches, add one in the change. Write specs only for the capabilities a change touches; do not spec the rest of an existing project unless the team decides to."
-    - "Follow the project's sources, do not restate them here: AGENTS.md (git, PRs, CI, Boy Scout Rule), .est_ai/rules/ (code and process rules, including .est_ai/rules/project/) and DEVELOPMENT.md (project facts, architecture, verification)."
-    - "Definition of Done: a change is complete when specs are updated, code aligns with specs, the verification in DEVELOPMENT.md passes, and no breaking surfaces are altered without a proposal."
+  Rules for every change:
+  - Specs first: before modifying any behavior, check openspec/specs/ for existing specs. If behavior is unclear, read the spec. If no spec exists for a capability the change touches, add one in the change. Write specs only for the capabilities a change touches; do not spec the rest of an existing project unless the team decides to.
+  - Follow the project's sources, do not restate them here: AGENTS.md (git, PRs, CI, Boy Scout Rule), .est_ai/rules/ (code and process rules, including .est_ai/rules/project/) and DEVELOPMENT.md (project facts, architecture, verification).
+  - Definition of Done: a change is complete when specs are updated, code aligns with specs, the verification in DEVELOPMENT.md passes, and no breaking surfaces are altered without a proposal.
 
+rules:
   proposal:
     - "Typical sections to include (skip when non-relevant to the specific task): Goals, Non-goals, User impact, Compatibility, and Rollback plan."
     - If changing public interfaces, explicitly list old vs new.
 
   design:
-    - Must describe: data flow through the architecture layers.
+    - "Must describe: data flow through the architecture layers."
     - Note known constraints when relevant.
 
   tasks:

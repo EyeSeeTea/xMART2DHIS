@@ -5,5 +5,5 @@ How the est-ai protocol applies to **this project**. The reviews and the init re
 -   **Language**: `typescript` → `rules/lang/typescript.md`
 -   **Profile**: `dhis2-react` → `rules/dhis2-react/`
 -   **Reference**: `dhis2-app-skeleton` → `reference/dhis2-app-skeleton/` (see [`reference/README.md`](reference/README.md))
--   **Installed from**: `EyeSeeTea/ai-dev-skeleton@3977692` (`est-ai@0.1.0`) — compare with the skeleton's `CHANGELOG.md` to see what changed since
+-   **Installed from**: `EyeSeeTea/ai-dev-skeleton@a36889f` (`est-ai@0.1.0`) — compare with the skeleton's `CHANGELOG.md` to see what changed since
 -   **Modules**: kept: frontend, OpenCode; removed: backend, database, Pencil (graphical design)
