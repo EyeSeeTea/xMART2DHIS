@@ -1,0 +1,40 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "instructions": ["AGENTS.md"],
+    "agent": {
+        "frontend-developer": {
+            "description": "Frontend developer for React, TypeScript, and UI implementation. Only use when explicitly invoked by name — not auto-selected.",
+            "mode": "subagent",
+            "prompt": "{file:.claude/agents/frontend-developer.md}",
+            "tools": {
+                "Read": true,
+                "Write": true,
+                "Edit": true,
+                "Bash": true,
+                "Glob": true,
+                "Grep": true
+            }
+        },
+        "code-reviewer": {
+            "description": "Reviews a published PR against EyeSeeTea standards in a fresh session. Thin wrapper over the est-review-pr skill. Only use when explicitly invoked by name — not auto-selected. To review work you just did, use the est-review-after-exec skill instead.",
+            "mode": "subagent",
+            "prompt": "{file:.claude/agents/code-reviewer.md}",
+            "tools": {
+                "Read": true,
+                "Glob": true,
+                "Grep": true,
+                "Bash": true
+            }
+        },
+        "project-manager": {
+            "description": "Project manager that translates OpenSpec proposals into tracker tasks, assigns work, and manages the sprint. Only use when explicitly invoked by name — not auto-selected.",
+            "mode": "subagent",
+            "prompt": "{file:.claude/agents/project-manager.md}",
+            "tools": {
+                "Read": true,
+                "Glob": true,
+                "Grep": true
+            }
+        }
+    }
+}
