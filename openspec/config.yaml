@@ -26,7 +26,9 @@ rules:
     - Note known constraints when relevant.
 
   tasks:
-    - Include at least one task for tests when behavior changes.
+    - "Test-first: each behavior is a 'test' task (a behavior-level test, following .est_ai/rules/ testing rules) immediately followed by an 'implement' task with the minimal code that makes it pass. Each pair is small enough to finish in one focused session."
+    - "Commit granularity is explicit in tasks.md, not inferred: a 'test' task followed by its 'implement' task for the same behavior is one commit (red -> green); a standalone 'test' task over an already-passing implementation is its own commit; non-behavior tasks (docs, specs, i18n) go in the commit they belong to or in their own. After each task group, add a 'Commit:' note with its Conventional Commits message (e.g. 'Commit: feat(xmart): send the file to xMART as multipart'), so an agent picking up tasks.md without the conversation knows where each commit falls."
+    - "When the behavior has failure or edge cases (errors from external systems, invalid input, empty or partial results), they get their own test tasks, not only the success path."
     - Include a task to update specs/ when behavior changes.
     - "Tag each task with the responsible agent role: [FE], [CR], or other as applicable."
 
