@@ -1,0 +1,39 @@
+schema: spec-driven
+
+# The project context lives in ./DEVELOPMENT.md (a single source of truth for humans
+# and AI agents). Keep this block as a short pointer; do not duplicate DEVELOPMENT.md here.
+context: |
+  Read ./DEVELOPMENT.md in the project root for full project context: what the project is,
+  tech stack, architecture and directory layout, canonical commands, code conventions,
+  verification steps, testing strategy, and git workflow. Read it before producing any
+  artifact and follow it.
+
+  Note: DEVELOPMENT.md is the project overview (written for people; agents read it too); it
+  is distinct from the behavioral capability specs under openspec/specs/.
+
+  Rules for every change:
+  - Specs first: before modifying any behavior, check openspec/specs/ for existing specs. If behavior is unclear, read the spec. If no spec exists for a capability the change touches, add one in the change. Write specs only for the capabilities a change touches; do not spec the rest of an existing project unless the team decides to.
+  - Follow the project's sources, do not restate them here: AGENTS.md (git, PRs, CI, Boy Scout Rule), .est_ai/rules/ (code and process rules, including .est_ai/rules/project/) and DEVELOPMENT.md (project facts, architecture, verification).
+  - Definition of Done: a change is complete when specs are updated, code aligns with specs, the verification in DEVELOPMENT.md passes, and no breaking surfaces are altered without a proposal.
+
+rules:
+  proposal:
+    - "Typical sections to include (skip when non-relevant to the specific task): Goals, Non-goals, User impact, Compatibility, and Rollback plan."
+    - If changing public interfaces, explicitly list old vs new.
+
+  design:
+    - "Must describe: data flow through the architecture layers."
+    - Note known constraints when relevant.
+
+  tasks:
+    - "Test-first: each behavior is a 'test' task (a behavior-level test, following .est_ai/rules/ testing rules) immediately followed by an 'implement' task with the minimal code that makes it pass. Each pair is small enough to finish in one focused session."
+    - "Commit granularity is explicit in tasks.md, not inferred: a 'test' task followed by its 'implement' task for the same behavior is one commit (red -> green); a standalone 'test' task over an already-passing implementation is its own commit; non-behavior tasks (docs, specs, i18n) go in the commit they belong to or in their own. After each task group, add a 'Commit:' note with its Conventional Commits message (e.g. 'Commit: feat(xmart): send the file to xMART as multipart'), so an agent picking up tasks.md without the conversation knows where each commit falls."
+    - "At each 'Commit:' note the agent stops, runs est-review-after-exec on that diff and asks the developer before committing."
+    - "When the behavior has failure or edge cases (errors from external systems, invalid input, empty or partial results), they get their own test tasks, not only the success path."
+    - Include a task to update specs/ when behavior changes.
+    - "Tag each task with the responsible agent role: [FE], [CR], or other as applicable."
+
+  specs:
+    - "Tests are the behavioral source of truth. Specs provide design context that tests cannot express (goals, non-goals, design decisions, rationale)."
+    - "Specs and tests are complementary: specs capture the 'why', tests capture the 'what'."
+    - "Keep specs lean: avoid duplicating in markdown what is already asserted by well-named tests."

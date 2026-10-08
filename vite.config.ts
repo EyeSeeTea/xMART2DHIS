@@ -16,7 +16,7 @@ export default ({ mode }): UserConfig => {
             environment: "jsdom",
             include: ["**/*.{spec,test}.{ts,tsx}"],
             setupFiles: "./src/tests/setup.js",
-            exclude: ["node_modules", "src/tests/playwright"],
+            exclude: ["node_modules", "src/tests/playwright", ".est_ai/**"],
             globals: true,
         },
         server: {
