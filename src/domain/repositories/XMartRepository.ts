@@ -7,6 +7,8 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
+    /** Loads the rows into a table of the mart. Resolves to the xMART batch id. */
+    loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
     runPipeline(
         mart: DataMart,
         pipeline: string,

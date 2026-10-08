@@ -21,7 +21,7 @@ Public interface changes:
 
 | | Old | New |
 |---|---|---|
-| `XMartRepository.runPipeline` | `(mart, pipeline, params)`; the file travels as the `url` param | `(mart, pipeline, params, file?)`; the file travels in the request body |
+| `XMartRepository` | `runPipeline(mart, pipeline, params)`: xMART's transport (pipeline code, inputs, file URL) | `loadModel(mart, model)`, `loadData(mart, table, rows)`, `checkConnection(mart)`: what the app needs; pipelines, file format and transport stay in the adapter |
 | `FileRepository` | `uploadFileAsExternal`, `removeFile` | removed |
 | Pipelines used by the app | `LOAD_PIPELINE`, `LOAD_MODEL`, `LOAD_DATA` | `LOAD_PIPELINE_V2`, `LOAD_MODEL_V2`, `LOAD_DATA_V2` |
 | `LOAD_DATA*` inputs | `url`, `table` | `table` |
@@ -67,8 +67,8 @@ Public interface changes:
 
 ## Impact
 
-- **Domain:** `XMartRepository` (`runPipeline` signature), `FileRepository` (removed), `TestConnectionUseCase`, `SaveActionsUseCase`, `ExecuteActionUseCase`.
-- **Data:** `XMartDefaultRepository` (`runPipeline`, `futureFetch` body and headers, `getBatchStatusPolling`), `FileD2ApiRepository` (removed), `data/utils/pipelines/` (new `_V2` XML).
+- **Domain:** `XMartRepository` (new operations, `runPipeline` removed), `FileRepository` (removed), `TestConnectionUseCase`, `SaveActionsUseCase`, `ExecuteActionUseCase` (no pipeline codes, file format or pipeline XML any more).
+- **Data:** `XMartDefaultRepository` (the new operations on top of a private `runPipeline`, `futureFetch` body and headers, `getBatchStatusPolling`), `FileD2ApiRepository` (removed), `data/utils/pipelines/` (new `_V2` XML).
 - **Presentation:** `ListConnectionsPage`, `NewConnectionPage` (when to open `PipelineSetupDialog`), `pipeline-setup-dialog` (pipeline code and XML in steps 2 and 3).
 - **Wiring:** `compositionRoot.ts` (no `FileD2ApiRepository`).
 - **Tests:** `ExecuteActionUseCase.spec.ts` (expects `url` and `LOAD_DATA` today).

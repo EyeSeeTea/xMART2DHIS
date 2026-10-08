@@ -20,6 +20,7 @@ import i18n from "../../utils/i18n";
 import { timeout } from "../../utils/futures";
 import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";
+import { PipelineCodes } from "../utils/pipelines/PipelineCodes";
 
 export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
@@ -98,10 +99,25 @@ export class XMartDefaultRepository implements XMartRepository {
         );
     }
 
+    public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number> {
+        const file: PipelineFile = { name: `${table}.json`, content: JSON.stringify(rows) };
+        return this.startPipeline(mart, PipelineCodes.loadData, { table }, file);
+    }
+
     public runPipeline(
         mart: DataMart,
         pipeline: string,
         params: Record<string, string | number | boolean>
+    ): FutureData<number> {
+        return this.startPipeline(mart, pipeline, params);
+    }
+
+    /* Starts the pipeline, with the file in the request body when there is one, and waits for its batch. */
+    private startPipeline(
+        mart: DataMart,
+        pipeline: string,
+        params: Record<string, string | number | boolean>,
+        file?: PipelineFile
     ): FutureData<number> {
         const { martCode, environment } = mart;
         const startParams = queryString.stringify({
@@ -117,7 +133,8 @@ export class XMartDefaultRepository implements XMartRepository {
         })
             .flatMap(({ endpoint, token }) => {
                 const url = joinUrl(endpoint, `/origin/start`) + "?" + startParams;
-                return futureFetch<XMartAPIBatchStartResponse>("post", url, { bearer: token });
+                const body = file ? toFormData(file) : undefined;
+                return futureFetch<XMartAPIBatchStartResponse>("post", url, { body, bearer: token });
             })
             .flatMap(response => {
                 const { BatchID, ErrorMessage } = response;
@@ -227,6 +244,12 @@ function buildParams(params?: Record<string, string | number | boolean>): string
     return _.map(params, (value, key) => `$${key}=${value}`).join("&");
 }
 
+function toFormData(file: PipelineFile): FormData {
+    const formData = new FormData();
+    formData.append("file", new Blob([file.content], { type: "application/json" }), file.name);
+    return formData;
+}
+
 function compactObject<Obj extends object>(object: Obj) {
     return _.pickBy(object, _.identity);
 }
@@ -235,7 +258,7 @@ function futureFetch<Data>(
     method: "get" | "post",
     path: string,
     options: {
-        body?: string;
+        body?: string | FormData;
         textResponse?: boolean;
         params?: Record<string, string | number | boolean>;
         bearer?: string;
@@ -254,7 +277,8 @@ function futureFetch<Data>(
             signal: controller.signal as unknown as AbortSignal,
             method,
             headers: {
-                "Content-Type": "application/json",
+                // With FormData, the browser sets multipart/form-data and its boundary
+                ...(body instanceof FormData ? {} : { "Content-Type": "application/json" }),
                 "x-requested-with": "XMLHttpRequest",
                 Authorization: bearer ? `Bearer ${bearer}` : "",
             },
@@ -287,6 +311,9 @@ function futureFetch<Data>(
 }
 
 type ODataResponse<Data> = { value: Data; [key: string]: any };
+
+/* A file sent to an xMART pipeline in the request that starts its run. */
+type PipelineFile = Readonly<{ name: string; content: string }>;
 
 type XMartAPIBatchStartResponse = { BatchID: number; Success?: boolean; ErrorMessage: string | null };
 
