@@ -50,8 +50,8 @@ These are proposals: they do not change a finding's severity or whether the chan
 
 - **Must fix** — blocks the commit or merge. Use it when:
   - new code violates a rule (a "must", "never", "no …" statement in `../rules/`), or legacy code was migrated outside the task's scope;
-  - the work breaks a process rule: a non-small change without a written plan, an open question decided without asking, a write to a shared system without approval;
-  - the change is incomplete: an OpenSpec task left unchecked, new/changed behavior without the test the testing rules require;
+  - the work breaks a process rule: a non-small change without a written plan, an open question decided without asking, a write to a shared system without approval, a commit without the developer's approval;
+  - the change is incomplete: an OpenSpec task whose work is in the diff left unchecked (every task on the change's last commit), new/changed behavior without the test the testing rules require;
   - verification fails: a verification command or CI check fails;
   - the code is wrong: a bug, a security issue, or behavior that does not match the spec or the task.
 - **Recommendations** — do not block, but should be addressed in this change or tracked. Use it when:

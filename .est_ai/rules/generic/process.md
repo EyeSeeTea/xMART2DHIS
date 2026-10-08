@@ -24,6 +24,10 @@ How work is done, not how code is written. These rules apply to every change, ne
 
 - Never write to GitHub, the issue tracker or any other shared system (PR descriptions, comments, reviews, tasks, statuses) without the developer's explicit approval of that exact write: show what you would write, and write it only once they approve it. Approval of one write does not extend to the next.
 
+## Commits
+
+- The agent does not create a commit without the developer's approval of that commit. First it runs the after-exec review ([`../../review/prompt-after-exec.md`](../../review/prompt-after-exec.md)) on the commit's diff; then it shows the files, the review result and the message, and commits only once the developer approves. Approval of one commit does not extend to the next, and neither a request to implement tasks nor a plan that marks where commits fall is approval.
+
 ## Fix the protocol, not only the code
 
 - When the same deviation appears a second time, the fix also goes into the protocol — a rule, a reference, the plan template or the checklist — so it does not appear a third time.
