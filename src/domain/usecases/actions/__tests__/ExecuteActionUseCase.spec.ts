@@ -86,6 +86,17 @@ describe("ExecuteActionUseCase", () => {
             expect(requestedPrograms(teiRepositoryMock)).toEqual([trackerProgram.id]);
         });
     });
+
+    describe("loading into xMART", () => {
+        it("starts no load and reports 0 rows for a table without rows", async () => {
+            const { useCase, action, xMartRepositoryMock } = givenAnActionWithoutRows();
+
+            const result = await useCase.execute(action.id).toPromise();
+
+            expect(result).toBe(`${metadataTable} 0 rows`);
+            expect(loads(xMartRepositoryMock)).toEqual([]);
+        });
+    });
 });
 
 /* An action over an event program and an org unit: its metadata table gets 2 rows. */
@@ -96,6 +107,11 @@ function givenAnActionWithOnlyAnEventProgram(): ActionScenario {
 /* An action over an event program, a tracker program and an org unit: its metadata table gets 3 rows. */
 function givenAnActionWithAnEventAndATrackerProgram(): ActionScenario {
     return givenAnActionWith([eventProgram, trackerProgram], [orgUnit.path]);
+}
+
+/* An action with no programs and no org units: its metadata table has no rows. */
+function givenAnActionWithoutRows(): ActionScenario {
+    return givenAnActionWith([], []);
 }
 
 type ActionScenario = {
