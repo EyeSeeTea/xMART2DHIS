@@ -33,7 +33,7 @@ Constraints: the project's own `Future` (`.est_ai/rules/project/async.md`), Reac
 
 **Non-Goals:**
 - Changing what the use cases gather for xMART (the tables/fields model, the data rows).
-- Polling changes beyond reading the result (interval, retries).
+- Polling changes beyond reading the result and removing the unused `maxRetries` (decision 5): no new interval, timeout or retry limit.
 - Replacing `ts-mockito` in the existing test.
 - Creating or publishing pipelines through xMART's undocumented internal API.
 
@@ -88,7 +88,9 @@ New XML in `src/data/utils/pipelines/`, as validated in the proof of concept:
 
 ### 5. Success means `ProcessResultCode == "SUCCESS"`
 
-`getBatchStatusPolling` keeps polling until `COMPLETED` (or `maxRetries`). Every load (`loadModel`, `loadData`, `checkConnection`) then returns the batch id only for `SUCCESS`; any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`. Reaching `maxRetries` without completion is also an error (today it is reported as success).
+`getBatchStatusPolling` keeps polling until `COMPLETED`. Every load (`loadModel`, `loadData`, `checkConnection`) then returns the batch id only for `SUCCESS`; any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`.
+
+- The unused `maxRetries` option of the polling is removed: no caller sets it, so polling only ends on `COMPLETED`, and its branch (a batch reported as success without finishing) could never run. The polling returns the completed status type, so the result check needs no "not finished" case.
 
 ### 6. "The mart needs setting up": a domain error, not xMART strings in the pages
 

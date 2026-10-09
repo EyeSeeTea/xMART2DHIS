@@ -145,7 +145,7 @@ export class XMartDefaultRepository implements XMartRepository {
                     return Future.error("Unknown batch id");
                 }
 
-                return this.getBatchStatusPolling(mart, BatchID).map(({ BatchID }) => BatchID);
+                return this.getBatchStatusPolling(mart, BatchID).flatMap(checkBatchSucceeded);
             });
     }
 
@@ -208,10 +208,8 @@ export class XMartDefaultRepository implements XMartRepository {
     private getBatchStatusPolling(
         mart: DataMart,
         batch: number,
-        options: { interval?: number; maxRetries?: number; currentRetry?: number } = {}
-    ): FutureData<XMartAPIBatchStatusResponse> {
-        const { interval = 1000, maxRetries, currentRetry = 0 } = options;
-
+        interval = 1000
+    ): FutureData<XMartAPICompletedBatchStatus> {
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart.environment),
             token: this.getAPIToken(mart.environment),
@@ -222,21 +220,29 @@ export class XMartDefaultRepository implements XMartRepository {
                 })
             )
             .flatMap(response => {
-                const hasFinished = response.ProcessStepCode === "COMPLETED";
-                const hasReachedMaxRetries = maxRetries !== undefined && currentRetry > maxRetries;
-                if (hasFinished || hasReachedMaxRetries) {
-                    return Future.success(response);
+                if (response.ProcessStepCode === "COMPLETED") {
+                    return Future.success<XMartAPICompletedBatchStatus, string>(response);
                 }
 
-                return timeout(interval).flatMap(() =>
-                    this.getBatchStatusPolling(mart, batch, {
-                        interval,
-                        maxRetries,
-                        currentRetry: currentRetry + 1,
-                    })
-                );
+                return timeout(interval).flatMap(() => this.getBatchStatusPolling(mart, batch, interval));
             });
     }
+}
+
+/* xMART reports a finished batch as COMPLETED; only a SUCCESS result means the load was done. */
+function checkBatchSucceeded(status: XMartAPICompletedBatchStatus): FutureData<number> {
+    if (status.ProcessResultCode !== "SUCCESS") {
+        return Future.error(
+            i18n.t("xMART batch {{batchId}} finished with {{result}}: {{title}}", {
+                nsSeparator: false,
+                batchId: status.BatchID,
+                result: status.ProcessResultCode,
+                title: status.ProcessResultTitle,
+            })
+        );
+    }
+
+    return Future.success(status.BatchID);
 }
 
 function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
@@ -345,6 +351,8 @@ type XMartAPIBatchStatusResponseStatus =
           ProcessStepCode: "COMPLETED";
           ProcessResultCode: "SYSTEM_ERROR" | "REJECTED" | "INVALID" | "SUCCESS" | "CANCELED" | "TIMEOUT_CANCELED";
       };
+
+type XMartAPICompletedBatchStatus = Extract<XMartAPIBatchStatusResponse, { ProcessStepCode: "COMPLETED" }>;
 
 function addCORSProxy(url: string): string {
     return url.replace(/^(.*?:\/\/)(.*)/, "$1dev.eyeseetea.com/cors/$2");

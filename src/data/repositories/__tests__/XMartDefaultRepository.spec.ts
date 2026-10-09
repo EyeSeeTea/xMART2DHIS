@@ -5,13 +5,21 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import { Future, FutureData } from "../../../domain/entities/Future";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import { AzureRepository } from "../../../domain/repositories/AzureRepository";
-import { MockWebServer } from "../../../utils/tests/MockWebServer";
+import { MockHandler, MockWebServer } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
 import batchStatusSuccessResponse from "./fixtures/BatchStatusSuccessResponse.json";
 
 const mockWebServer = new MockWebServer();
+
+const batchStatusStagingResponse = {
+    ...batchStatusSuccessResponse,
+    ProcessStepCode: "STAGING",
+    ProcessStepTitle: "Staging",
+    ProcessResultCode: null,
+    ProcessResultTitle: null,
+};
 
 const token = "user-token";
 const table = "POC_TABLE";
@@ -62,11 +70,54 @@ describe("XMartDefaultRepository", () => {
             expect(sentFile).toBeInstanceOf(Blob);
             expect(sentFile instanceof Blob ? JSON.parse(await sentFile.text()) : undefined).toEqual(rows);
         });
+
+        it("waits for a batch that is still running and resolves to its id once xMART finishes it", async () => {
+            const repository = givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck();
+
+            const batchId = await repository.loadData(dataMart, table, rows).toPromise();
+
+            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+        });
+
+        it.each(["INVALID", "REJECTED", "SYSTEM_ERROR", "CANCELED", "TIMEOUT_CANCELED"])(
+            "fails with the result and the batch id when xMART finishes the batch with %s",
+            async resultCode => {
+                const repository = givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode);
+
+                const error = await repository
+                    .loadData(dataMart, table, rows)
+                    .toPromise()
+                    .then(
+                        () => undefined,
+                        (error: string) => error
+                    );
+
+                expect(error).toContain(resultCode);
+                expect(error).toContain(String(runPipelineSuccessResponse.BatchID));
+            }
+        );
     });
 });
 
 /* An xMART that starts every run and finishes its batch with SUCCESS. */
 function givenAnXMartRepositoryWhosePipelinesSucceed(): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchesFinishWith("SUCCESS");
+}
+
+/* An xMART whose batches are still staging on the first status check and finish with SUCCESS on the next. */
+function givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck(): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchStatusIs(() =>
+        statusRequests().length === 1 ? batchStatusStagingResponse : batchStatusSuccessResponse
+    );
+}
+
+/* An xMART that starts every run and finishes its batch with the given result. */
+function givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode: string): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchStatusIs({ ...batchStatusSuccessResponse, ProcessResultCode: resultCode });
+}
+
+/* An xMART that starts every run and answers the status of its batch with the given response. */
+function givenAnXMartRepositoryWhoseBatchStatusIs(statusResponse: MockHandler["response"]): XMartDefaultRepository {
     mockWebServer.addRequestHandlers([
         {
             method: "post",
@@ -78,7 +129,7 @@ function givenAnXMartRepositoryWhosePipelinesSucceed(): XMartDefaultRepository {
             method: "get",
             endpoint: `${xMartApi}/batch/${runPipelineSuccessResponse.BatchID}/status`,
             httpStatusCode: 200,
-            response: batchStatusSuccessResponse,
+            response: statusResponse,
         },
     ]);
 
@@ -93,6 +144,10 @@ class AzureTestRepository implements AzureRepository {
     getToken(_scope: string): FutureData<string> {
         return Future.success(token);
     }
+}
+
+function statusRequests() {
+    return mockWebServer.allRequests.filter(request => request.url.pathname.endsWith("/status"));
 }
 
 function startRequest() {

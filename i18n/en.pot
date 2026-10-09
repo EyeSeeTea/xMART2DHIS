@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-28T12:52:28.410Z\n"
-"PO-Revision-Date: 2026-09-28T12:52:28.411Z\n"
+"POT-Creation-Date: 2026-10-08T20:07:08.233Z\n"
+"PO-Revision-Date: 2026-10-08T20:07:08.234Z\n"
 
 msgid "Unknown model"
 msgstr ""
@@ -15,6 +15,9 @@ msgid "Metadata"
 msgstr ""
 
 msgid "Unable to call xMART API for public data marts"
+msgstr ""
+
+msgid "xMART batch {{batchId}} finished with {{result}}: {{title}}"
 msgstr ""
 
 msgid "API error code: {{statusText}} ({{status}})"
