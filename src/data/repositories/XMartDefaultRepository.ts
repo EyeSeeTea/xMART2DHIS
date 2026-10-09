@@ -9,6 +9,7 @@ import {
     XMartContent,
     XMartResponse,
 } from "../../domain/entities/xmart/DataMart";
+import { XMartLoadModelData } from "../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,
@@ -97,6 +98,11 @@ export class XMartDefaultRepository implements XMartRepository {
         return this.requestMart<number>("get", mart, `/${table}/$count`, { textResponse: true }).map(
             ({ value }) => value
         );
+    }
+
+    public loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<number> {
+        const file: PipelineFile = { name: "model.json", content: JSON.stringify(model) };
+        return this.startPipeline(mart, PipelineCodes.loadModel, {}, file);
     }
 
     public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number> {

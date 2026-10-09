@@ -4,8 +4,9 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { Future, FutureData } from "../../../domain/entities/Future";
 import { DataMart } from "../../../domain/entities/xmart/DataMart";
+import { XMartLoadModelData } from "../../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../../domain/repositories/AzureRepository";
-import { MockHandler, MockWebServer } from "../../../utils/tests/MockWebServer";
+import { MockHandler, MockWebServer, Request as MockRequest } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
@@ -28,6 +29,14 @@ const rows: ReadonlyArray<object> = [
     { ID: "a", NAME: "first" },
     { ID: "b", NAME: "second" },
 ];
+
+const model: Readonly<XMartLoadModelData> = {
+    tables: [{ CODE: table, TITLE: "POC table" }],
+    fields: [
+        { TABLE_CODE: table, CODE: "ID", TITLE: "Id", FIELD_TYPE_CODE: "TEXT", IS_PRIMARY_KEY: 1, IS_REQUIRED: 1 },
+        { TABLE_CODE: table, CODE: "NAME", TITLE: "Name", FIELD_TYPE_CODE: "TEXT", IS_PRIMARY_KEY: 0, IS_REQUIRED: 0 },
+    ],
+};
 
 /* Matches the xMART external API whether the request goes direct or through the CORS proxy. */
 const xMartApi = "*/xmart4/external";
@@ -67,9 +76,7 @@ describe("XMartDefaultRepository", () => {
             expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
             expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
 
-            const sentFile = (await start.raw.formData()).get("file");
-            expect(sentFile).toBeInstanceOf(Blob);
-            expect(sentFile instanceof Blob ? JSON.parse(await sentFile.text()) : undefined).toEqual(rows);
+            expect(await sentFileContent(start)).toEqual(rows);
         });
 
         it("resolves to the batch id when xMART finishes the batch with SUCCESS", async () => {
@@ -114,6 +121,24 @@ describe("XMartDefaultRepository", () => {
             const error = await loadDataError(repository);
 
             expect(error).toBe("Unknown batch id");
+        });
+    });
+
+    describe("loadModel", () => {
+        it("sends the tables and fields to LOAD_MODEL_V2 as a JSON file in a multipart/form-data body, with no other inputs, and resolves to the batch id", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            const batchId = await repository.loadModel(dataMart, model).toPromise();
+
+            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+            const start = startRequest();
+            expect(start.raw.method).toBe("POST");
+            expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
+            expect(start.params.get("martCode")).toBe(dataMart.martCode);
+            expect(start.params.get("originCode")).toBe("LOAD_MODEL_V2");
+            expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
+            expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
+            expect(await sentFileContent(start)).toEqual(model);
         });
     });
 });
@@ -192,6 +217,13 @@ class AzureTestRepository implements AzureRepository {
 
 function statusRequests() {
     return mockWebServer.allRequests.filter(request => request.url.pathname.endsWith("/status"));
+}
+
+/* The JSON file sent in the "file" field of the multipart body, parsed. */
+async function sentFileContent(request: MockRequest): Promise<unknown> {
+    const file = (await request.raw.formData()).get("file");
+    if (!(file instanceof Blob)) throw new Error("No file in the multipart body");
+    return JSON.parse(await file.text());
 }
 
 function startRequest() {

@@ -1,5 +1,6 @@
 import { FutureData } from "../entities/Future";
 import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
+import { XMartLoadModelData } from "../entities/xmart/xMartSyncTableTemplates";
 
 export interface XMartRepository {
     listMartSuggestions(): FutureData<MartSuggestions>;
@@ -7,6 +8,8 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
+    /** Creates or updates the tables and fields of the mart. Resolves to the xMART batch id. */
+    loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<number>;
     /** Loads the rows into a table of the mart. Resolves to the xMART batch id. */
     loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
     runPipeline(
