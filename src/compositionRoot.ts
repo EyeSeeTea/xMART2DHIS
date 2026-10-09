@@ -83,7 +83,6 @@ export function getCompositionRoot(instance: Instance) {
                 eventsRepository,
                 teiRepository,
                 aggregatedRespository,
-                fileRepository,
                 martRepository,
                 connectionRepository
             ),
