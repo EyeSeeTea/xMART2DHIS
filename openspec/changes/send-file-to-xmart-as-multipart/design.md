@@ -78,7 +78,7 @@ The app uses `LOAD_PIPELINE_V2`, `LOAD_MODEL_V2` and `LOAD_DATA_V2`, and never t
 
 ### 4. Pipelines read the uploaded file, and register runnable pipelines
 
-New XML in `src/data/utils/pipelines/`, as validated in the proof of concept:
+The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `LoadData.ts`) changes as validated in the proof of concept. The files keep their names: the version lives only in the pipeline codes (decision 3). While the use cases still run the previous pipelines, the new XML lives in temporary `V2` files next to them. The changes:
 
 - `LOAD_DATA_V2`: `<GetJson OutputTableName="data"><Path>$</Path></GetJson>` directly in `<Extract>`; only the `table` input. Load section unchanged (`MERGE`, `DeleteNotInSource="false"`, `ColumnMappings Auto`).
 - `LOAD_MODEL_V2`: two `GetJson` over the same file (`tables`, `fields`); `TestRow` `ContextColumns="CODE,FIELD_TYPE_CODE,IS_PRIMARY_KEY"`. Rest of the load unchanged.
