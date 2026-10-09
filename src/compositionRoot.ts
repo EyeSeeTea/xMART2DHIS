@@ -73,7 +73,6 @@ export function getCompositionRoot(instance: Instance) {
             save: new SaveActionUseCase(
                 actionRepository,
                 metadataRepository,
-                fileRepository,
                 martRepository,
                 connectionRepository
             ),
