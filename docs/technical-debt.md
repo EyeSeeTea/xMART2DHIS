@@ -20,3 +20,18 @@ Debt found and deliberately postponed. Each entry says what it is, why it matter
 - **When:** a separate change, after `send-file-to-xmart-as-multipart` (a non-goal there: it does not change what
   the use cases gather). That change already reduces it: the use case no longer knows the pipeline, the JSON or
   the URL.
+
+## The table model that saving an action builds has almost no tests
+
+- **Found:** 2026-10-09, review of task 5.6 of `send-file-to-xmart-as-multipart` (`pillar-based-testing` → coverage).
+- **What:** `SaveActionUseCase` builds the tables and fields it loads into xMART: one table per mapping, the
+  template fields with their `SEQUENCE` and `FK_TABLE_CODE` pointing to the metadata table, and, for mappings with
+  *values as columns*, one field per data element and category option combo (`createDataValuesFieldsByDataSet`),
+  per program stage data element (`createEventValuesFieldsByProgramStage`) or per program attribute
+  (`createTEIAttributesFieldsByProgram`), without the optional fields. Only the simplest case (an action with only
+  the metadata table) is tested.
+- **Why it matters:** if that logic breaks, xMART creates tables with the wrong columns, and nobody notices until a
+  load fails.
+- **Proposal:** use-case tests for each kind of mapping, with and without values as columns, and for the foreign
+  keys to the metadata table, asserting explicit fields rather than recomputing them from the templates.
+- **When:** a separate task; `send-file-to-xmart-as-multipart` changes how the model is sent, not how it is built.
