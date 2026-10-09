@@ -3,9 +3,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { Future, FutureData } from "../../../domain/entities/Future";
-import { DataMart } from "../../../domain/entities/xmart/DataMart";
 import { XMartLoadModelData } from "../../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../../domain/repositories/AzureRepository";
+import { dataMart } from "../../../utils/tests/dataMart";
 import { MockHandler, MockWebServer, Request as MockRequest } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
 
@@ -40,22 +40,6 @@ const model: Readonly<XMartLoadModelData> = {
 
 /* Matches the xMART external API whether the request goes direct or through the CORS proxy. */
 const xMartApi = "*/xmart4/external";
-
-const dataMart: Readonly<DataMart> = {
-    id: "dataMartId1",
-    name: "Training",
-    owner: { id: "userId00001", name: "Admin" },
-    created: new Date(2026, 0, 1),
-    lastUpdated: new Date(2026, 0, 1),
-    lastUpdatedBy: { id: "userId00001", name: "Admin" },
-    publicAccess: "--------",
-    userAccesses: [],
-    userGroupAccesses: [],
-    environment: "UAT",
-    martCode: "TRAINING_EYESEETEA",
-    dataEndpoint: "https://portal-uat.who.int/xmart-api/odata/TRAINING_EYESEETEA",
-    connectionWorks: true,
-};
 
 describe("XMartDefaultRepository", () => {
     beforeAll(() => mockWebServer.start());

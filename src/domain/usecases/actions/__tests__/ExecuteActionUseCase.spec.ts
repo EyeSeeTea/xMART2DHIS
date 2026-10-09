@@ -5,7 +5,6 @@ import { Future, FutureData } from "../../../entities/Future";
 import { MetadataPackage } from "../../../entities/metadata/Metadata";
 import { OrganisationUnit } from "../../../entities/metadata/OrganisationUnit";
 import { Program } from "../../../entities/metadata/Program";
-import { DataMart } from "../../../entities/xmart/DataMart";
 import { ActionRepository } from "../../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../../repositories/AggregatedRepository";
 import { ConnectionsRepository } from "../../../repositories/ConnectionsRepository";
@@ -14,6 +13,7 @@ import { MetadataRepository } from "../../../repositories/MetadataRepository";
 import { getTEIsFilters, TEIRepository } from "../../../repositories/TEIRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 import { ExecuteActionUseCase } from "../ExecuteActionUseCase";
+import { dataMart } from "../../../../utils/tests/dataMart";
 
 const metadataTable = "METADATA";
 
@@ -37,22 +37,6 @@ const orgUnit: Readonly<OrganisationUnit> = {
     id: "DiszpKrYNg8",
     name: "Ngelehun CHC",
     path: "/ImspTQPwCqd/O6uvpzGd5pu/YuQRtpLP10I/DiszpKrYNg8",
-};
-
-const dataMart: Readonly<DataMart> = {
-    id: "dataMartId1",
-    name: "Training",
-    owner: { id: "userId00001", name: "Admin" },
-    created: new Date(2026, 0, 1),
-    lastUpdated: new Date(2026, 0, 1),
-    lastUpdatedBy: { id: "userId00001", name: "Admin" },
-    publicAccess: "--------",
-    userAccesses: [],
-    userGroupAccesses: [],
-    environment: "UAT",
-    martCode: "TRAINING_EYESEETEA",
-    dataEndpoint: "https://portal-uat.who.int/xmart-api/odata/TRAINING_EYESEETEA",
-    connectionWorks: true,
 };
 
 describe("ExecuteActionUseCase", () => {
