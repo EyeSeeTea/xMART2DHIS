@@ -9,6 +9,7 @@ import { MockHandler, MockWebServer } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
+import runPipelineErrorResponse from "./fixtures/RunPipelineErrorResponse.json";
 import batchStatusSuccessResponse from "./fixtures/BatchStatusSuccessResponse.json";
 
 const mockWebServer = new MockWebServer();
@@ -71,6 +72,14 @@ describe("XMartDefaultRepository", () => {
             expect(sentFile instanceof Blob ? JSON.parse(await sentFile.text()) : undefined).toEqual(rows);
         });
 
+        it("resolves to the batch id when xMART finishes the batch with SUCCESS", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            const batchId = await repository.loadData(dataMart, table, rows).toPromise();
+
+            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+        });
+
         it("waits for a batch that is still running and resolves to its id once xMART finishes it", async () => {
             const repository = givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck();
 
@@ -84,20 +93,40 @@ describe("XMartDefaultRepository", () => {
             async resultCode => {
                 const repository = givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode);
 
-                const error = await repository
-                    .loadData(dataMart, table, rows)
-                    .toPromise()
-                    .then(
-                        () => undefined,
-                        (error: string) => error
-                    );
+                const error = await loadDataError(repository);
 
                 expect(error).toContain(resultCode);
                 expect(error).toContain(String(runPipelineSuccessResponse.BatchID));
             }
         );
+
+        it("fails with xMART's message when xMART does not start the batch", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers(runPipelineErrorResponse);
+
+            const error = await loadDataError(repository);
+
+            expect(error).toBe(runPipelineErrorResponse.ErrorMessage);
+        });
+
+        it("fails with an unknown batch id when xMART starts the run without a batch id", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers({ BatchID: null, ErrorMessage: null });
+
+            const error = await loadDataError(repository);
+
+            expect(error).toBe("Unknown batch id");
+        });
     });
 });
+
+function loadDataError(repository: XMartDefaultRepository): Promise<string | undefined> {
+    return repository
+        .loadData(dataMart, table, rows)
+        .toPromise()
+        .then(
+            () => undefined,
+            (error: string) => error
+        );
+}
 
 /* An xMART that starts every run and finishes its batch with SUCCESS. */
 function givenAnXMartRepositoryWhosePipelinesSucceed(): XMartDefaultRepository {
@@ -116,21 +145,36 @@ function givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode: string): XMart
     return givenAnXMartRepositoryWhoseBatchStatusIs({ ...batchStatusSuccessResponse, ProcessResultCode: resultCode });
 }
 
+/* An xMART that answers every start request with the given response and has no batch status to report. */
+function givenAnXMartRepositoryWhoseStartAnswers(startResponse: MockHandler["response"]): XMartDefaultRepository {
+    return givenAnXMartRepositoryWith(startResponse);
+}
+
 /* An xMART that starts every run and answers the status of its batch with the given response. */
 function givenAnXMartRepositoryWhoseBatchStatusIs(statusResponse: MockHandler["response"]): XMartDefaultRepository {
-    mockWebServer.addRequestHandlers([
-        {
-            method: "post",
-            endpoint: `${xMartApi}/origin/start`,
-            httpStatusCode: 200,
-            response: runPipelineSuccessResponse,
-        },
+    return givenAnXMartRepositoryWith(runPipelineSuccessResponse, [
         {
             method: "get",
             endpoint: `${xMartApi}/batch/${runPipelineSuccessResponse.BatchID}/status`,
             httpStatusCode: 200,
             response: statusResponse,
         },
+    ]);
+}
+
+/* An xMART that answers every start request with the given response and the batch status with the given handlers. */
+function givenAnXMartRepositoryWith(
+    startResponse: MockHandler["response"],
+    statusHandlers: ReadonlyArray<MockHandler> = []
+): XMartDefaultRepository {
+    mockWebServer.addRequestHandlers([
+        {
+            method: "post",
+            endpoint: `${xMartApi}/origin/start`,
+            httpStatusCode: 200,
+            response: startResponse,
+        },
+        ...statusHandlers,
     ]);
 
     return new XMartDefaultRepository(new AzureTestRepository());
