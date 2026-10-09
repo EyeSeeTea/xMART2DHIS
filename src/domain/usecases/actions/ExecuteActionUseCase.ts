@@ -1,7 +1,6 @@
 import _ from "lodash";
 import i18n from "../../../utils/i18n";
 import { cache } from "../../../utils/cache";
-import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
 import { DataValueSet } from "../../entities/data/DataValue";
 import { ProgramEvent, ProgramEventDataValue } from "../../entities/data/ProgramEvent";
@@ -16,7 +15,6 @@ import { ActionRepository } from "../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../repositories/AggregatedRepository";
 import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
 import { EventsRepository } from "../../repositories/EventsRepository";
-import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { TEIRepository } from "../../repositories/TEIRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
@@ -60,7 +58,6 @@ export class ExecuteActionUseCase {
         private eventsRepository: EventsRepository,
         private teiRepository: TEIRepository,
         private aggregatedRespository: AggregatedRepository,
-        private fileRepository: FileRepository,
         private xMartRepository: XMartRepository,
         private connectionsRepository: ConnectionsRepository
     ) {}
@@ -244,7 +241,7 @@ export class ExecuteActionUseCase {
 
             return Future.sequential(
                 dataByTables.map(dataByTable => {
-                    return this.sendDataByTable(dataByTable.data, dataMart, dataByTable.table, dataByTable.table);
+                    return this.sendDataByTable(dataByTable.data, dataMart, dataByTable.table);
                 })
             ).map((results: string[]) => results.join("\n"));
         } catch (error) {
@@ -505,17 +502,12 @@ export class ExecuteActionUseCase {
         }
     }
 
-    private sendDataByTable(data: unknown[], dataMart: DataMart, key: string, tableCode: string): FutureData<string> {
+    private sendDataByTable(data: unknown[], dataMart: DataMart, tableCode: string): FutureData<string> {
         if (data.length === 0) return Future.success(i18n.t(`${tableCode} 0 rows`));
 
-        const fileInfo = this.generateFileInfo(data, key);
-
-        return this.fileRepository
-            .uploadFileAsExternal(fileInfo)
-            .flatMap(({ url }) => {
-                return this.xMartRepository.runPipeline(dataMart, "LOAD_DATA", { url, table: tableCode });
-            })
-            .flatMap(() => Future.success(i18n.t(`${tableCode} {{count}} rows`, { count: data.length })));
+        return this.xMartRepository
+            .loadData(dataMart, tableCode, data)
+            .map(() => i18n.t(`${tableCode} {{count}} rows`, { count: data.length }));
     }
 
     private getMetadataPairs(metadata: MetadataPackage): MetadataMap {
@@ -539,16 +531,6 @@ export class ExecuteActionUseCase {
         const pairs: Array<[string, MetadataItem]> = _.compact(items).map(item => [item.id, item]);
 
         return new Map([...pairs]);
-    }
-
-    private generateFileInfo(teis: unknown, key: string) {
-        const value = JSON.stringify(teis);
-
-        const blob = new Blob([value], { type: "application/json" });
-
-        const fileInfo = { id: getUid(`xMART2DHIS_${key}`), name: `xMART2DHIS_${key} file`, data: blob };
-
-        return fileInfo;
     }
 }
 

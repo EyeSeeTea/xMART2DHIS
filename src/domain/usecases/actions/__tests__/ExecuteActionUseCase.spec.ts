@@ -10,14 +10,12 @@ import { ActionRepository } from "../../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../../repositories/AggregatedRepository";
 import { ConnectionsRepository } from "../../../repositories/ConnectionsRepository";
 import { EventsRepository } from "../../../repositories/EventsRepository";
-import { FileRepository } from "../../../repositories/FileRepository";
 import { MetadataRepository } from "../../../repositories/MetadataRepository";
 import { getTEIsFilters, TEIRepository } from "../../../repositories/TEIRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 import { ExecuteActionUseCase } from "../ExecuteActionUseCase";
 
 const metadataTable = "METADATA";
-const fileUrl = "http://dhis2.test/api/documents/GoDTB1mkhEI/data";
 
 const eventProgram: Readonly<Program> = {
     id: "lxAQ7Zs9VYR",
@@ -60,7 +58,7 @@ const dataMart: Readonly<DataMart> = {
 describe("ExecuteActionUseCase", () => {
     describe("tracked entities", () => {
         /* /tracker/trackedEntities answers 400 E1003 for an event program, which failed the whole action. */
-        it("requests no tracked entities and succeeds for an action with only an event program", async () => {
+        it("requests no tracked entities and loads the action's rows into its xMART table for an action with only an event program", async () => {
             const action = createAction([eventProgram]);
             const teiRepository = fakeTEIRepository();
             const xMartRepository = fakeXMartRepository();
@@ -74,8 +72,15 @@ describe("ExecuteActionUseCase", () => {
 
             expect(result).toBe(`${metadataTable} 2 rows`);
             expect(requestedPrograms(teiRepository.mock)).toEqual([]);
-            expect(capture(xMartRepository.mock.runPipeline).all()).toEqual([
-                [dataMart, "LOAD_DATA", { url: fileUrl, table: metadataTable }],
+            expect(capture(xMartRepository.mock.loadData).all()).toEqual([
+                [
+                    dataMart,
+                    metadataTable,
+                    [
+                        { id: eventProgram.id, name: eventProgram.name, metadataType: "programs" },
+                        { id: orgUnit.id, name: orgUnit.name, metadataType: "organisationUnits" },
+                    ],
+                ],
             ]);
         });
 
@@ -115,7 +120,6 @@ function createUseCase(options: {
         fakeEventsRepository(),
         options.teis,
         instance(imock<AggregatedRepository>()),
-        fakeFileRepository(),
         options.xMart ?? fakeXMartRepository().instance,
         fakeConnectionsRepository()
     );
@@ -164,15 +168,9 @@ function fakeTEIRepository() {
     return { mock: repository, instance: instance(repository) };
 }
 
-function fakeFileRepository(): FileRepository {
-    const repository = imock<FileRepository>();
-    when(repository.uploadFileAsExternal(anything())).thenReturn(Future.success({ id: "GoDTB1mkhEI", url: fileUrl }));
-    return instance(repository);
-}
-
 function fakeXMartRepository() {
     const repository = imock<XMartRepository>();
-    when(repository.runPipeline(anything(), anything(), anything())).thenReturn(Future.success(1));
+    when(repository.loadData(anything(), anything(), anything())).thenReturn(Future.success(1));
     return { mock: repository, instance: instance(repository) };
 }
 
