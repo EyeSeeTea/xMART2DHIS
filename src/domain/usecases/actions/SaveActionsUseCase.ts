@@ -2,7 +2,6 @@ import _ from "lodash";
 import { UseCase } from "../../../compositionRoot";
 import i18n from "../../../utils/i18n";
 import { cache } from "../../../utils/cache";
-import { getUid } from "../../../utils/uid";
 import { SyncAction } from "../../entities/actions/SyncAction";
 import { Future, FutureData } from "../../entities/Future";
 import { ModelMapping } from "../../entities/mapping-template/MappingTemplate";
@@ -18,7 +17,6 @@ import {
 } from "../../entities/xmart/xMartSyncTableTemplates";
 import { ActionRepository } from "../../repositories/ActionRepository";
 import { ConnectionsRepository } from "../../repositories/ConnectionsRepository";
-import { FileRepository } from "../../repositories/FileRepository";
 import { MetadataRepository } from "../../repositories/MetadataRepository";
 import { XMartRepository } from "../../repositories/XMartRepository";
 import { generateXMartFieldId, generateXMartFieldName } from "../../utils";
@@ -27,7 +25,6 @@ export class SaveActionUseCase implements UseCase {
     constructor(
         private actionRepository: ActionRepository,
         private metadataRepository: MetadataRepository,
-        private fileRepository: FileRepository,
         private xMartRepository: XMartRepository,
         private connectionsRepository: ConnectionsRepository
     ) {}
@@ -93,12 +90,7 @@ export class SaveActionUseCase implements UseCase {
                     };
                 }, initialXMARTModels);
 
-                const tableFileInfo = this.generateFileInfo(xMARTModels, `Models`);
-
-                return this.fileRepository
-                    .uploadFileAsExternal(tableFileInfo)
-                    .flatMap(({ url }) => this.xMartRepository.runPipeline(dataMart, "LOAD_MODEL", { url }))
-                    .map(() => undefined);
+                return this.xMartRepository.loadModel(dataMart, xMARTModels).map(() => undefined);
             });
     }
 
@@ -226,16 +218,6 @@ export class SaveActionUseCase implements UseCase {
         if (ids.length === 0) Future.success({});
 
         return this.metadataRepository.getMetadataByIds(ids, fields, true);
-    }
-
-    private generateFileInfo(teis: unknown, key: string) {
-        const value = JSON.stringify(teis);
-
-        const blob = new Blob([value], { type: "application/json" });
-
-        const fileInfo = { id: getUid(`xMART2DHIS_${key}`), name: `xMART2DHIS_${key} file`, data: blob };
-
-        return fileInfo;
     }
 
     validateModelMappings(action: SyncAction): FutureData<SyncAction> {
