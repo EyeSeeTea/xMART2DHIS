@@ -30,14 +30,6 @@ export interface XMartFieldDefinition {
     _Delete?: 0 | 1;
 }
 
-export interface XMartPipelineDefinition {
-    CODE: string;
-    TITLE: string;
-    DESCRIPTION?: string;
-    XML: string;
-    _Delete?: 0 | 1;
-}
-
 export interface xMartTable {
     table: XMartTableDefinition;
     fields: XMartFieldDefinition[];

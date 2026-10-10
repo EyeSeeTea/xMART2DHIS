@@ -9,7 +9,7 @@ import {
     XMartContent,
     XMartResponse,
 } from "../../domain/entities/xmart/DataMart";
-import { XMartLoadModelData, XMartPipelineDefinition } from "../../domain/entities/xmart/xMartSyncTableTemplates";
+import { XMartLoadModelData } from "../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,
@@ -245,7 +245,7 @@ export class XMartDefaultRepository implements XMartRepository {
 }
 
 /* Definitions of the app's pipelines, which LOAD_PIPELINE_V2 registers or updates in the mart. */
-const appPipelines: ReadonlyArray<XMartPipelineDefinition> = [
+const appPipelines: ReadonlyArray<XMartAPIPipelineDefinition> = [
     { CODE: PipelineCodes.loadPipeline, TITLE: "[xMART2DHIS] Load pipeline from file", XML: LoadPipelineV2 },
     { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadDataV2 },
     { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModelV2 },
@@ -342,6 +342,9 @@ type ODataResponse<Data> = { value: Data; [key: string]: any };
 
 /* A file sent to an xMART pipeline in the request that starts its run. */
 type PipelineFile = Readonly<{ name: string; content: string }>;
+
+/* A pipeline as LOAD_PIPELINE_V2 reads it from the uploaded file. */
+type XMartAPIPipelineDefinition = Readonly<{ CODE: string; TITLE: string; XML: string }>;
 
 type XMartAPIBatchStartResponse = { BatchID: number; Success?: boolean; ErrorMessage: string | null };
 
