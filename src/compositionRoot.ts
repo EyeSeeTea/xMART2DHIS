@@ -4,7 +4,6 @@ import { AggregatedD2ApiRepository } from "./data/repositories/AggregatedD2ApiRe
 import { AzureMSALRepository } from "./data/repositories/AzureMSALRepository";
 import { ConnectionsDataStoreRepository } from "./data/repositories/ConnectionsDataStoreRepository";
 import { EventsD2ApiRepository } from "./data/repositories/EventsD2ApiRepository";
-import { FileD2ApiRepository } from "./data/repositories/FileD2ApiRepository";
 import { InstanceD2ApiRepository } from "./data/repositories/InstanceD2ApiRepository";
 import { MappingTemplateDataStoreRepository } from "./data/repositories/MappingTemplateDataStoreRepository";
 import { MetadataD2ApiRepository } from "./data/repositories/MetadataD2ApiRepository";
@@ -47,7 +46,6 @@ export function getCompositionRoot(instance: Instance) {
     const eventsRepository = new EventsD2ApiRepository(instance);
     const teiRepository = new TEID2ApiRepository(instance);
     const aggregatedRespository = new AggregatedD2ApiRepository(instance);
-    const fileRepository = new FileD2ApiRepository(instance);
     const mappingRepository = new MappingTemplateDataStoreRepository(dataStoreClient);
 
     return {
@@ -94,7 +92,7 @@ export function getCompositionRoot(instance: Instance) {
             save: new SaveConnectionUseCase(connectionRepository),
             delete: new DeleteConnectionsUseCase(connectionRepository),
             getById: new GetConnectionByIdUseCase(connectionRepository),
-            testConnection: new TestConnectionUseCase(martRepository, fileRepository),
+            testConnection: new TestConnectionUseCase(martRepository),
         }),
     };
 }
