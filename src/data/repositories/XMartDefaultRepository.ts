@@ -9,7 +9,7 @@ import {
     XMartContent,
     XMartResponse,
 } from "../../domain/entities/xmart/DataMart";
-import { XMartLoadModelData } from "../../domain/entities/xmart/xMartSyncTableTemplates";
+import { XMartLoadModelData, XMartPipelineDefinition } from "../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,
@@ -21,6 +21,9 @@ import i18n from "../../utils/i18n";
 import { timeout } from "../../utils/futures";
 import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";
+import { LoadDataV2 } from "../utils/pipelines/LoadDataV2";
+import { LoadModelV2 } from "../utils/pipelines/LoadModelV2";
+import { LoadPipelineV2 } from "../utils/pipelines/LoadPipelineV2";
 import { PipelineCodes } from "../utils/pipelines/PipelineCodes";
 
 export class XMartDefaultRepository implements XMartRepository {
@@ -108,6 +111,12 @@ export class XMartDefaultRepository implements XMartRepository {
     public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number> {
         const file: PipelineFile = { name: `${table}.json`, content: JSON.stringify(rows) };
         return this.startPipeline(mart, PipelineCodes.loadData, { table }, file);
+    }
+
+    /* Registers the app's pipelines with LOAD_PIPELINE_V2, which fails if the mart has not been set up for the app. */
+    public checkConnection(mart: DataMart): FutureData<number> {
+        const file: PipelineFile = { name: "pipelines.json", content: JSON.stringify(appPipelines) };
+        return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file);
     }
 
     public runPipeline(
@@ -234,6 +243,13 @@ export class XMartDefaultRepository implements XMartRepository {
             });
     }
 }
+
+/* Definitions of the app's pipelines, which LOAD_PIPELINE_V2 registers or updates in the mart. */
+const appPipelines: ReadonlyArray<XMartPipelineDefinition> = [
+    { CODE: PipelineCodes.loadPipeline, TITLE: "[xMART2DHIS] Load pipeline from file", XML: LoadPipelineV2 },
+    { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadDataV2 },
+    { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModelV2 },
+];
 
 /* xMART reports a finished batch as COMPLETED; only a SUCCESS result means the load was done. */
 function checkBatchSucceeded(status: XMartAPICompletedBatchStatus): FutureData<number> {

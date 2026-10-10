@@ -12,6 +12,8 @@ export interface XMartRepository {
     loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<number>;
     /** Loads the rows into a table of the mart. Resolves to the xMART batch id. */
     loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
+    /** Checks that the mart is ready to receive the app's data. Resolves to the xMART batch id. */
+    checkConnection(mart: DataMart): FutureData<number>;
     runPipeline(
         mart: DataMart,
         pipeline: string,

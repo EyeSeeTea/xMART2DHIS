@@ -8,6 +8,9 @@ import { AzureRepository } from "../../../domain/repositories/AzureRepository";
 import { dataMart } from "../../../utils/tests/dataMart";
 import { MockHandler, MockWebServer, Request as MockRequest } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
+import { LoadDataV2 } from "../../utils/pipelines/LoadDataV2";
+import { LoadModelV2 } from "../../utils/pipelines/LoadModelV2";
+import { LoadPipelineV2 } from "../../utils/pipelines/LoadPipelineV2";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
 import runPipelineErrorResponse from "./fixtures/RunPipelineErrorResponse.json";
@@ -53,13 +56,8 @@ describe("XMartDefaultRepository", () => {
             await repository.loadData(dataMart, table, rows).toPromise();
 
             const start = startRequest();
-            expect(start.raw.method).toBe("POST");
-            expect(start.params.get("martCode")).toBe(dataMart.martCode);
-            expect(start.params.get("originCode")).toBe("LOAD_DATA_V2");
+            expectAFileSentTo("LOAD_DATA_V2", start);
             expect(start.params.get("table")).toBe(table);
-            expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
-            expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
-
             expect(await sentFileContent(start)).toEqual(rows);
         });
 
@@ -116,16 +114,43 @@ describe("XMartDefaultRepository", () => {
 
             expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
             const start = startRequest();
-            expect(start.raw.method).toBe("POST");
+            expectAFileSentTo("LOAD_MODEL_V2", start);
             expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
-            expect(start.params.get("martCode")).toBe(dataMart.martCode);
-            expect(start.params.get("originCode")).toBe("LOAD_MODEL_V2");
-            expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
-            expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
             expect(await sentFileContent(start)).toEqual(model);
         });
     });
+
+    describe("checkConnection", () => {
+        it("sends the definitions of the app's pipelines to LOAD_PIPELINE_V2 as a JSON file in a multipart/form-data body, with no other inputs, and resolves to the batch id", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            const batchId = await repository.checkConnection(dataMart).toPromise();
+
+            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+            const start = startRequest();
+            expectAFileSentTo("LOAD_PIPELINE_V2", start);
+            expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
+            const definitions = await sentFileContent(start);
+            expect(definitions).toHaveLength(3);
+            expect(definitions).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ CODE: "LOAD_PIPELINE_V2", XML: LoadPipelineV2 }),
+                    expect.objectContaining({ CODE: "LOAD_MODEL_V2", XML: LoadModelV2 }),
+                    expect.objectContaining({ CODE: "LOAD_DATA_V2", XML: LoadDataV2 }),
+                ])
+            );
+        });
+    });
 });
+
+/* The request starts the pipeline in the mart, authorized with the user's token, with a file in a multipart body. */
+function expectAFileSentTo(pipeline: string, start: MockRequest): void {
+    expect(start.raw.method).toBe("POST");
+    expect(start.params.get("martCode")).toBe(dataMart.martCode);
+    expect(start.params.get("originCode")).toBe(pipeline);
+    expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
+    expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
+}
 
 function loadDataError(repository: XMartDefaultRepository): Promise<string | undefined> {
     return repository
