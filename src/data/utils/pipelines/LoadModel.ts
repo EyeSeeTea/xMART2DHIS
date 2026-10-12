@@ -1,26 +1,11 @@
 export const LoadModel = `<XmartPipeline IsStructure="true">
-  <Context>
-    <Inputs>
-      <Add Key="url" Type="text" />
-    </Inputs>
-  </Context>
   <Extract>
-    <GetWebService Url="\${url}?from=xmart">
-      <Headers>
-        <add Name="from-xmart" Value="true" />
-      </Headers>
-      <GetJson OutputTableName="tables">
-        <Path>tables</Path>
-      </GetJson>
-    </GetWebService>
-    <GetWebService Url="\${url}?from=xmart">
-      <Headers>
-        <add Name="from-xmart" Value="true" />
-      </Headers>
-      <GetJson OutputTableName="fields">
-        <Path>fields</Path>
-      </GetJson>
-    </GetWebService>
+    <GetJson OutputTableName="tables">
+      <Path>tables</Path>
+    </GetJson>
+    <GetJson OutputTableName="fields">
+      <Path>fields</Path>
+    </GetJson>
   </Extract>
   <Load>
     <LoadTable SourceTable="tables" TargetTable="TABLES" LoadStrategy="MERGE">
@@ -76,7 +61,7 @@ export const LoadModel = `<XmartPipeline IsStructure="true">
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not start with Sys_" Column="CODE" Pattern="^\\s*(?!sys_).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must not use reserved names _RecordID nor _Delete" Column="CODE" Pattern="^\\s*(?!_Record)(?!_Delete).*?$" />
         <TestPattern Impact="Error_RemoveRow" Tag="Field Code must only contain alpha-numeric or underscore characters" Column="CODE" Pattern="^[A-Za-z0-9_]+$" />
-        <TestRow Impact="Error_RemoveRow" Tag="TEXT_MAX not allowed as BPK" ContextColumns="CODE,FIELD_TYPE,IS_PRIMARY_KEY">
+        <TestRow Impact="Error_RemoveRow" Tag="TEXT_MAX not allowed as BPK" ContextColumns="CODE,FIELD_TYPE_CODE,IS_PRIMARY_KEY">
           <Expression>row["IS_PRIMARY_KEY"].NumberValue == 0 || row["FIELD_TYPE_CODE"].StringValue != "TEXT_MAX"</Expression>
         </TestRow>
       </Validate>

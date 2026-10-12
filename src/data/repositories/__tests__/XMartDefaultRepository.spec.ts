@@ -8,9 +8,9 @@ import { AzureRepository } from "../../../domain/repositories/AzureRepository";
 import { dataMart } from "../../../utils/tests/dataMart";
 import { MockHandler, MockWebServer, Request as MockRequest } from "../../../utils/tests/MockWebServer";
 import { XMartDefaultRepository } from "../XMartDefaultRepository";
-import { LoadDataV2 } from "../../utils/pipelines/LoadDataV2";
-import { LoadModelV2 } from "../../utils/pipelines/LoadModelV2";
-import { LoadPipelineV2 } from "../../utils/pipelines/LoadPipelineV2";
+import { LoadData } from "../../utils/pipelines/LoadData";
+import { LoadModel } from "../../utils/pipelines/LoadModel";
+import { LoadPipeline } from "../../utils/pipelines/LoadPipeline";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
 import runPipelineErrorResponse from "./fixtures/RunPipelineErrorResponse.json";
@@ -134,9 +134,9 @@ describe("XMartDefaultRepository", () => {
             expect(definitions).toHaveLength(3);
             expect(definitions).toEqual(
                 expect.arrayContaining([
-                    expect.objectContaining({ CODE: "LOAD_PIPELINE_V2", XML: LoadPipelineV2 }),
-                    expect.objectContaining({ CODE: "LOAD_MODEL_V2", XML: LoadModelV2 }),
-                    expect.objectContaining({ CODE: "LOAD_DATA_V2", XML: LoadDataV2 }),
+                    expect.objectContaining({ CODE: "LOAD_PIPELINE_V2", XML: LoadPipeline }),
+                    expect.objectContaining({ CODE: "LOAD_MODEL_V2", XML: LoadModel }),
+                    expect.objectContaining({ CODE: "LOAD_DATA_V2", XML: LoadData }),
                 ])
             );
         });

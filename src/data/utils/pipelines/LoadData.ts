@@ -1,19 +1,13 @@
 export const LoadData = `<XmartPipeline>
   <Context>
     <Inputs>
-      <Add Key="url" Type="text" />
       <Add Key="table" Type="text" />
     </Inputs>
   </Context>
   <Extract>
-    <GetWebService Url="\${url}?from=xmart">
-      <Headers>
-        <add Name="from-xmart" Value="true" />
-      </Headers>
-      <GetJson OutputTableName="data">
-        <Path>$</Path>
-      </GetJson>
-    </GetWebService>
+    <GetJson OutputTableName="data">
+      <Path>$</Path>
+    </GetJson>
   </Extract>
   <Load>
     <LoadTable SourceTable="data" TargetTable="\${table}" LoadStrategy="MERGE" DeleteNotInSource="false">

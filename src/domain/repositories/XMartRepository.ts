@@ -14,11 +14,6 @@ export interface XMartRepository {
     loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
     /** Checks that the mart is ready to receive the app's data. Resolves to the xMART batch id. */
     checkConnection(mart: DataMart): FutureData<number>;
-    runPipeline(
-        mart: DataMart,
-        pipeline: string,
-        params: Record<string, string | number | boolean>
-    ): FutureData<number>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

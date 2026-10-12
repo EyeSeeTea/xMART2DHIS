@@ -1,18 +1,8 @@
 export const LoadPipeline = `<XmartPipeline IsStructure="true">
-  <Context>
-    <Inputs>
-      <Add Key="url" Type="text" />
-    </Inputs>
-  </Context>
   <Extract>
-    <GetWebService Url="\${url}?from=xmart">
-      <Headers>
-        <add Name="from-xmart" Value="true" />
-      </Headers>
-      <GetJson OutputTableName="PIPELINE">
-        <Path>$</Path>
-      </GetJson>
-    </GetWebService>
+    <GetJson OutputTableName="PIPELINE">
+      <Path>$</Path>
+    </GetJson>
   </Extract>
   <Load>
     <LoadTable SourceTable="PIPELINE" TargetTable="PIPELINE" LoadStrategy="MERGE" DeleteNotInSource="false">
@@ -20,6 +10,7 @@ export const LoadPipeline = `<XmartPipeline IsStructure="true">
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
         <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
+        <AddColumn Name="TYPE_ID" FillWith="2" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -30,6 +21,7 @@ export const LoadPipeline = `<XmartPipeline IsStructure="true">
         <ColumnMapping Source="XML" Target="XML_Draft" />
         <ColumnMapping Source="XML" Target="XML_Published" />
         <ColumnMapping Source="_Delete" Target="_Delete" />
+        <ColumnMapping Source="TYPE_ID" Target="TypeID" />
       </ColumnMappings>
     </LoadTable>
     <LoadTable SourceTable="PIPELINE" TargetTable="ORIGIN" LoadStrategy="MERGE" DeleteNotInSource="false">
@@ -37,6 +29,7 @@ export const LoadPipeline = `<XmartPipeline IsStructure="true">
         <AddColumn Name="DESCRIPTION" />
         <AddColumn Name="_Delete" FillWith="0" />
         <AddColumn Name="MART_ID" FillWith="\${MART_ID}" />
+        <AddColumn Name="IS_FILE_BASED" FillWith="1" />
         <FindReplace Find=" " ReplaceWith="_" Column="CODE" />
         <FindReplace Find="-" ReplaceWith="_" Column="CODE" />
       </Transform>
@@ -50,6 +43,7 @@ export const LoadPipeline = `<XmartPipeline IsStructure="true">
         <ColumnMapping Source="TITLE" Target="Title" />
         <ColumnMapping Source="DESCRIPTION" Target="Description" />
         <ColumnMapping Source="_Delete" Target="_Delete" />
+        <ColumnMapping Source="IS_FILE_BASED" Target="IsFileBased" />
       </ColumnMappings>
     </LoadTable>
   </Load>

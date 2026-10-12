@@ -21,9 +21,9 @@ import i18n from "../../utils/i18n";
 import { timeout } from "../../utils/futures";
 import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";
-import { LoadDataV2 } from "../utils/pipelines/LoadDataV2";
-import { LoadModelV2 } from "../utils/pipelines/LoadModelV2";
-import { LoadPipelineV2 } from "../utils/pipelines/LoadPipelineV2";
+import { LoadData } from "../utils/pipelines/LoadData";
+import { LoadModel } from "../utils/pipelines/LoadModel";
+import { LoadPipeline } from "../utils/pipelines/LoadPipeline";
 import { PipelineCodes } from "../utils/pipelines/PipelineCodes";
 
 export class XMartDefaultRepository implements XMartRepository {
@@ -119,20 +119,12 @@ export class XMartDefaultRepository implements XMartRepository {
         return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file);
     }
 
-    public runPipeline(
-        mart: DataMart,
-        pipeline: string,
-        params: Record<string, string | number | boolean>
-    ): FutureData<number> {
-        return this.startPipeline(mart, pipeline, params);
-    }
-
-    /* Starts the pipeline, with the file in the request body when there is one, and waits for its batch. */
+    /* Starts the pipeline with the file in the request body and waits for its batch. */
     private startPipeline(
         mart: DataMart,
         pipeline: string,
         params: Record<string, string | number | boolean>,
-        file?: PipelineFile
+        file: PipelineFile
     ): FutureData<number> {
         const { martCode, environment } = mart;
         const startParams = queryString.stringify({
@@ -148,8 +140,10 @@ export class XMartDefaultRepository implements XMartRepository {
         })
             .flatMap(({ endpoint, token }) => {
                 const url = joinUrl(endpoint, `/origin/start`) + "?" + startParams;
-                const body = file ? toFormData(file) : undefined;
-                return futureFetch<XMartAPIBatchStartResponse>("post", url, { body, bearer: token });
+                return futureFetch<XMartAPIBatchStartResponse>("post", url, {
+                    body: toFormData(file),
+                    bearer: token,
+                });
             })
             .flatMap(response => {
                 const { BatchID, ErrorMessage } = response;
@@ -246,9 +240,9 @@ export class XMartDefaultRepository implements XMartRepository {
 
 /* Definitions of the app's pipelines, which LOAD_PIPELINE_V2 registers or updates in the mart. */
 const appPipelines: ReadonlyArray<XMartAPIPipelineDefinition> = [
-    { CODE: PipelineCodes.loadPipeline, TITLE: "[xMART2DHIS] Load pipeline from file", XML: LoadPipelineV2 },
-    { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadDataV2 },
-    { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModelV2 },
+    { CODE: PipelineCodes.loadPipeline, TITLE: "[xMART2DHIS] Load pipeline from file", XML: LoadPipeline },
+    { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadData },
+    { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModel },
 ];
 
 /* xMART reports a finished batch as COMPLETED; only a SUCCESS result means the load was done. */
