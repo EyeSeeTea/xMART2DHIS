@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-10-08T20:07:08.233Z\n"
-"PO-Revision-Date: 2026-10-08T20:07:08.234Z\n"
+"POT-Creation-Date: 2026-10-13T07:32:10.200Z\n"
+"PO-Revision-Date: 2026-10-13T07:32:10.201Z\n"
 
 msgid "Unknown model"
 msgstr ""
@@ -326,6 +326,19 @@ msgstr ""
 msgid "page"
 msgstr ""
 
+msgid "Step 2: Create '{{code}}' pipeline"
+msgstr ""
+
+msgid ""
+"Click 'New' above the list of pipelines ('Create a Pipeline' if the mart "
+"has no pipelines yet). The code needs to be exactly '{{code}}'."
+msgstr ""
+
+msgid ""
+"Choose the type 'Normal', not 'Flow': the pipeline does not work as a Flow "
+"pipeline."
+msgstr ""
+
 msgid "Step 3: "
 msgstr ""
 
@@ -514,12 +527,4 @@ msgid "Connection successfully created"
 msgstr ""
 
 msgid "Error saving connection"
-msgstr ""
-
-msgctxt "PIPELINE' pipeline"
-msgid "Step 2: Create 'LOAD"
-msgstr ""
-
-msgctxt "PIPELINE'."
-msgid "The code needs to be exactly 'LOAD"
 msgstr ""

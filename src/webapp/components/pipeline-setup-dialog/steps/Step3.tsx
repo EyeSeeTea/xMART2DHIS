@@ -1,6 +1,7 @@
 import React from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
 import { LoadPipeline } from "../../../../data/utils/pipelines/LoadPipeline";
+import { PipelineCodes } from "../../../../data/utils/pipelines/PipelineCodes";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../utils/i18n";
 import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
@@ -40,9 +41,9 @@ export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (
 const getUrl = (mart: DataMart) => {
     switch (mart.environment) {
         case "PROD":
-            return `https://extranet.who.int/xmart4/${mart.martCode}/pipelines/LOAD_PIPELINE`;
+            return `https://extranet.who.int/xmart4/${mart.martCode}/pipelines/configure/${PipelineCodes.loadPipeline}`;
         case "UAT":
-            return `https://portal-uat.who.int/xmart4/${mart.martCode}/pipelines/LOAD_PIPELINE`;
+            return `https://portal-uat.who.int/xmart4/${mart.martCode}/pipelines/configure/${PipelineCodes.loadPipeline}`;
         default:
             return "";
     }

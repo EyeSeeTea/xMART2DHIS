@@ -3,8 +3,9 @@
 See proposal.md → *Why*. Current state:
 
 - Three use cases transfer a JSON file to xMART the same way: `FileRepository.uploadFileAsExternal` creates a DHIS2 document shared with `externalAccess`, and `XMartRepository.runPipeline` starts a pipeline with its URL as the `url` input. `TestConnectionUseCase` then deletes the document; `SaveActionsUseCase` and `ExecuteActionUseCase` leave it in DHIS2.
-- The pipelines (`data/utils/pipelines/`) download that URL with `GetWebService` and parse it with `GetJson`. `LOAD_PIPELINE` is `IsStructure` and `MERGE`s the system tables `PIPELINE` and `ORIGIN` (itself included). It is pasted by hand once per mart through `PipelineSetupDialog` (step 2 shows the code, step 3 the `LoadPipeline` XML); the pages open the dialog when the error is `Origin code 'LOAD_PIPELINE' does not exists` or `Sequence contains no elements`.
+- The pipelines (`data/utils/pipelines/`) download that URL with `GetWebService` and parse it with `GetJson`. `LOAD_PIPELINE` is `IsStructure` and `MERGE`s the system tables `PIPELINE` and `ORIGIN` (itself included). It is pasted by hand once per mart through `PipelineSetupDialog` (step 2 shows the code, step 3 the `LoadPipeline` XML); the pages open the dialog when the error is `Origin code 'LOAD_PIPELINE' does not exists` or `Sequence contains no elements`. xMART 4.35 words the first one `Origin code '<CODE>' does not exist in mart <MART>.`, so that comparison no longer matches and the dialog does not open for a missing pipeline.
 - `XMartDefaultRepository.futureFetch` always sends `Content-Type: application/json` and only accepts a `string` body. If the direct request fails, it retries once through the CORS proxy `dev.eyeseetea.com/cors` (also in production).
+- xMART rejects a start (unknown origin, missing input) with HTTP 200 and `{ BatchID: 0, Success: false, ErrorMessage }` when the request carries `x-requested-with: XMLHttpRequest`, as `futureFetch` does; without it, it answers a generic HTML 500. Checked with curl on UAT, 2026-10-13.
 - `getBatchStatusPolling` returns when `ProcessStepCode == "COMPLETED"` and never looks at `ProcessResultCode`.
 
 Proof of concept (xMART 4.35.3, UAT, mart `TRAINING_EYESEETEA`, `POC_*` pipelines with the user's token):
@@ -69,7 +70,7 @@ The body becomes `string | FormData`. With `FormData`, `futureFetch` does not se
 The app uses `LOAD_PIPELINE_V2`, `LOAD_MODEL_V2` and `LOAD_DATA_V2`, and never touches `LOAD_PIPELINE`, `LOAD_MODEL` or `LOAD_DATA`.
 
 - A mart can be shared by several installations of the app (several DHIS2 instances, or older DHIS2 versions where external sharing still works). Overwriting `LOAD_DATA` with a file-based version would break those installations without anyone touching them.
-- Detection becomes the case the app already handles: if `LOAD_PIPELINE_V2` does not exist, xMART answers `Origin code 'LOAD_PIPELINE_V2' does not exists` (decision 6).
+- Detection becomes the case the app already handles: if `LOAD_PIPELINE_V2` does not exist, xMART answers `Origin code 'LOAD_PIPELINE_V2' does not exist in mart <MART>.` (decision 6).
 - Rollback is free: the previous pipelines stay in the mart.
 - **Rule:** the suffix changes only when the pipelines' contract changes (inputs, or the shape of the file), because that would break other installations sharing the mart. Compatible fixes (like decision 4's `FIELD_TYPE_CODE`) keep the suffix and reach every mart on the next Test connection.
 - The pipeline codes and their XML live only in the data layer; the use cases never name them (decision 1), and the setup dialog takes `LOAD_PIPELINE_V2` and its XML from there.
@@ -94,9 +95,11 @@ The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `Load
 
 ### 6. "The mart needs setting up": a domain error, not xMART strings in the pages
 
-`checkConnection` maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (`Origin code 'LOAD_PIPELINE_V2' does not exists`, `Sequence contains no elements`) to one domain error, *the mart needs setting up*, which names no pipeline. Both pages open `PipelineSetupDialog` on that error; the dialog shows the steps and the XML of `LOAD_PIPELINE_V2`, taken from the data layer.
+`checkConnection` maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (a message starting with `Origin code 'LOAD_PIPELINE_V2' does not exist`, which covers xMART's current `does not exist in mart <MART>.` and the older `does not exists`; and `Sequence contains no elements`) to one domain error, *the mart needs setting up*, which names no pipeline. Both pages open `PipelineSetupDialog` on that error; the dialog shows the steps and the XML of `LOAD_PIPELINE_V2`, taken from the data layer.
 
+- The error is typed: `checkConnection` returns `Future<CheckConnectionError, number>`, with `CheckConnectionError = { type: "martNeedsSetup" } | { type: "failed"; message: string }` in `domain/entities/xmart/`. `TestConnectionUseCase` passes it on, and the pages switch on `type` (developer's decision, 2026-10-13). It is the only operation that leaves `FutureData`: the other operations have no error the app reacts to.
 - Alternative: keep matching the strings in each page. Rejected: duplicated in two pages and tied to xMART's wording.
+- Alternative: a translated message exported by the domain, still in `FutureData`, compared by the pages. Rejected: detection would still be a string comparison.
 
 ### 7. Remove `FileRepository` and `FileD2ApiRepository`
 

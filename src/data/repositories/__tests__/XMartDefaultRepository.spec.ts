@@ -3,6 +3,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { Future, FutureData } from "../../../domain/entities/Future";
+import { CheckConnectionError } from "../../../domain/entities/xmart/CheckConnectionError";
 import { XMartLoadModelData } from "../../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../../domain/repositories/AzureRepository";
 import { dataMart } from "../../../utils/tests/dataMart";
@@ -14,6 +15,7 @@ import { LoadPipeline } from "../../utils/pipelines/LoadPipeline";
 
 import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
 import runPipelineErrorResponse from "./fixtures/RunPipelineErrorResponse.json";
+import originNotFoundErrorResponse from "./fixtures/OriginNotFoundErrorResponse.json";
 import batchStatusSuccessResponse from "./fixtures/BatchStatusSuccessResponse.json";
 
 const mockWebServer = new MockWebServer();
@@ -140,6 +142,37 @@ describe("XMartDefaultRepository", () => {
                 ])
             );
         });
+
+        it.each([
+            originNotFoundErrorResponse.ErrorMessage,
+            "Origin code 'LOAD_PIPELINE_V2' does not exists",
+            "Sequence contains no elements",
+        ])("fails because the mart needs setting up when xMART does not start LOAD_PIPELINE_V2: %s", async message => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers({
+                ...originNotFoundErrorResponse,
+                ErrorMessage: message,
+            });
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "martNeedsSetup" });
+        });
+
+        it("fails with xMART's message when xMART does not start the batch for another reason", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers(runPipelineErrorResponse);
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "failed", message: runPipelineErrorResponse.ErrorMessage });
+        });
+
+        it("fails with the result when xMART finishes the batch without SUCCESS", async () => {
+            const repository = givenAnXMartRepositoryWhoseBatchesFinishWith("REJECTED");
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "failed", message: expect.stringContaining("REJECTED") });
+        });
     });
 });
 
@@ -159,6 +192,16 @@ function loadDataError(repository: XMartDefaultRepository): Promise<string | und
         .then(
             () => undefined,
             (error: string) => error
+        );
+}
+
+function checkConnectionError(repository: XMartDefaultRepository): Promise<CheckConnectionError | undefined> {
+    return repository
+        .checkConnection(dataMart)
+        .toPromise()
+        .then(
+            () => undefined,
+            (error: CheckConnectionError) => error
         );
 }
 

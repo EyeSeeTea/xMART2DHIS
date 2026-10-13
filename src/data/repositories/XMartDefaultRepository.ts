@@ -2,6 +2,7 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import queryString from "query-string";
 import { Future, FutureData } from "../../domain/entities/Future";
+import { CheckConnectionError } from "../../domain/entities/xmart/CheckConnectionError";
 import {
     DataMart,
     DataMartEnvironment,
@@ -114,9 +115,9 @@ export class XMartDefaultRepository implements XMartRepository {
     }
 
     /* Registers the app's pipelines with LOAD_PIPELINE_V2, which fails if the mart has not been set up for the app. */
-    public checkConnection(mart: DataMart): FutureData<number> {
+    public checkConnection(mart: DataMart): Future<CheckConnectionError, number> {
         const file: PipelineFile = { name: "pipelines.json", content: JSON.stringify(appPipelines) };
-        return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file);
+        return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file).mapError(toCheckConnectionError);
     }
 
     /* Starts the pipeline with the file in the request body and waits for its batch. */
@@ -244,6 +245,15 @@ const appPipelines: ReadonlyArray<XMartAPIPipelineDefinition> = [
     { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadData },
     { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModel },
 ];
+
+/* xMART's answers when LOAD_PIPELINE_V2 is not in the mart ("does not exists" in older xMART versions). */
+function toCheckConnectionError(message: string): CheckConnectionError {
+    const martNeedsSetup =
+        message.startsWith(`Origin code '${PipelineCodes.loadPipeline}' does not exist`) ||
+        message === "Sequence contains no elements";
+
+    return martNeedsSetup ? { type: "martNeedsSetup" } : { type: "failed", message };
+}
 
 /* xMART reports a finished batch as COMPLETED; only a SUCCESS result means the load was done. */
 function checkBatchSucceeded(status: XMartAPICompletedBatchStatus): FutureData<number> {
