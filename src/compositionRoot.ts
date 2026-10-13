@@ -19,6 +19,7 @@ import { SaveActionUseCase } from "./domain/usecases/actions/SaveActionsUseCase"
 import { GetAzureInstanceUseCase } from "./domain/usecases/azure/GetAzureConfigUseCase";
 import { DeleteConnectionsUseCase } from "./domain/usecases/connection/DeleteConnectionsUseCase";
 import { GetConnectionByIdUseCase } from "./domain/usecases/connection/GetConnectionByIdUseCase";
+import { GetMartSetupInstructionsUseCase } from "./domain/usecases/connection/GetMartSetupInstructionsUseCase";
 import { ListAllConnectionsUseCase } from "./domain/usecases/connection/ListAllConnectionsUseCase";
 import { SaveConnectionUseCase } from "./domain/usecases/connection/SaveConnectionUseCase";
 import { TestConnectionUseCase } from "./domain/usecases/connection/TestConnectionUseCase";
@@ -93,6 +94,7 @@ export function getCompositionRoot(instance: Instance) {
             delete: new DeleteConnectionsUseCase(connectionRepository),
             getById: new GetConnectionByIdUseCase(connectionRepository),
             testConnection: new TestConnectionUseCase(martRepository),
+            getSetupInstructions: new GetMartSetupInstructionsUseCase(martRepository),
         }),
     };
 }

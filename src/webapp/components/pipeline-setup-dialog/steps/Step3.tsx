@@ -1,23 +1,21 @@
 import React from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
-import { LoadPipeline } from "../../../../data/utils/pipelines/LoadPipeline";
-import { PipelineCodes } from "../../../../data/utils/pipelines/PipelineCodes";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../utils/i18n";
-import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
+import { PipelineSetupStepProps } from "../PipelineSetupDialog";
 
-export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (
+export const Step3: React.FC<PipelineSetupStepProps> = ({ mart, instructions }) => (
     <React.Fragment>
         <h2>
             {i18n.t("Step 3: ", { nsSeparator: false })}
-            <a href={getUrl(mart)} target="_blank" rel="noreferrer">
+            <a href={getUrl(mart, instructions.pipelineCode)} target="_blank" rel="noreferrer">
                 {i18n.t("Configure the pipeline")}
             </a>
             {i18n.t(" with:", { nsSeparator: false })}
         </h2>
         <p>{i18n.t("Remember to click on the 'Publish' button.")}</p>
         <CopyBlock
-            text={LoadPipeline}
+            text={instructions.definition}
             language={"html"}
             showLineNumbers={true}
             startingLineNumber={1}
@@ -38,12 +36,12 @@ export const Step3: React.FC<PipelineSetupDialogProps> = ({ mart }) => (
     </React.Fragment>
 );
 
-const getUrl = (mart: DataMart) => {
+const getUrl = (mart: DataMart, pipelineCode: string) => {
     switch (mart.environment) {
         case "PROD":
-            return `https://extranet.who.int/xmart4/${mart.martCode}/pipelines/configure/${PipelineCodes.loadPipeline}`;
+            return `https://extranet.who.int/xmart4/${mart.martCode}/pipelines/configure/${pipelineCode}`;
         case "UAT":
-            return `https://portal-uat.who.int/xmart4/${mart.martCode}/pipelines/configure/${PipelineCodes.loadPipeline}`;
+            return `https://portal-uat.who.int/xmart4/${mart.martCode}/pipelines/configure/${pipelineCode}`;
         default:
             return "";
     }

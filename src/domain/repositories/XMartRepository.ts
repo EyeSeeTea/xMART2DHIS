@@ -1,6 +1,7 @@
 import { Future, FutureData } from "../entities/Future";
 import { CheckConnectionError } from "../entities/xmart/CheckConnectionError";
 import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
+import { MartSetupInstructions } from "../entities/xmart/MartSetupInstructions";
 import { XMartLoadModelData } from "../entities/xmart/xMartSyncTableTemplates";
 
 export interface XMartRepository {
@@ -15,6 +16,8 @@ export interface XMartRepository {
     loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
     /** Checks that the mart is ready to receive the app's data. Resolves to the xMART batch id. */
     checkConnection(mart: DataMart): Future<CheckConnectionError, number>;
+    /** What the user creates in xMART when `checkConnection` fails with `martNeedsSetup`. */
+    getSetupInstructions(): FutureData<MartSetupInstructions>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

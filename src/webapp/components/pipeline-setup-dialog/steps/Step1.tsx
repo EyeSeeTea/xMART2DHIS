@@ -2,9 +2,9 @@ import React from "react";
 import { DataMart } from "../../../../domain/entities/xmart/DataMart";
 import i18n from "../../../../utils/i18n";
 import step1Image from "../assets/step1.png";
-import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
+import { PipelineSetupStepProps } from "../PipelineSetupDialog";
 
-export const Step1: React.FC<PipelineSetupDialogProps> = ({ mart }) => {
+export const Step1: React.FC<PipelineSetupStepProps> = ({ mart }) => {
     return (
         <React.Fragment>
             <h2>

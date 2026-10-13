@@ -28,6 +28,9 @@ const batchStatusStagingResponse = {
     ProcessResultTitle: null,
 };
 
+/* The codes the app's pipelines have in xMART, written out so that a change in PipelineCodes breaks the tests. */
+const pipelineCodes = { loadPipeline: "LOAD_PIPELINE_V2", loadModel: "LOAD_MODEL_V2", loadData: "LOAD_DATA_V2" };
+
 const token = "user-token";
 const table = "POC_TABLE";
 const rows: ReadonlyArray<object> = [
@@ -58,7 +61,7 @@ describe("XMartDefaultRepository", () => {
             await repository.loadData(dataMart, table, rows).toPromise();
 
             const start = startRequest();
-            expectAFileSentTo("LOAD_DATA_V2", start);
+            expectAFileSentTo(pipelineCodes.loadData, start);
             expect(start.params.get("table")).toBe(table);
             expect(await sentFileContent(start)).toEqual(rows);
         });
@@ -116,7 +119,7 @@ describe("XMartDefaultRepository", () => {
 
             expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
             const start = startRequest();
-            expectAFileSentTo("LOAD_MODEL_V2", start);
+            expectAFileSentTo(pipelineCodes.loadModel, start);
             expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
             expect(await sentFileContent(start)).toEqual(model);
         });
@@ -130,22 +133,22 @@ describe("XMartDefaultRepository", () => {
 
             expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
             const start = startRequest();
-            expectAFileSentTo("LOAD_PIPELINE_V2", start);
+            expectAFileSentTo(pipelineCodes.loadPipeline, start);
             expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
             const definitions = await sentFileContent(start);
             expect(definitions).toHaveLength(3);
             expect(definitions).toEqual(
                 expect.arrayContaining([
-                    expect.objectContaining({ CODE: "LOAD_PIPELINE_V2", XML: LoadPipeline }),
-                    expect.objectContaining({ CODE: "LOAD_MODEL_V2", XML: LoadModel }),
-                    expect.objectContaining({ CODE: "LOAD_DATA_V2", XML: LoadData }),
+                    expect.objectContaining({ CODE: pipelineCodes.loadPipeline, XML: LoadPipeline }),
+                    expect.objectContaining({ CODE: pipelineCodes.loadModel, XML: LoadModel }),
+                    expect.objectContaining({ CODE: pipelineCodes.loadData, XML: LoadData }),
                 ])
             );
         });
 
         it.each([
             originNotFoundErrorResponse.ErrorMessage,
-            "Origin code 'LOAD_PIPELINE_V2' does not exists",
+            `Origin code '${pipelineCodes.loadPipeline}' does not exists`,
             "Sequence contains no elements",
         ])("fails because the mart needs setting up when xMART does not start LOAD_PIPELINE_V2: %s", async message => {
             const repository = givenAnXMartRepositoryWhoseStartAnswers({
@@ -172,6 +175,16 @@ describe("XMartDefaultRepository", () => {
             const error = await checkConnectionError(repository);
 
             expect(error).toEqual({ type: "failed", message: expect.stringContaining("REJECTED") });
+        });
+    });
+
+    describe("getSetupInstructions", () => {
+        it("resolves to the code and definition of the pipeline the mart needs to be set up with", async () => {
+            const repository = givenAnXMartRepository();
+
+            const instructions = await repository.getSetupInstructions().toPromise();
+
+            expect(instructions).toEqual({ pipelineCode: pipelineCodes.loadPipeline, definition: LoadPipeline });
         });
     });
 });
@@ -254,6 +267,11 @@ function givenAnXMartRepositoryWith(
         ...statusHandlers,
     ]);
 
+    return givenAnXMartRepository();
+}
+
+/* A repository authorized with the user's token, for whatever xMART the test has set up. */
+function givenAnXMartRepository(): XMartDefaultRepository {
     return new XMartDefaultRepository(new AzureTestRepository());
 }
 

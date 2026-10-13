@@ -10,6 +10,7 @@ import {
     XMartContent,
     XMartResponse,
 } from "../../domain/entities/xmart/DataMart";
+import { MartSetupInstructions } from "../../domain/entities/xmart/MartSetupInstructions";
 import { XMartLoadModelData } from "../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
@@ -118,6 +119,11 @@ export class XMartDefaultRepository implements XMartRepository {
     public checkConnection(mart: DataMart): Future<CheckConnectionError, number> {
         const file: PipelineFile = { name: "pipelines.json", content: JSON.stringify(appPipelines) };
         return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file).mapError(toCheckConnectionError);
+    }
+
+    /* The mart is set up by creating LOAD_PIPELINE_V2 by hand; checkConnection registers the rest. */
+    public getSetupInstructions(): FutureData<MartSetupInstructions> {
+        return Future.success({ pipelineCode: PipelineCodes.loadPipeline, definition: LoadPipeline });
     }
 
     /* Starts the pipeline with the file in the request body and waits for its batch. */
