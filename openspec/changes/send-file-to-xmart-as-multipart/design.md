@@ -107,6 +107,14 @@ The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `Load
 
 Nothing else uses them once the three use cases stop. `compositionRoot.ts` stops building `FileD2ApiRepository`; the use case constructors lose the `fileRepository` argument. The public `runPipeline` leaves the port at the same time (decision 1).
 
+### 8. Data values carry their org unit on any DHIS2 version
+
+Found in the end-to-end check on DHIS2 2.43: when `dataValueSets` is filtered by a single org unit, DHIS2 2.43 sends `orgUnit` only once, at the root of the response, not on each data value (same finding as EyeSeeTea/metadata-synchronization#1253). The rows then reach `LOAD_DATA_V2` without the `orgUnit` column, and xMART rejects the `MERGE` because it is a required primary key of the data values table.
+
+- `AggregatedD2ApiRepository.get` sets the root `orgUnit` on each data value that has none, so `ExecuteActionUseCase` and the rows sent to xMART do not depend on the DHIS2 version.
+- No version check: a data value's own `orgUnit` is kept whenever DHIS2 sends it.
+- Before this change, the same rows failed in xMART without the app noticing, because the batch result was not checked (decision 5).
+
 ## Risks / Trade-offs
 
 - [The CORS proxy may not forward multipart bodies] → Checked from the app running locally (dev always uses the proxy). If it fails, multipart requests skip the proxy fallback in production and the dev setup documents a direct origin.

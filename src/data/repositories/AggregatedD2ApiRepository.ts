@@ -31,10 +31,19 @@ export class AggregatedD2ApiRepository implements AggregatedRepository {
                 startDate: start.format("YYYY-MM-DD"),
                 endDate: end.format("YYYY-MM-DD"),
             })
-        ).map(dataValuesSet =>
-            filters.dataSetIds.length === 1 && !dataValuesSet.dataSet
-                ? { ...dataValuesSet, dataSet: filters.dataSetIds[0] }
-                : dataValuesSet
-        );
+        )
+            .map(dataValuesSet =>
+                filters.dataSetIds.length === 1 && !dataValuesSet.dataSet
+                    ? { ...dataValuesSet, dataSet: filters.dataSetIds[0] }
+                    : dataValuesSet
+            )
+            .map(dataValuesSet => ({
+                ...dataValuesSet,
+                // DHIS2 2.43+ sends orgUnit only once, at the root, when the request has a single org unit.
+                dataValues: dataValuesSet.dataValues.map(dataValue => ({
+                    ...dataValue,
+                    orgUnit: dataValue.orgUnit ?? dataValuesSet.orgUnit,
+                })),
+            }));
     }
 }
