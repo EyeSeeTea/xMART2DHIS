@@ -1,0 +1,104 @@
+# Project context — xMART2DHIS
+
+This file is the project OVERVIEW and CONVENTIONS, written for the people who work on the project; AI agents read it too, as the source of the project's facts. How the AI protocol applies to the project lives in [`.est_ai/project.md`](./.est_ai/project.md). It is distinct from the behavioral capability specs under `openspec/specs/`. For setup/usage details see [`README.md`](./README.md).
+
+## What it is
+
+`xMART2DHIS` is a DHIS2 web app that moves data from WHO xMART marts into DHIS2. Users define **connections** to xMART (signing in with Microsoft/Azure via MSAL), **mapping templates** that map xMART tables to DHIS2 models, and **actions** (sync pipelines) that read mart contents and import them into DHIS2 as aggregated data, events or tracked entities. Connections, templates and actions are stored in the DHIS2 data store. It is packaged as a DHIS2 app ZIP.
+
+## Tech stack
+
+-   **Language**: TypeScript 5.7 (`strict`, `noUncheckedIndexedAccess`)
+-   **Framework(s)**: React 17, react-router-dom 6 (`HashRouter`), Material UI 4, `@dhis2/ui` 7, `@eyeseetea/d2-ui-components`, styled-components
+-   **External APIs / clients**: `@eyeseetea/d2-api` (DHIS2 API), axios (xMART API), `@azure/msal-browser` / `@azure/msal-react` (Azure login)
+-   **Async / FP**: own `Future` on `fluture` (`src/domain/entities/Future.ts`), `purify-ts` (`Either`, codecs)
+-   **Tests**: Vitest 0.32 (jsdom) + Testing Library, `@johanblumenberg/ts-mockito`
+-   **Build**: Vite 4 + `d2-manifest`; `yarn build` produces `xmart-to-dhis.zip`
+-   **Lint/format**: ESLint 8 (`.eslintrc.js`) + Prettier 2.5 (`.prettierrc.js`)
+-   **i18n**: `@dhis2/d2-i18n` (gettext `.po` files in `i18n/`, generated `src/locales/`)
+-   **Runtime**: Node v22.22.0 (`.nvmrc` → `nvm use`), Yarn 4.12.0 via Corepack (`packageManager`)
+
+## First-time setup (each developer)
+
+Install the project as described in [`README.md` → Setup](./README.md#setup) (`nvm use`, Corepack + Yarn 4, `yarn install`). To run it against a DHIS2 instance, set `VITE_DHIS2_BASE_URL` (and optionally `VITE_DHIS2_AUTH`, `VITE_PORT`) in `.env.local` (git-ignored) or on the command line — see [`README.md` → Development](./README.md#development).
+
+After cloning, every developer also runs these once — none of it is committed:
+
+1. **Local Claude Code settings**: `cp .claude/settings.local.json.template .claude/settings.local.json`
+2. **References** for the AI agents: clone or symlink the reference declared in [`.est_ai/project.md`](./.est_ai/project.md) into `.est_ai/reference/` as described in [`.est_ai/reference/README.md`](./.est_ai/reference/README.md). Without it, the agents work from the rules alone and the reviews report "no references available".
+
+## Canonical commands
+
+| Task      | Command                                                                  |
+| --------- | ------------------------------------------------------------------------ |
+| Install   | `yarn install` (also runs `yarn localize`)                               |
+| Dev run   | `VITE_PORT=8081 VITE_DHIS2_BASE_URL="http://localhost:8080" yarn start`  |
+| Build     | `yarn build` (localize + tests + `tsc` + Vite build → `xmart-to-dhis.zip`) |
+| Test      | `yarn test` (watch: `yarn test-unit-watch`)                              |
+| Typecheck | `yarn tsc`                                                               |
+| Lint      | `yarn lint`                                                              |
+| Format    | `yarn prettify`                                                          |
+| i18n      | `yarn update-po`, then edit `i18n/*.po`, then `yarn localize`            |
+| Check     | `yarn check` (typecheck + lint + tests)                                  |
+
+## Architecture
+
+Clean Architecture. Dependencies point inward toward the domain; `domain/` has no framework or infrastructure dependencies and reaches external systems through repository interfaces.
+
+```
+src/
+  domain/
+    entities/       Domain models (actions, connections, mapping-template, metadata, xmart, …) + Future, Either
+    repositories/   Repository interfaces only
+    usecases/       Application logic, grouped by feature; depend on repository interfaces
+  data/
+    repositories/   Implementations: *D2ApiRepository (DHIS2 API), *DataStoreRepository (DHIS2 data store),
+                    XMartDefaultRepository (xMART), AzureMSALRepository (Azure login)
+    models/, utils/ Data-layer models and helpers (e.g. tracker import pipelines)
+  webapp/
+    pages/          Routed pages (Router.tsx) and the App shell
+    components/     Reusable React components
+    contexts/       app-context.ts: compositionRoot, api, current user
+    hooks/, utils/  Presentation hooks (e.g. useFuture) and helpers
+  compositionRoot.ts  Builds the repositories and injects them into the use cases
+  utils/            Shared utilities (futures, codecs, i18n)
+  types/            `.d.ts` for modules without types
+  locales/          Generated by `yarn localize` — do not edit
+```
+
+A typical flow: a page or component gets `compositionRoot` from the app context, calls a use case (e.g. `compositionRoot.connection.listAll().run(onSuccess, onError)`) that returns a `FutureData`, and renders the result; the use case orchestrates the repositories that `compositionRoot.ts` wired in.
+
+## Code conventions
+
+Project rules checked in reviews (extra restrictions, or exceptions to the shared EyeSeeTea rules) live in [`.est_ai/rules/project/`](./.est_ai/rules/project/README.md).
+
+-   New code goes in the correct layer per the architecture above, and is wired in `src/compositionRoot.ts`.
+-   Async code returns the project's `FutureData` ([`async.md`](./.est_ai/rules/project/async.md)).
+-   UI texts go through `i18n.t(...)` from `src/utils/i18n`; never edit `src/locales/` ([`generated-code.md`](./.est_ai/rules/project/generated-code.md)).
+-   Mind the version gap with the reference ([`versions.md`](./.est_ai/rules/project/versions.md)).
+
+## Verification
+
+Before considering a change done, run the project's checks:
+
+-   **All checks** (`yarn check`) — runs every check below, so none is skipped.
+-   Typecheck (`yarn tsc`)
+-   Lint (`yarn lint`)
+-   Tests (`yarn test`)
+
+The `pre-push` hook (`.husky/pre-push`) runs `yarn prettify && yarn lint && yarn update-po && yarn test`.
+
+## Testing strategy
+
+-   Vitest with `jsdom` and global APIs; setup in `src/tests/setup.js`. Tests live next to the code in `__tests__/` folders, named `*.spec.ts(x)`.
+-   Unit tests cover use cases (e.g. `ExecuteActionUseCase`), repositories (e.g. `TEID2ApiRepository`) and data utils (tracker pagers/events).
+-   Use-case tests use in-memory test repositories implementing the domain interface, not mocks of `D2Api` (see `.est_ai/rules/dhis2-react/testing.md`).
+-   Add or adjust tests whenever behavior changes.
+
+## Git workflow
+
+-   Format (`yarn prettify`) before committing (the `pre-push` hook also runs it).
+-   Branch from `development` (unless the work depends on an unmerged branch); merge back to the same branch you started from.
+-   Branch naming: `feature/<name>` for features, `fix/<name>` for bugs, `refactor/<name>` for refactors.
+-   Commits follow [Conventional Commits](https://www.conventionalcommits.org/).
+-   PRs follow `.github/pull_request_template.md`; CI runs the shared EyeSeeTea workflow (`.github/workflows/main.yml`).

@@ -138,6 +138,7 @@
         "test-unit": "vitest run --reporter=basic --passWithNoTests",
         "test-unit-watch": "vitest watch",
         "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+        "check": "tsc && yarn lint && yarn test",
         "prettify": "prettier \"./**/*.{js,jsx,json,css,ts,tsx}\" --write",
         "extract-pot": "yarn d2-i18n-extract -p src/ -o i18n/",
         "localize": "yarn update-po && d2-i18n-generate -n xMART2DHIS -p ./i18n/ -o ./src/locales/",

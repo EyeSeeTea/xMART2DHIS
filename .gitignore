@@ -46,3 +46,15 @@ dist/
 .pnp.*
 
 .journal
+
+# est-ai
+
+# Claude Code local settings (per-user permissions, not shared)
+.claude/settings.local.json
+
+# est-ai references: provided locally (clone or symlink), see .est_ai/reference/README.md
+.est_ai/reference/*
+!.est_ai/reference/README.md
+
+# OpenSpec: tasks stay local; proposal, design and specs are committed (see AGENTS.md → Git workflow)
+openspec/**/tasks.md
