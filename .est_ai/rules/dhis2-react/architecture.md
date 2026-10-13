@@ -33,7 +33,7 @@ Applies to new code. See [scope](../README.md#scope-new-code-vs-legacy).
 
 ## Async — Future, not Promise
 
-- New repositories and use cases return `FutureData<T>` (our lazy, cancellable async abstraction). **Never `Promise` in new `domain/` or `data/` code.**
+- New repositories and use cases return the project's `Future` (our lazy, cancellable async abstraction): `FutureData<T>` by default; `Future<E, T>` with a domain error union (in `domain/entities/`) when callers branch on the kind of failure, so they switch on its discriminant instead of comparing messages. **Never `Promise` in new `domain/` or `data/` code.**
 - In React, Futures are executed with `.run(onSuccess, onError)` inside `useEffect`.
 - `.toPromise()` appears only in tests.
 - **Legacy Promise code is not a violation.** It is not migrated opportunistically; only in a deliberate, bounded refactor. References to copy always use Future.
