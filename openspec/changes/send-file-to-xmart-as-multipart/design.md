@@ -73,7 +73,7 @@ The app uses `LOAD_PIPELINE_V2`, `LOAD_MODEL_V2` and `LOAD_DATA_V2`, and never t
 - Detection becomes the case the app already handles: if `LOAD_PIPELINE_V2` does not exist, xMART answers `Origin code 'LOAD_PIPELINE_V2' does not exist in mart <MART>.` (decision 6).
 - Rollback is free: the previous pipelines stay in the mart.
 - **Rule:** the suffix changes only when the pipelines' contract changes (inputs, or the shape of the file), because that would break other installations sharing the mart. Compatible fixes (like decision 4's `FIELD_TYPE_CODE`) keep the suffix and reach every mart on the next Test connection.
-- The pipeline codes and their XML live only in the data layer; the use cases never name them (decision 1), and the setup dialog takes `LOAD_PIPELINE_V2` and its XML from there.
+- The pipeline codes and their XML live only in the data layer; the use cases never name them (decision 1), and the setup dialog gets `LOAD_PIPELINE_V2` and its XML through a use case (decision 6).
 - Alternative: reuse the current names. Rejected for the reason above.
 - Alternative: a prefix (`X2D_LOAD_DATA_V2`). Rejected: further from the names users already know.
 
@@ -95,7 +95,9 @@ The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `Load
 
 ### 6. "The mart needs setting up": a domain error, not xMART strings in the pages
 
-`checkConnection` maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (a message starting with `Origin code 'LOAD_PIPELINE_V2' does not exist`, which covers xMART's current `does not exist in mart <MART>.` and the older `does not exists`; and `Sequence contains no elements`) to one domain error, *the mart needs setting up*, which names no pipeline. Both pages open `PipelineSetupDialog` on that error; the dialog shows the steps and the XML of `LOAD_PIPELINE_V2`, taken from the data layer.
+`checkConnection` maps the failures that mean "`LOAD_PIPELINE_V2` is missing" (a message starting with `Origin code 'LOAD_PIPELINE_V2' does not exist`, which covers xMART's current `does not exist in mart <MART>.` and the older `does not exists`; and `Sequence contains no elements`) to one domain error, *the mart needs setting up*, which names no pipeline. Both pages open `PipelineSetupDialog` on that error; the dialog shows the steps and the XML of `LOAD_PIPELINE_V2`.
+
+- The dialog gets the pipeline code and its XML through `GetMartSetupInstructionsUseCase` → `XMartRepository.getSetupInstructions(): FutureData<MartSetupInstructions>`, with `MartSetupInstructions = { pipelineCode: string; definition: string }` in `domain/entities/xmart/`; the adapter fills it from `PipelineCodes` and `LoadPipeline`. So `webapp/` imports nothing from `data/`, like the rest of the app (developer's decision, 2026-10-13). Alternative: import `PipelineCodes` and `LoadPipeline` in the dialog's steps. Rejected: the only presentation code that depended on how the adapter talks to xMART.
 
 - The error is typed: `checkConnection` returns `Future<CheckConnectionError, number>`, with `CheckConnectionError = { type: "martNeedsSetup" } | { type: "failed"; message: string }` in `domain/entities/xmart/`. `TestConnectionUseCase` passes it on, and the pages switch on `type` (developer's decision, 2026-10-13). It is the only operation that leaves `FutureData`: the other operations have no error the app reacts to.
 - Alternative: keep matching the strings in each page. Rejected: duplicated in two pages and tied to xMART's wording.
