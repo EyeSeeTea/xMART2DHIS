@@ -204,7 +204,10 @@ export const ListConnectionsPage: React.FC = () => {
                             loadingScreen.reset();
                         },
                         error => {
-                            compositionRoot.connection.save({ ...connection, connectionWorks: false }).runAsync();
+                            compositionRoot.connection.save({ ...connection, connectionWorks: false }).run(
+                                () => reload(),
+                                () => null
+                            );
                             if (error.type === "martNeedsSetup") {
                                 setOpenHelpDialogProps({
                                     onCancel: () => setOpenHelpDialogProps(undefined),
