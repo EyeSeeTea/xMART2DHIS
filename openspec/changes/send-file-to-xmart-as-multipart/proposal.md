@@ -49,7 +49,7 @@ Public interface changes:
 
 - Works on any DHIS2 version: DHIS2 is no longer involved in the transfer, and the data values read from DHIS2 2.43 get their org unit back in the adapter (design → decision 8).
 - Older installations of the app keep using the previous pipelines in the same mart.
-- The pipeline type id for Normal (`2`) was confirmed on UAT only; it is checked on PROD before release.
+- The pipeline type id for Normal (`2`) was confirmed on UAT only; it could not be checked on PROD, and the PR description states it.
 
 ### Rollback plan
 

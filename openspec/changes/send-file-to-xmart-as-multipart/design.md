@@ -85,7 +85,7 @@ The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `Load
 - `LOAD_MODEL_V2`: two `GetJson` over the same file (`tables`, `fields`); `TestRow` `ContextColumns="CODE,FIELD_TYPE_CODE,IS_PRIMARY_KEY"`. Rest of the load unchanged.
 - `LOAD_PIPELINE_V2`: reads the array of definitions; in the `PIPELINE` load, `<AddColumn Name="TYPE_ID" FillWith="2" />` mapped to `TypeID` (Normal); in the `ORIGIN` load, `<AddColumn Name="IS_FILE_BASED" FillWith="1" />` mapped to `IsFileBased`. All three pipelines read a file, so the flag is the same for all.
 - The `?from=xmart` query and the `from-xmart` header (used to tell DHIS2 requests from xMART) disappear with `GetWebService`.
-- `TypeID = 2` is a fixed id confirmed on UAT. Alternative: a lookup by type code (`NORMAL`), like `FIELD_TYPE_CODE` → `FIELD_TYPE_ID`. Rejected for now: the type table is not documented. The id is checked on PROD before release (tasks); if it differs, the lookup becomes necessary.
+- `TypeID = 2` is a fixed id confirmed on UAT. Alternative: a lookup by type code (`NORMAL`), like `FIELD_TYPE_CODE` → `FIELD_TYPE_ID`. Rejected for now: the type table is not documented. The id could not be checked on PROD (no access); the PR description states it (developer's decision, 2026-10-15). If it differs there, the lookup becomes necessary.
 
 ### 5. Success means `ProcessResultCode == "SUCCESS"`
 
@@ -118,7 +118,7 @@ Found in the end-to-end check on DHIS2 2.43: when `dataValueSets` is filtered by
 ## Risks / Trade-offs
 
 - [The CORS proxy may not forward multipart bodies] → Checked from the app running locally (dev always uses the proxy). If it fails, multipart requests skip the proxy fallback in production and the dev setup documents a direct origin.
-- [`TypeID = 2` may not be Normal on PROD] → Checked on PROD before release; if it differs, switch to a lookup or a per-environment value.
+- [`TypeID = 2` may not be Normal on PROD] → Not checked on PROD (no access); stated in the PR description. A wrong type would show as a failed batch on Test connection or when saving or running an action (decision 5); then switch to a lookup or a per-environment value.
 - [xMART keeps adding required system columns (as with `TypeID` and `IsFileBased`)] → The stricter success check (decision 5) makes the next such change visible on Test connection instead of failing silently.
 - [Large actions send big files in one request] → Same size as the documents created today. No chunking in this change.
 - [Stricter success check surfaces errors that were silently ignored] → Intended. Error messages include xMART's result so users can open the batch in xMART.
