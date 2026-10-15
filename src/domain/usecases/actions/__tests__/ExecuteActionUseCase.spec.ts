@@ -182,7 +182,7 @@ function mockTEIRepository(): TEIRepository {
 /* An xMART that accepts every load. */
 function mockXMartRepository(): XMartRepository {
     const repository = imock<XMartRepository>();
-    when(repository.loadData(anything(), anything(), anything())).thenReturn(Future.success(1));
+    when(repository.loadData(anything(), anything(), anything())).thenReturn(Future.success(undefined));
     return repository;
 }
 

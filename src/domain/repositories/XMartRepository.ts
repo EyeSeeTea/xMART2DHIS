@@ -10,10 +10,10 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
-    /** Creates or updates the tables and fields of the mart. Resolves to the xMART batch id. */
-    loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<number>;
-    /** Loads the rows into a table of the mart. Resolves to the xMART batch id. */
-    loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number>;
+    /** Creates or updates the tables and fields of the mart. */
+    loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<void>;
+    /** Loads the rows into a table of the mart. */
+    loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<void>;
     /** Checks that the mart is ready to receive the app's data. Resolves to the xMART batch id. */
     checkConnection(mart: DataMart): Future<CheckConnectionError, number>;
     /** What the user creates in xMART when `checkConnection` fails with `martNeedsSetup`. */

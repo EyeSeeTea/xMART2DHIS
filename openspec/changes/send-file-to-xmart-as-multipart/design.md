@@ -48,7 +48,7 @@ Constraints: the project's own `Future` (`.est_ai/rules/project/async.md`), Reac
 - `loadData(mart, table, rows)`: load rows into a table of the mart.
 - `checkConnection(mart)`: check that the mart is ready to receive the app's data.
 
-Each returns the batch id (`FutureData<number>`), as `runPipeline` does today. How each is done is the adapter's business: `XMartDefaultRepository` picks the pipeline (`LOAD_MODEL_V2`, `LOAD_DATA_V2`, `LOAD_PIPELINE_V2`), serialises the payload to JSON, sends it as a multipart file to `/origin/start` and polls the batch (a private `startPipeline`). `checkConnection` runs `LOAD_PIPELINE_V2` with the definitions of the app's pipelines, so it also registers and updates them.
+`loadModel` and `loadData` return `FutureData<void>`: no caller uses the batch id. `checkConnection` returns the batch id (`Future<CheckConnectionError, number>`), which Test connection shows to the user so the run can be found in xMART. How each is done is the adapter's business: `XMartDefaultRepository` picks the pipeline (`LOAD_MODEL_V2`, `LOAD_DATA_V2`, `LOAD_PIPELINE_V2`), serialises the payload to JSON, sends it as a multipart file to `/origin/start` and polls the batch (a private `startPipeline`). `checkConnection` runs `LOAD_PIPELINE_V2` with the definitions of the app's pipelines, so it also registers and updates them.
 
 - Why: today `runPipeline(mart, pipeline, params)` is xMART's transport as is (pipeline code, loose inputs, a URL, now a file), so the use cases know pipeline codes, the file format (`JSON.stringify`) and even the pipeline XML (`TestConnectionUseCase` imports them from `data/`). Any change on xMART's side reaches the domain, as the move to `_V2` shows. With intent operations, if xMART offered a plain REST API for tables and rows, only the adapter would change. (*Clean Architecture code smells* → implicit infrastructure coupling in the domain.)
 - No pipeline-specific operation such as `registerPipelines`: pipelines are xMART's mechanism, not something the app needs; with another API that operation would be meaningless. Test connection's intent is "is this mart ready?".
@@ -57,7 +57,7 @@ Each returns the batch id (`FutureData<number>`), as `runPipeline` does today. H
 - Alternative: keep a generic `runPipeline(mart, pipeline, params, file)` in the port. Rejected for the reasons above.
 - Alternative: keep `FileRepository` with an xMART implementation. Rejected: the file is no longer stored anywhere; it is part of the run request.
 
-**Data flow (running an action):** `ExecuteActionUseCase` gathers the rows of each table (domain) → `XMartRepository.loadData(mart, table, rows)` (domain port) → `XMartDefaultRepository` serialises the rows to a JSON file, gets the API token from `AzureRepository`, posts `multipart/form-data` to `/origin/start` with `originCode=LOAD_DATA_V2` and `table`, polls `/batch/{id}/status` until `COMPLETED` and checks `ProcessResultCode` (data) → `FutureData<number>` back to the use case → the page shows the summary or the error (presentation, unchanged). Saving an action (`loadModel`) and Test connection (`checkConnection`) follow the same path.
+**Data flow (running an action):** `ExecuteActionUseCase` gathers the rows of each table (domain) → `XMartRepository.loadData(mart, table, rows)` (domain port) → `XMartDefaultRepository` serialises the rows to a JSON file, gets the API token from `AzureRepository`, posts `multipart/form-data` to `/origin/start` with `originCode=LOAD_DATA_V2` and `table`, polls `/batch/{id}/status` until `COMPLETED` and checks `ProcessResultCode` (data) → `FutureData<void>` back to the use case → the page shows the summary or the error (presentation, unchanged). Saving an action (`loadModel`) and Test connection (`checkConnection`) follow the same path.
 
 ### 2. `futureFetch` accepts `FormData` and lets the browser set the content type
 
@@ -89,7 +89,7 @@ The XML in `src/data/utils/pipelines/` (`LoadPipeline.ts`, `LoadModel.ts`, `Load
 
 ### 5. Success means `ProcessResultCode == "SUCCESS"`
 
-`getBatchStatusPolling` keeps polling until `COMPLETED`. Every load (`loadModel`, `loadData`, `checkConnection`) then returns the batch id only for `SUCCESS`; any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`.
+`getBatchStatusPolling` keeps polling until `COMPLETED`. Every load (`loadModel`, `loadData`, `checkConnection`) then succeeds only for `SUCCESS` (`checkConnection` with the batch id); any other result becomes `Future.error` with a translated message that includes the batch id, `ProcessResultCode` and `ProcessResultTitle`.
 
 - The unused `maxRetries` option of the polling is removed: no caller sets it, so polling only ends on `COMPLETED`, and its branch (a batch reported as success without finishing) could never run. The polling returns the completed status type, so the result check needs no "not finished" case.
 

@@ -66,20 +66,21 @@ describe("XMartDefaultRepository", () => {
             expect(await sentFileContent(start)).toEqual(rows);
         });
 
-        it("resolves to the batch id when xMART finishes the batch with SUCCESS", async () => {
+        it("succeeds when xMART finishes the batch with SUCCESS", async () => {
             const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
 
-            const batchId = await repository.loadData(dataMart, table, rows).toPromise();
+            const result = await repository.loadData(dataMart, table, rows).toPromise();
 
-            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+            expect(result).toBeUndefined();
         });
 
-        it("waits for a batch that is still running and resolves to its id once xMART finishes it", async () => {
+        it("waits for a batch that is still running and succeeds once xMART finishes it with SUCCESS", async () => {
             const repository = givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck();
 
-            const batchId = await repository.loadData(dataMart, table, rows).toPromise();
+            const result = await repository.loadData(dataMart, table, rows).toPromise();
 
-            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+            expect(result).toBeUndefined();
+            expect(statusRequests()).toHaveLength(2);
         });
 
         it.each(["INVALID", "REJECTED", "SYSTEM_ERROR", "CANCELED", "TIMEOUT_CANCELED"])(
@@ -112,12 +113,11 @@ describe("XMartDefaultRepository", () => {
     });
 
     describe("loadModel", () => {
-        it("sends the tables and fields to LOAD_MODEL_V2 as a JSON file in a multipart/form-data body, with no other inputs, and resolves to the batch id", async () => {
+        it("sends the tables and fields to LOAD_MODEL_V2 as a JSON file in a multipart/form-data body, with no other inputs", async () => {
             const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
 
-            const batchId = await repository.loadModel(dataMart, model).toPromise();
+            await repository.loadModel(dataMart, model).toPromise();
 
-            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
             const start = startRequest();
             expectAFileSentTo(pipelineCodes.loadModel, start);
             expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);

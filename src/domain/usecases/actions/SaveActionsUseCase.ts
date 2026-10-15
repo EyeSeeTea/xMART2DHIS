@@ -90,7 +90,7 @@ export class SaveActionUseCase implements UseCase {
                     };
                 }, initialXMARTModels);
 
-                return this.xMartRepository.loadModel(dataMart, xMARTModels).map(() => undefined);
+                return this.xMartRepository.loadModel(dataMart, xMARTModels);
             });
     }
 

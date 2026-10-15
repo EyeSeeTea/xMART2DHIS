@@ -105,14 +105,14 @@ export class XMartDefaultRepository implements XMartRepository {
         );
     }
 
-    public loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<number> {
+    public loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<void> {
         const file: PipelineFile = { name: "model.json", content: JSON.stringify(model) };
-        return this.startPipeline(mart, PipelineCodes.loadModel, {}, file);
+        return this.startPipeline(mart, PipelineCodes.loadModel, {}, file).map(() => undefined);
     }
 
-    public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<number> {
+    public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<void> {
         const file: PipelineFile = { name: `${table}.json`, content: JSON.stringify(rows) };
-        return this.startPipeline(mart, PipelineCodes.loadData, { table }, file);
+        return this.startPipeline(mart, PipelineCodes.loadData, { table }, file).map(() => undefined);
     }
 
     /* Registers the app's pipelines with LOAD_PIPELINE_V2, which fails if the mart has not been set up for the app. */

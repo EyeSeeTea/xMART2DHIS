@@ -91,7 +91,7 @@ function fakeMetadataRepository(): MetadataRepository {
 /* An xMART that accepts every load. */
 function mockXMartRepository(): XMartRepository {
     const repository = imock<XMartRepository>();
-    when(repository.loadModel(anything(), anything())).thenReturn(Future.success(1));
+    when(repository.loadModel(anything(), anything())).thenReturn(Future.success(undefined));
     return repository;
 }
 
