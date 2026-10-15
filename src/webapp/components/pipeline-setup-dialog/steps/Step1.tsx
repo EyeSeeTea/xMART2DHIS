@@ -13,7 +13,7 @@ export const Step1: React.FC<PipelineSetupStepProps> = ({ mart }) => {
                     {i18n.t("page")}
                 </a>
             </h2>
-            <img src={step1Image} width={"100%"} alt={"xMART pipelines page"} />
+            <img src={step1Image} width={"100%"} alt={i18n.t("xMART pipelines page")} />
         </React.Fragment>
     );
 };
