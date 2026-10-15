@@ -1,0 +1,303 @@
+// @vitest-environment node
+// node: fetch, FormData and Blob must come from the same runtime for the multipart body to be serialised.
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { PublicClientApplication } from "@azure/msal-browser";
+import { Future, FutureData } from "../../../domain/entities/Future";
+import { CheckConnectionError } from "../../../domain/entities/xmart/CheckConnectionError";
+import { XMartLoadModelData } from "../../../domain/entities/xmart/xMartSyncTableTemplates";
+import { AzureRepository } from "../../../domain/repositories/AzureRepository";
+import { dataMart } from "../../../utils/tests/dataMart";
+import { MockHandler, MockWebServer, Request as MockRequest } from "../../../utils/tests/MockWebServer";
+import { XMartDefaultRepository } from "../XMartDefaultRepository";
+import { LoadData } from "../../utils/pipelines/LoadData";
+import { LoadModel } from "../../utils/pipelines/LoadModel";
+import { LoadPipeline } from "../../utils/pipelines/LoadPipeline";
+
+import runPipelineSuccessResponse from "./fixtures/RunPipelineSuccessResponse.json";
+import runPipelineErrorResponse from "./fixtures/RunPipelineErrorResponse.json";
+import originNotFoundErrorResponse from "./fixtures/OriginNotFoundErrorResponse.json";
+import batchStatusSuccessResponse from "./fixtures/BatchStatusSuccessResponse.json";
+
+const mockWebServer = new MockWebServer();
+
+const batchStatusStagingResponse = {
+    ...batchStatusSuccessResponse,
+    ProcessStepCode: "STAGING",
+    ProcessStepTitle: "Staging",
+    ProcessResultCode: null,
+    ProcessResultTitle: null,
+};
+
+/* The codes the app's pipelines have in xMART, written out so that a change in PipelineCodes breaks the tests. */
+const pipelineCodes = { loadPipeline: "LOAD_PIPELINE_V2", loadModel: "LOAD_MODEL_V2", loadData: "LOAD_DATA_V2" };
+
+const token = "user-token";
+const table = "POC_TABLE";
+const rows: ReadonlyArray<object> = [
+    { ID: "a", NAME: "first" },
+    { ID: "b", NAME: "second" },
+];
+
+const model: Readonly<XMartLoadModelData> = {
+    tables: [{ CODE: table, TITLE: "POC table" }],
+    fields: [
+        { TABLE_CODE: table, CODE: "ID", TITLE: "Id", FIELD_TYPE_CODE: "TEXT", IS_PRIMARY_KEY: 1, IS_REQUIRED: 1 },
+        { TABLE_CODE: table, CODE: "NAME", TITLE: "Name", FIELD_TYPE_CODE: "TEXT", IS_PRIMARY_KEY: 0, IS_REQUIRED: 0 },
+    ],
+};
+
+/* Matches the xMART external API whether the request goes direct or through the CORS proxy. */
+const xMartApi = "*/xmart4/external";
+
+describe("XMartDefaultRepository", () => {
+    beforeAll(() => mockWebServer.start());
+    afterEach(() => mockWebServer.resetHandlers());
+    afterAll(() => mockWebServer.close());
+
+    describe("loadData", () => {
+        it("sends the rows to LOAD_DATA_V2 as a JSON file in a multipart/form-data body, with the table in the query string", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            await repository.loadData(dataMart, table, rows).toPromise();
+
+            const start = startRequest();
+            expectAFileSentTo(pipelineCodes.loadData, start);
+            expect(start.params.get("table")).toBe(table);
+            expect(await sentFileContent(start)).toEqual(rows);
+        });
+
+        it("succeeds when xMART finishes the batch with SUCCESS", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            const result = await repository.loadData(dataMart, table, rows).toPromise();
+
+            expect(result).toBeUndefined();
+        });
+
+        it("waits for a batch that is still running and succeeds once xMART finishes it with SUCCESS", async () => {
+            const repository = givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck();
+
+            const result = await repository.loadData(dataMart, table, rows).toPromise();
+
+            expect(result).toBeUndefined();
+            expect(statusRequests()).toHaveLength(2);
+        });
+
+        it.each(["INVALID", "REJECTED", "SYSTEM_ERROR", "CANCELED", "TIMEOUT_CANCELED"])(
+            "fails with the result and the batch id when xMART finishes the batch with %s",
+            async resultCode => {
+                const repository = givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode);
+
+                const error = await loadDataError(repository);
+
+                expect(error).toContain(resultCode);
+                expect(error).toContain(String(runPipelineSuccessResponse.BatchID));
+            }
+        );
+
+        it("fails with xMART's message when xMART does not start the batch", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers(runPipelineErrorResponse);
+
+            const error = await loadDataError(repository);
+
+            expect(error).toBe(runPipelineErrorResponse.ErrorMessage);
+        });
+
+        it("fails with an unknown batch id when xMART starts the run without a batch id", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers({ BatchID: null, ErrorMessage: null });
+
+            const error = await loadDataError(repository);
+
+            expect(error).toBe("Unknown batch id");
+        });
+    });
+
+    describe("loadModel", () => {
+        it("sends the tables and fields to LOAD_MODEL_V2 as a JSON file in a multipart/form-data body, with no other inputs", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            await repository.loadModel(dataMart, model).toPromise();
+
+            const start = startRequest();
+            expectAFileSentTo(pipelineCodes.loadModel, start);
+            expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
+            expect(await sentFileContent(start)).toEqual(model);
+        });
+    });
+
+    describe("checkConnection", () => {
+        it("sends the definitions of the app's pipelines to LOAD_PIPELINE_V2 as a JSON file in a multipart/form-data body, with no other inputs, and resolves to the batch id", async () => {
+            const repository = givenAnXMartRepositoryWhosePipelinesSucceed();
+
+            const batchId = await repository.checkConnection(dataMart).toPromise();
+
+            expect(batchId).toBe(runPipelineSuccessResponse.BatchID);
+            const start = startRequest();
+            expectAFileSentTo(pipelineCodes.loadPipeline, start);
+            expect([...start.params.keys()].sort()).toEqual(["comment", "martCode", "originCode"]);
+            const definitions = await sentFileContent(start);
+            expect(definitions).toHaveLength(3);
+            expect(definitions).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ CODE: pipelineCodes.loadPipeline, XML: LoadPipeline }),
+                    expect.objectContaining({ CODE: pipelineCodes.loadModel, XML: LoadModel }),
+                    expect.objectContaining({ CODE: pipelineCodes.loadData, XML: LoadData }),
+                ])
+            );
+        });
+
+        it.each([
+            originNotFoundErrorResponse.ErrorMessage,
+            `Origin code '${pipelineCodes.loadPipeline}' does not exists`,
+            "Sequence contains no elements",
+        ])("fails because the mart needs setting up when xMART does not start LOAD_PIPELINE_V2: %s", async message => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers({
+                ...originNotFoundErrorResponse,
+                ErrorMessage: message,
+            });
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "martNeedsSetup" });
+        });
+
+        it("fails with xMART's message when xMART does not start the batch for another reason", async () => {
+            const repository = givenAnXMartRepositoryWhoseStartAnswers(runPipelineErrorResponse);
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "failed", message: runPipelineErrorResponse.ErrorMessage });
+        });
+
+        it("fails with the result when xMART finishes the batch without SUCCESS", async () => {
+            const repository = givenAnXMartRepositoryWhoseBatchesFinishWith("REJECTED");
+
+            const error = await checkConnectionError(repository);
+
+            expect(error).toEqual({ type: "failed", message: expect.stringContaining("REJECTED") });
+        });
+    });
+
+    describe("getSetupInstructions", () => {
+        it("resolves to the code and definition of the pipeline the mart needs to be set up with", async () => {
+            const repository = givenAnXMartRepository();
+
+            const instructions = await repository.getSetupInstructions().toPromise();
+
+            expect(instructions).toEqual({ pipelineCode: pipelineCodes.loadPipeline, definition: LoadPipeline });
+        });
+    });
+});
+
+/* The request starts the pipeline in the mart, authorized with the user's token, with a file in a multipart body. */
+function expectAFileSentTo(pipeline: string, start: MockRequest): void {
+    expect(start.raw.method).toBe("POST");
+    expect(start.params.get("martCode")).toBe(dataMart.martCode);
+    expect(start.params.get("originCode")).toBe(pipeline);
+    expect(start.headers["authorization"]).toBe(`Bearer ${token}`);
+    expect(start.headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
+}
+
+function loadDataError(repository: XMartDefaultRepository): Promise<string | undefined> {
+    return repository
+        .loadData(dataMart, table, rows)
+        .toPromise()
+        .then(
+            () => undefined,
+            (error: string) => error
+        );
+}
+
+function checkConnectionError(repository: XMartDefaultRepository): Promise<CheckConnectionError | undefined> {
+    return repository
+        .checkConnection(dataMart)
+        .toPromise()
+        .then(
+            () => undefined,
+            (error: CheckConnectionError) => error
+        );
+}
+
+/* An xMART that starts every run and finishes its batch with SUCCESS. */
+function givenAnXMartRepositoryWhosePipelinesSucceed(): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchesFinishWith("SUCCESS");
+}
+
+/* An xMART whose batches are still staging on the first status check and finish with SUCCESS on the next. */
+function givenAnXMartRepositoryWhoseBatchesAreStillRunningOnTheFirstCheck(): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchStatusIs(() =>
+        statusRequests().length === 1 ? batchStatusStagingResponse : batchStatusSuccessResponse
+    );
+}
+
+/* An xMART that starts every run and finishes its batch with the given result. */
+function givenAnXMartRepositoryWhoseBatchesFinishWith(resultCode: string): XMartDefaultRepository {
+    return givenAnXMartRepositoryWhoseBatchStatusIs({ ...batchStatusSuccessResponse, ProcessResultCode: resultCode });
+}
+
+/* An xMART that answers every start request with the given response and has no batch status to report. */
+function givenAnXMartRepositoryWhoseStartAnswers(startResponse: MockHandler["response"]): XMartDefaultRepository {
+    return givenAnXMartRepositoryWith(startResponse);
+}
+
+/* An xMART that starts every run and answers the status of its batch with the given response. */
+function givenAnXMartRepositoryWhoseBatchStatusIs(statusResponse: MockHandler["response"]): XMartDefaultRepository {
+    return givenAnXMartRepositoryWith(runPipelineSuccessResponse, [
+        {
+            method: "get",
+            endpoint: `${xMartApi}/batch/${runPipelineSuccessResponse.BatchID}/status`,
+            httpStatusCode: 200,
+            response: statusResponse,
+        },
+    ]);
+}
+
+/* An xMART that answers every start request with the given response and the batch status with the given handlers. */
+function givenAnXMartRepositoryWith(
+    startResponse: MockHandler["response"],
+    statusHandlers: ReadonlyArray<MockHandler> = []
+): XMartDefaultRepository {
+    mockWebServer.addRequestHandlers([
+        {
+            method: "post",
+            endpoint: `${xMartApi}/origin/start`,
+            httpStatusCode: 200,
+            response: startResponse,
+        },
+        ...statusHandlers,
+    ]);
+
+    return givenAnXMartRepository();
+}
+
+/* A repository authorized with the user's token, for whatever xMART the test has set up. */
+function givenAnXMartRepository(): XMartDefaultRepository {
+    return new XMartDefaultRepository(new AzureTestRepository());
+}
+
+class AzureTestRepository implements AzureRepository {
+    getInstance(): PublicClientApplication {
+        throw new Error("Not used by XMartDefaultRepository");
+    }
+
+    getToken(_scope: string): FutureData<string> {
+        return Future.success(token);
+    }
+}
+
+function statusRequests() {
+    return mockWebServer.allRequests.filter(request => request.url.pathname.endsWith("/status"));
+}
+
+/* The JSON file sent in the "file" field of the multipart body, parsed. */
+async function sentFileContent(request: MockRequest): Promise<unknown> {
+    const file = (await request.raw.formData()).get("file");
+    if (!(file instanceof Blob)) throw new Error("No file in the multipart body");
+    return JSON.parse(await file.text());
+}
+
+function startRequest() {
+    const start = mockWebServer.allRequests.find(request => request.url.pathname.endsWith("/origin/start"));
+    if (!start) throw new Error("No request to /origin/start");
+    return start;
+}

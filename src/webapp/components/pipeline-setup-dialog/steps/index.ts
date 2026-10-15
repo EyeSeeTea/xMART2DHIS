@@ -1,12 +1,12 @@
 import { WizardStep } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../../utils/i18n";
-import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
+import { PipelineSetupStepProps } from "../PipelineSetupDialog";
 import { Step1 } from "./Step1";
 import { Step2 } from "./Step2";
 import { Step3 } from "./Step3";
 
 export interface HelpPipelineWizardStep extends WizardStep {
-    props?: PipelineSetupDialogProps;
+    props?: PipelineSetupStepProps;
 }
 
 export const PipelineWizardSteps: HelpPipelineWizardStep[] = [

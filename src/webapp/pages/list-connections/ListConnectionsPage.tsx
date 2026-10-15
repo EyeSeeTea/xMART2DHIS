@@ -204,16 +204,17 @@ export const ListConnectionsPage: React.FC = () => {
                             loadingScreen.reset();
                         },
                         error => {
-                            snackbar.error(error);
-                            compositionRoot.connection.save({ ...connection, connectionWorks: false }).runAsync();
-                            if (
-                                error === "Origin code 'LOAD_PIPELINE' does not exists" ||
-                                error === "Sequence contains no elements"
-                            ) {
+                            compositionRoot.connection.save({ ...connection, connectionWorks: false }).run(
+                                () => reload(),
+                                () => null
+                            );
+                            if (error.type === "martNeedsSetup") {
                                 setOpenHelpDialogProps({
                                     onCancel: () => setOpenHelpDialogProps(undefined),
                                     mart: connection,
                                 });
+                            } else {
+                                snackbar.error(error.message);
                             }
                             loadingScreen.reset();
                         }

@@ -5,19 +5,17 @@ import { Future, FutureData } from "../../../entities/Future";
 import { MetadataPackage } from "../../../entities/metadata/Metadata";
 import { OrganisationUnit } from "../../../entities/metadata/OrganisationUnit";
 import { Program } from "../../../entities/metadata/Program";
-import { DataMart } from "../../../entities/xmart/DataMart";
 import { ActionRepository } from "../../../repositories/ActionRepository";
 import { AggregatedRepository } from "../../../repositories/AggregatedRepository";
 import { ConnectionsRepository } from "../../../repositories/ConnectionsRepository";
 import { EventsRepository } from "../../../repositories/EventsRepository";
-import { FileRepository } from "../../../repositories/FileRepository";
 import { MetadataRepository } from "../../../repositories/MetadataRepository";
 import { getTEIsFilters, TEIRepository } from "../../../repositories/TEIRepository";
 import { XMartRepository } from "../../../repositories/XMartRepository";
 import { ExecuteActionUseCase } from "../ExecuteActionUseCase";
+import { dataMart } from "../../../../utils/tests/dataMart";
 
 const metadataTable = "METADATA";
-const fileUrl = "http://dhis2.test/api/documents/GoDTB1mkhEI/data";
 
 const eventProgram: Readonly<Program> = {
     id: "lxAQ7Zs9VYR",
@@ -41,88 +39,105 @@ const orgUnit: Readonly<OrganisationUnit> = {
     path: "/ImspTQPwCqd/O6uvpzGd5pu/YuQRtpLP10I/DiszpKrYNg8",
 };
 
-const dataMart: Readonly<DataMart> = {
-    id: "dataMartId1",
-    name: "Training",
-    owner: { id: "userId00001", name: "Admin" },
-    created: new Date(2026, 0, 1),
-    lastUpdated: new Date(2026, 0, 1),
-    lastUpdatedBy: { id: "userId00001", name: "Admin" },
-    publicAccess: "--------",
-    userAccesses: [],
-    userGroupAccesses: [],
-    environment: "UAT",
-    martCode: "TRAINING_EYESEETEA",
-    dataEndpoint: "https://portal-uat.who.int/xmart-api/odata/TRAINING_EYESEETEA",
-    connectionWorks: true,
-};
-
 describe("ExecuteActionUseCase", () => {
     describe("tracked entities", () => {
         /* /tracker/trackedEntities answers 400 E1003 for an event program, which failed the whole action. */
-        it("requests no tracked entities and succeeds for an action with only an event program", async () => {
-            const action = createAction([eventProgram]);
-            const teiRepository = fakeTEIRepository();
-            const xMartRepository = fakeXMartRepository();
-            const useCase = createUseCase({
-                action,
-                teis: teiRepository.instance,
-                xMart: xMartRepository.instance,
-            });
+        it("requests no tracked entities and loads the action's rows into its xMART table for an action with only an event program", async () => {
+            const { useCase, action, teiRepositoryMock, xMartRepositoryMock } = givenAnActionWithOnlyAnEventProgram();
 
             const result = await useCase.execute(action.id).toPromise();
 
             expect(result).toBe(`${metadataTable} 2 rows`);
-            expect(requestedPrograms(teiRepository.mock)).toEqual([]);
-            expect(capture(xMartRepository.mock.runPipeline).all()).toEqual([
-                [dataMart, "LOAD_DATA", { url: fileUrl, table: metadataTable }],
+            expect(requestedPrograms(teiRepositoryMock)).toEqual([]);
+            expect(loads(xMartRepositoryMock)).toEqual([
+                [
+                    dataMart,
+                    metadataTable,
+                    [
+                        { id: eventProgram.id, name: eventProgram.name, metadataType: "programs" },
+                        { id: orgUnit.id, name: orgUnit.name, metadataType: "organisationUnits" },
+                    ],
+                ],
             ]);
         });
 
         it("requests tracked entities only for the tracker programs of the action", async () => {
-            const action = createAction([eventProgram, trackerProgram]);
-            const teiRepository = fakeTEIRepository();
-            const useCase = createUseCase({ action, teis: teiRepository.instance });
+            const { useCase, action, teiRepositoryMock } = givenAnActionWithAnEventAndATrackerProgram();
 
             const result = await useCase.execute(action.id).toPromise();
 
             expect(result).toBe(`${metadataTable} 3 rows`);
-            expect(requestedPrograms(teiRepository.mock)).toEqual([trackerProgram.id]);
+            expect(requestedPrograms(teiRepositoryMock)).toEqual([trackerProgram.id]);
+        });
+    });
+
+    describe("loading into xMART", () => {
+        it("starts no load and reports 0 rows for a table without rows", async () => {
+            const { useCase, action, xMartRepositoryMock } = givenAnActionWithoutRows();
+
+            const result = await useCase.execute(action.id).toPromise();
+
+            expect(result).toBe(`${metadataTable} 0 rows`);
+            expect(loads(xMartRepositoryMock)).toEqual([]);
         });
     });
 });
 
-function createAction(programs: ReadonlyArray<Program>): SyncAction {
-    return new SyncAction({
+/* An action over an event program and an org unit: its metadata table gets 2 rows. */
+function givenAnActionWithOnlyAnEventProgram(): ActionScenario {
+    return givenAnActionWith([eventProgram], [orgUnit.path]);
+}
+
+/* An action over an event program, a tracker program and an org unit: its metadata table gets 3 rows. */
+function givenAnActionWithAnEventAndATrackerProgram(): ActionScenario {
+    return givenAnActionWith([eventProgram, trackerProgram], [orgUnit.path]);
+}
+
+/* An action with no programs and no org units: its metadata table has no rows. */
+function givenAnActionWithoutRows(): ActionScenario {
+    return givenAnActionWith([], []);
+}
+
+type ActionScenario = {
+    useCase: ExecuteActionUseCase;
+    action: SyncAction;
+    teiRepositoryMock: TEIRepository;
+    xMartRepositoryMock: XMartRepository;
+};
+
+/* An action over the given programs and org units, mapping its metadata to the xMART table. */
+function givenAnActionWith(programs: ReadonlyArray<Program>, orgUnitPaths: ReadonlyArray<string>): ActionScenario {
+    const action = new SyncAction({
         id: "actionId001",
         name: "Action",
         connectionId: dataMart.id,
         period: "ALL",
-        orgUnitPaths: [orgUnit.path],
+        orgUnitPaths: [...orgUnitPaths],
         metadataIds: programs.map(program => program.id),
         modelMappings: [{ dhis2Model: "metadata", xMARTTable: metadataTable }],
     });
-}
+    const teiRepositoryMock = mockTEIRepository();
+    const xMartRepositoryMock = mockXMartRepository();
 
-function createUseCase(options: {
-    action: SyncAction;
-    teis: TEIRepository;
-    xMart?: XMartRepository;
-}): ExecuteActionUseCase {
-    return new ExecuteActionUseCase(
-        fakeActionRepository(options.action),
+    const useCase = new ExecuteActionUseCase(
+        fakeActionRepository(action),
         fakeMetadataRepository(),
         fakeEventsRepository(),
-        options.teis,
+        instance(teiRepositoryMock),
         instance(imock<AggregatedRepository>()),
-        fakeFileRepository(),
-        options.xMart ?? fakeXMartRepository().instance,
+        instance(xMartRepositoryMock),
         fakeConnectionsRepository()
     );
+
+    return { useCase, action, teiRepositoryMock, xMartRepositoryMock };
 }
 
-function requestedPrograms(teiRepository: TEIRepository): ReadonlyArray<string> {
-    return capture(teiRepository.get)
+function loads(xMartRepositoryMock: XMartRepository) {
+    return capture(xMartRepositoryMock.loadData).all();
+}
+
+function requestedPrograms(teiRepositoryMock: TEIRepository): ReadonlyArray<string> {
+    return capture(teiRepositoryMock.get)
         .all()
         .flatMap(([filters]) => filters.programIds);
 }
@@ -154,26 +169,21 @@ function fakeEventsRepository(): EventsRepository {
 }
 
 /* As /tracker/trackedEntities does, rejects event programs. */
-function fakeTEIRepository() {
+function mockTEIRepository(): TEIRepository {
     const repository = imock<TEIRepository>();
 
     when(repository.get(anything())).thenCall(({ programIds }: getTEIsFilters) =>
         programIds.includes(eventProgram.id) ? Future.error("An error has occurred rerieving TEIs") : Future.success([])
     );
 
-    return { mock: repository, instance: instance(repository) };
+    return repository;
 }
 
-function fakeFileRepository(): FileRepository {
-    const repository = imock<FileRepository>();
-    when(repository.uploadFileAsExternal(anything())).thenReturn(Future.success({ id: "GoDTB1mkhEI", url: fileUrl }));
-    return instance(repository);
-}
-
-function fakeXMartRepository() {
+/* An xMART that accepts every load. */
+function mockXMartRepository(): XMartRepository {
     const repository = imock<XMartRepository>();
-    when(repository.runPipeline(anything(), anything(), anything())).thenReturn(Future.success(1));
-    return { mock: repository, instance: instance(repository) };
+    when(repository.loadData(anything(), anything(), anything())).thenReturn(Future.success(undefined));
+    return repository;
 }
 
 function fakeConnectionsRepository(): ConnectionsRepository {

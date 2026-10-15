@@ -102,6 +102,26 @@ $ yarn test
 $ yarn build
 ```
 
+## Setting up a mart in xMART
+
+The app sends data to xMART through three pipelines in each mart:
+
+-   `LOAD_PIPELINE_V2`: registers the other two. It is the only one created by hand.
+-   `LOAD_MODEL_V2`: creates or updates the mart's tables and fields.
+-   `LOAD_DATA_V2`: loads rows into a table.
+
+Versions up to 0.4.2 use `LOAD_PIPELINE`, `LOAD_MODEL` and `LOAD_DATA` instead.
+
+To set up a mart, or to upgrade one used by a previous version:
+
+1. In the app, run **Test connection** on the connection. If the mart is not set up, the setup dialog opens (also available from the **Help setting up pipeline** action).
+2. In xMART, open the mart's pipelines page (`https://portal-uat.who.int/xmart4/<MART>/pipelines` for UAT, `https://extranet.who.int/xmart4/<MART>/pipelines` for PROD) and click **New** above the list (**Create a Pipeline** if the mart has no pipelines yet).
+3. Create a pipeline with the code `LOAD_PIPELINE_V2` and the type **Normal**, not Flow.
+4. Paste the XML shown in the dialog's last step into the pipeline's configuration and click **Publish**.
+5. Run **Test connection** again: it registers `LOAD_MODEL_V2` and `LOAD_DATA_V2` and the connection shows as working.
+
+The previous pipelines are left untouched, so a mart can be used by this version and older ones at the same time. Once no older installation uses the mart, `LOAD_PIPELINE`, `LOAD_MODEL` and `LOAD_DATA` can be deleted in xMART, together with any leftover `xMART2DHIS_*` documents in DHIS2.
+
 ## Some development tips
 
 ### Structure

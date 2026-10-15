@@ -1,12 +1,22 @@
 import step2Image from "../assets/step2.gif";
 import React from "react";
 import i18n from "../../../../utils/i18n";
-import { PipelineSetupDialogProps } from "../PipelineSetupDialog";
+import { PipelineSetupStepProps } from "../PipelineSetupDialog";
 
-export const Step2: React.FC<PipelineSetupDialogProps> = () => (
+export const Step2: React.FC<PipelineSetupStepProps> = ({ instructions }) => (
     <React.Fragment>
-        <h2>{i18n.t("Step 2: Create 'LOAD_PIPELINE' pipeline", { nsSeparator: false })}</h2>
-        <p>{i18n.t("The code needs to be exactly 'LOAD_PIPELINE'.")}</p>
+        <h2>{i18n.t("Step 2: Create '{{code}}' pipeline", { code: instructions.pipelineCode, nsSeparator: false })}</h2>
+        <p>
+            {i18n.t(
+                "Click 'New' above the list of pipelines ('Create a Pipeline' if the mart has no pipelines yet). The code needs to be exactly '{{code}}'.",
+                { code: instructions.pipelineCode }
+            )}
+        </p>
+        <p>
+            {i18n.t("Choose the type 'Normal', not 'Flow': the pipeline does not work as a Flow pipeline.", {
+                nsSeparator: false,
+            })}
+        </p>
         <img src={step2Image} width={"100%"} alt={"Pipeline screen"} />
     </React.Fragment>
 );

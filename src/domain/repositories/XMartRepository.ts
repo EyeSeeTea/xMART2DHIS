@@ -1,5 +1,8 @@
-import { FutureData } from "../entities/Future";
+import { Future, FutureData } from "../entities/Future";
+import { CheckConnectionError } from "../entities/xmart/CheckConnectionError";
 import { DataMart, DataMartEnvironment, MartTable, XMartContent, XMartResponse } from "../entities/xmart/DataMart";
+import { MartSetupInstructions } from "../entities/xmart/MartSetupInstructions";
+import { XMartLoadModelData } from "../entities/xmart/xMartSyncTableTemplates";
 
 export interface XMartRepository {
     listMartSuggestions(): FutureData<MartSuggestions>;
@@ -7,11 +10,14 @@ export interface XMartRepository {
     listTableContent(mart: DataMart, table: string, options?: ListXMartOptions): FutureData<XMartResponse>;
     listAllTableContent(mart: DataMart, table: string, options?: ListAllOptions): FutureData<XMartContent[]>;
     countTableElements(mart: DataMart, table: string): FutureData<number>;
-    runPipeline(
-        mart: DataMart,
-        pipeline: string,
-        params: Record<string, string | number | boolean>
-    ): FutureData<number>;
+    /** Creates or updates the tables and fields of the mart. */
+    loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<void>;
+    /** Loads the rows into a table of the mart. */
+    loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<void>;
+    /** Checks that the mart is ready to receive the app's data. Resolves to the xMART batch id. */
+    checkConnection(mart: DataMart): Future<CheckConnectionError, number>;
+    /** What the user creates in xMART when `checkConnection` fails with `martNeedsSetup`. */
+    getSetupInstructions(): FutureData<MartSetupInstructions>;
 }
 
 export type ListXMartOptions = ListAllOptions & {

@@ -1,0 +1,5 @@
+{
+    "BatchID": 0,
+    "Success": false,
+    "ErrorMessage": "Origin code 'LOAD_PIPELINE_V2' does not exist in mart TRAINING_EYESEETEA."
+}

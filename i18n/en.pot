@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-28T12:52:28.410Z\n"
-"PO-Revision-Date: 2026-09-28T12:52:28.411Z\n"
+"POT-Creation-Date: 2026-10-15T08:53:27.829Z\n"
+"PO-Revision-Date: 2026-10-15T08:53:27.829Z\n"
 
 msgid "Unknown model"
 msgstr ""
@@ -15,6 +15,9 @@ msgid "Metadata"
 msgstr ""
 
 msgid "Unable to call xMART API for public data marts"
+msgstr ""
+
+msgid "xMART batch {{batchId}} finished with {{result}}: {{title}}"
 msgstr ""
 
 msgid "API error code: {{statusText}} ({{status}})"
@@ -323,6 +326,22 @@ msgstr ""
 msgid "page"
 msgstr ""
 
+msgid "xMART pipelines page"
+msgstr ""
+
+msgid "Step 2: Create '{{code}}' pipeline"
+msgstr ""
+
+msgid ""
+"Click 'New' above the list of pipelines ('Create a Pipeline' if the mart "
+"has no pipelines yet). The code needs to be exactly '{{code}}'."
+msgstr ""
+
+msgid ""
+"Choose the type 'Normal', not 'Flow': the pipeline does not work as a Flow "
+"pipeline."
+msgstr ""
+
 msgid "Step 3: "
 msgstr ""
 
@@ -511,12 +530,4 @@ msgid "Connection successfully created"
 msgstr ""
 
 msgid "Error saving connection"
-msgstr ""
-
-msgctxt "PIPELINE' pipeline"
-msgid "Step 2: Create 'LOAD"
-msgstr ""
-
-msgctxt "PIPELINE'."
-msgid "The code needs to be exactly 'LOAD"
 msgstr ""

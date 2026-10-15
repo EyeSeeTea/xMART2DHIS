@@ -2,6 +2,7 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import queryString from "query-string";
 import { Future, FutureData } from "../../domain/entities/Future";
+import { CheckConnectionError } from "../../domain/entities/xmart/CheckConnectionError";
 import {
     DataMart,
     DataMartEnvironment,
@@ -9,6 +10,8 @@ import {
     XMartContent,
     XMartResponse,
 } from "../../domain/entities/xmart/DataMart";
+import { MartSetupInstructions } from "../../domain/entities/xmart/MartSetupInstructions";
+import { XMartLoadModelData } from "../../domain/entities/xmart/xMartSyncTableTemplates";
 import { AzureRepository } from "../../domain/repositories/AzureRepository";
 import {
     ListAllOptions,
@@ -20,6 +23,10 @@ import i18n from "../../utils/i18n";
 import { timeout } from "../../utils/futures";
 import { joinUrl } from "../../utils/url";
 import { Constants } from "../Constants";
+import { LoadData } from "../utils/pipelines/LoadData";
+import { LoadModel } from "../utils/pipelines/LoadModel";
+import { LoadPipeline } from "../utils/pipelines/LoadPipeline";
+import { PipelineCodes } from "../utils/pipelines/PipelineCodes";
 
 export class XMartDefaultRepository implements XMartRepository {
     constructor(private azureRepository: AzureRepository) {}
@@ -98,10 +105,33 @@ export class XMartDefaultRepository implements XMartRepository {
         );
     }
 
-    public runPipeline(
+    public loadModel(mart: DataMart, model: XMartLoadModelData): FutureData<void> {
+        const file: PipelineFile = { name: "model.json", content: JSON.stringify(model) };
+        return this.startPipeline(mart, PipelineCodes.loadModel, {}, file).map(() => undefined);
+    }
+
+    public loadData(mart: DataMart, table: string, rows: ReadonlyArray<unknown>): FutureData<void> {
+        const file: PipelineFile = { name: `${table}.json`, content: JSON.stringify(rows) };
+        return this.startPipeline(mart, PipelineCodes.loadData, { table }, file).map(() => undefined);
+    }
+
+    /* Registers the app's pipelines with LOAD_PIPELINE_V2, which fails if the mart has not been set up for the app. */
+    public checkConnection(mart: DataMart): Future<CheckConnectionError, number> {
+        const file: PipelineFile = { name: "pipelines.json", content: JSON.stringify(appPipelines) };
+        return this.startPipeline(mart, PipelineCodes.loadPipeline, {}, file).mapError(toCheckConnectionError);
+    }
+
+    /* The mart is set up by creating LOAD_PIPELINE_V2 by hand; checkConnection registers the rest. */
+    public getSetupInstructions(): FutureData<MartSetupInstructions> {
+        return Future.success({ pipelineCode: PipelineCodes.loadPipeline, definition: LoadPipeline });
+    }
+
+    /* Starts the pipeline with the file in the request body and waits for its batch. */
+    private startPipeline(
         mart: DataMart,
         pipeline: string,
-        params: Record<string, string | number | boolean>
+        params: Record<string, string | number | boolean>,
+        file: PipelineFile
     ): FutureData<number> {
         const { martCode, environment } = mart;
         const startParams = queryString.stringify({
@@ -117,7 +147,10 @@ export class XMartDefaultRepository implements XMartRepository {
         })
             .flatMap(({ endpoint, token }) => {
                 const url = joinUrl(endpoint, `/origin/start`) + "?" + startParams;
-                return futureFetch<XMartAPIBatchStartResponse>("post", url, { bearer: token });
+                return futureFetch<XMartAPIBatchStartResponse>("post", url, {
+                    body: toFormData(file),
+                    bearer: token,
+                });
             })
             .flatMap(response => {
                 const { BatchID, ErrorMessage } = response;
@@ -128,7 +161,7 @@ export class XMartDefaultRepository implements XMartRepository {
                     return Future.error("Unknown batch id");
                 }
 
-                return this.getBatchStatusPolling(mart, BatchID).map(({ BatchID }) => BatchID);
+                return this.getBatchStatusPolling(mart, BatchID).flatMap(checkBatchSucceeded);
             });
     }
 
@@ -191,10 +224,8 @@ export class XMartDefaultRepository implements XMartRepository {
     private getBatchStatusPolling(
         mart: DataMart,
         batch: number,
-        options: { interval?: number; maxRetries?: number; currentRetry?: number } = {}
-    ): FutureData<XMartAPIBatchStatusResponse> {
-        const { interval = 1000, maxRetries, currentRetry = 0 } = options;
-
+        interval = 1000
+    ): FutureData<XMartAPICompletedBatchStatus> {
         return Future.joinObj({
             endpoint: this.getAPIEndpoint(mart.environment),
             token: this.getAPIToken(mart.environment),
@@ -205,26 +236,56 @@ export class XMartDefaultRepository implements XMartRepository {
                 })
             )
             .flatMap(response => {
-                const hasFinished = response.ProcessStepCode === "COMPLETED";
-                const hasReachedMaxRetries = maxRetries !== undefined && currentRetry > maxRetries;
-                if (hasFinished || hasReachedMaxRetries) {
-                    return Future.success(response);
+                if (response.ProcessStepCode === "COMPLETED") {
+                    return Future.success<XMartAPICompletedBatchStatus, string>(response);
                 }
 
-                return timeout(interval).flatMap(() =>
-                    this.getBatchStatusPolling(mart, batch, {
-                        interval,
-                        maxRetries,
-                        currentRetry: currentRetry + 1,
-                    })
-                );
+                return timeout(interval).flatMap(() => this.getBatchStatusPolling(mart, batch, interval));
             });
     }
+}
+
+/* Definitions of the app's pipelines, which LOAD_PIPELINE_V2 registers or updates in the mart. */
+const appPipelines: ReadonlyArray<XMartAPIPipelineDefinition> = [
+    { CODE: PipelineCodes.loadPipeline, TITLE: "[xMART2DHIS] Load pipeline from file", XML: LoadPipeline },
+    { CODE: PipelineCodes.loadData, TITLE: "[xMART2DHIS] Load data from file", XML: LoadData },
+    { CODE: PipelineCodes.loadModel, TITLE: "[xMART2DHIS] Load model from file", XML: LoadModel },
+];
+
+/* xMART's answers when LOAD_PIPELINE_V2 is not in the mart ("does not exists" in older xMART versions). */
+function toCheckConnectionError(message: string): CheckConnectionError {
+    const martNeedsSetup =
+        message.startsWith(`Origin code '${PipelineCodes.loadPipeline}' does not exist`) ||
+        message === "Sequence contains no elements";
+
+    return martNeedsSetup ? { type: "martNeedsSetup" } : { type: "failed", message };
+}
+
+/* xMART reports a finished batch as COMPLETED; only a SUCCESS result means the load was done. */
+function checkBatchSucceeded(status: XMartAPICompletedBatchStatus): FutureData<number> {
+    if (status.ProcessResultCode !== "SUCCESS") {
+        return Future.error(
+            i18n.t("xMART batch {{batchId}} finished with {{result}}: {{title}}", {
+                nsSeparator: false,
+                batchId: status.BatchID,
+                result: status.ProcessResultCode,
+                title: status.ProcessResultTitle,
+            })
+        );
+    }
+
+    return Future.success(status.BatchID);
 }
 
 function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
     if (!params) return undefined;
     return _.map(params, (value, key) => `$${key}=${value}`).join("&");
+}
+
+function toFormData(file: PipelineFile): FormData {
+    const formData = new FormData();
+    formData.append("file", new Blob([file.content], { type: "application/json" }), file.name);
+    return formData;
 }
 
 function compactObject<Obj extends object>(object: Obj) {
@@ -235,7 +296,7 @@ function futureFetch<Data>(
     method: "get" | "post",
     path: string,
     options: {
-        body?: string;
+        body?: string | FormData;
         textResponse?: boolean;
         params?: Record<string, string | number | boolean>;
         bearer?: string;
@@ -254,7 +315,8 @@ function futureFetch<Data>(
             signal: controller.signal as unknown as AbortSignal,
             method,
             headers: {
-                "Content-Type": "application/json",
+                // With FormData, the browser sets multipart/form-data and its boundary
+                ...(body instanceof FormData ? {} : { "Content-Type": "application/json" }),
                 "x-requested-with": "XMLHttpRequest",
                 Authorization: bearer ? `Bearer ${bearer}` : "",
             },
@@ -288,6 +350,12 @@ function futureFetch<Data>(
 
 type ODataResponse<Data> = { value: Data; [key: string]: any };
 
+/* A file sent to an xMART pipeline in the request that starts its run. */
+type PipelineFile = Readonly<{ name: string; content: string }>;
+
+/* A pipeline as LOAD_PIPELINE_V2 reads it from the uploaded file. */
+type XMartAPIPipelineDefinition = Readonly<{ CODE: string; TITLE: string; XML: string }>;
+
 type XMartAPIBatchStartResponse = { BatchID: number; Success?: boolean; ErrorMessage: string | null };
 
 type XMartAPIBatchStatusResponse = XMartAPIBatchStatusResponseStatus & {
@@ -318,6 +386,8 @@ type XMartAPIBatchStatusResponseStatus =
           ProcessStepCode: "COMPLETED";
           ProcessResultCode: "SYSTEM_ERROR" | "REJECTED" | "INVALID" | "SUCCESS" | "CANCELED" | "TIMEOUT_CANCELED";
       };
+
+type XMartAPICompletedBatchStatus = Extract<XMartAPIBatchStatusResponse, { ProcessStepCode: "COMPLETED" }>;
 
 function addCORSProxy(url: string): string {
     return url.replace(/^(.*?:\/\/)(.*)/, "$1dev.eyeseetea.com/cors/$2");

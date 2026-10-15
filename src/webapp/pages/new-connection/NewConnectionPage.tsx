@@ -74,16 +74,13 @@ export const NewConnectionPage: React.FC<NewConnectionPageProps> = ({ action }) 
                 loading.reset();
             },
             error => {
-                if (
-                    error === "Origin code 'LOAD_PIPELINE' does not exists" ||
-                    error === "Sequence contains no elements"
-                ) {
+                if (error.type === "martNeedsSetup") {
                     setOpenHelpDialogProps({
                         onCancel: () => setOpenHelpDialogProps(undefined),
                         mart: connection,
                     });
                 } else {
-                    snackbar.error(error);
+                    snackbar.error(error.message);
                 }
 
                 loading.reset();
